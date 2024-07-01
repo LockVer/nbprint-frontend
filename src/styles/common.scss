@@ -1,0 +1,64 @@
+@use "variables.scss" as *;
+
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      'base': $primary-color,
+    ),
+  ),
+);
+@use "element-plus/theme-chalk/src/index.scss" as *;
+@import "//at.alicdn.com/t/c/font_3857483_z72x8c1kd0s.css";
+
+
+body,html{
+    padding: 0;
+    margin: 0;
+}
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+.hide {
+  visibility: hidden;
+}
+.einput{
+    width: 100%;
+    margin-bottom: 20px;
+    height: 64px;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border: none;
+    font-size: 16px;
+    border-radius: 2px;
+}
+.ebutton{
+    width: 100%;
+    height: 64px;
+    background-color: #002299;
+    color: #fff;
+    font-size: 16px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    &:hover{
+        background-color: #001a80;
+    }
+}
+
+.el-steps--simple{
+  padding: 0;
+  background-color: white;
+  .el-step.is-simple .el-step__head{
+    display: none;
+  }
+}
+
+.loading{
+  color: white;
+  .el-loading-spinner .path{
+    stroke: white;
+  }
+  .el-loading-spinner .el-loading-text{
+    color: white;
+  }
+}

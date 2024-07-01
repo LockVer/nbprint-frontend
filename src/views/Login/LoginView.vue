@@ -1,0 +1,86 @@
+
+<template>
+    <div class="login-page">
+        <div class="cover">
+
+        </div>
+        <div class="login-box">
+            <div class="title">登录</div>
+            <input class="einput" v-model="username" type="text" placeholder="用户名">
+            <input class="einput" v-model="password" type="password" placeholder="密码">
+            <button class="ebutton" @click="login">登录</button>
+            <p>默认用户名为<b>姓名全拼</b></p>
+            <p>默认密码为姓<b>拼音+手机号</b></p>
+            <p>例如：章三 - zhangsan - zhang17666266366</p>
+        </div>
+    </div>
+</template>
+<script setup>
+import { ref } from 'vue';
+import UserService from '../../services/UserService';
+import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus'
+const userService = new UserService();
+const username = ref('');
+const password = ref('');
+const errorMsg = ref('');
+const router = useRouter();
+const login = () => {
+    if (username.value === '' || password.value === '') {
+        ElMessage.error('用户名或密码不能为空');
+        return;
+    }
+    userService.Login({
+        username: username.value,
+        password: password.value
+    }).then((res) => {
+        console.log(res);
+        localStorage.setItem('token', res.data.token);
+        router.push('/opencard/orderlist');
+    }).catch((err) => {
+        console.log(err);
+        ElMessage.error(err);
+    });
+
+}
+
+</script>
+<style lang="scss" scoped>
+.login-page {
+    display: flex;
+    height: 100vh;
+    .cover {
+        flex: 1;
+        background: url('../../assets/login-bg.png') no-repeat center center;
+        background-size: cover;
+    }
+    .login-box {
+        width: 400px;
+        padding: 30px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .title {
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .ebutton{
+            margin-bottom: 20px;
+        }
+        p{
+            padding: 0;
+            margin: 0;
+            margin-bottom: 5px;
+            color: #909090;
+            font-size: 14px;
+        }
+        .error-msg {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    }
+}   
+</style>
