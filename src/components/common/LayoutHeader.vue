@@ -7,16 +7,8 @@ export default defineComponent({
             title: "揭开卡",
             actions: [
                 {
-                    text: "综观",
+                    text: "订单管理",
                     isActive: true
-                },
-                {
-                    text: "工序",
-                },
-                {
-                    text: "创建订单",
-                }, {
-                    text: "印前工具",
                 }
             ]
         });

@@ -58,7 +58,7 @@
             </div>
         </div>
         <el-dialog v-model="revealDialogVisible" :destroy-on-close="true" title="添加揭开区" :close-on-click-modal="false"
-            :close-on-press-escape="false">
+            :close-on-press-escape="false" :fullscreen="true">
             <!-- 添加揭开区的内容 -->
             <RevealAreaEditor ref="RAEditor" :pre-areas="componentData[currentEditingIndex].revealAreas"
                 :background-image-url="backgroundImageUrl" />

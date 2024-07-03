@@ -22,8 +22,10 @@ const navList = reactive({
         <el-menu default-active="1" :router="true">
             <el-sub-menu index="1">
                 <template #title>
-                    <span class="iconfont icon-folder-fill t-icon"></span>
-                    <span>{{ navList.title }}</span>
+                    <div class="nav-title">
+                        <span class="iconfont icon-folder-fill t-icon"></span>
+                        <span>{{ navList.title }}</span>
+                    </div>
                 </template>
                 <el-menu-item :index="item.url" :key="item.id" v-for="item in navList.actions">
                     <div class="mitem">
@@ -42,7 +44,6 @@ const navList = reactive({
     height: 100%;
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
-
     .el-menu {
         border-right: none !important;
 

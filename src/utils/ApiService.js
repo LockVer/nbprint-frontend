@@ -1,13 +1,14 @@
 import axios from 'axios';
-import { ElLoading } from 'element-plus'
+import { ElLoading } from 'element-plus';
+import { useRouter } from 'vue-router';
 class ApiService {
   constructor(baseURL) {
     this.api = axios.create({
-      baseURL: baseURL || 'http://192.168.1.224:8084/', // 你的API基础URL
+      baseURL: baseURL || 'https://nbprint-backend-qqxiwhelwc.cn-shenzhen.fcapp.run', // 你的API基础URL
       timeout: 120000, // 请求超时时间
     });
-
-    
+    this.router=useRouter();
+    console.log(this.router)
     // 请求拦截器
     this.api.interceptors.request.use((config) => {
       if (config.requireAuth === false) return config;
@@ -29,7 +30,7 @@ class ApiService {
       // 对响应错误做点什么
       return Promise.reject(error);
     });
-    
+
   }
 
 
@@ -93,6 +94,10 @@ class ApiService {
             case 1:
               resolve(response.data);
               break;
+            case -1:
+              this.router.push('/login');
+              reject("请重新登录");
+              break;
             default:
               reject(response.data.msg);
               break;
@@ -124,6 +129,10 @@ class ApiService {
             case 1:
               resolve(response.data);
               break;
+            case -1:
+              this.router.push('/login');
+              reject("请重新登录");
+              break;
             default:
               reject(response.data.msg);
               break;
@@ -137,8 +146,6 @@ class ApiService {
       });
     })
   }
-
-  // 其他 HTTP 方法，如 put, delete 等
 }
 
 export default ApiService;

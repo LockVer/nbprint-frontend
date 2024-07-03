@@ -4,7 +4,7 @@
         <general v-model:initData="general"></general>
         <small-card v-model:initData="smallCard"></small-card>
         <ad-card v-model:initData="adCard"></ad-card>
-        <payout v-model:initData="payout" v-if="false" v-model:generalData="general"></payout>
+        <payout v-model:initData="payout" v-model:generalData="general"></payout>
         <prize-mark v-model:initData="prizeMark"></prize-mark>
         <layout-footer @submit="handleSubmit"></layout-footer>
     </div>
@@ -51,7 +51,12 @@ const smallCard = ref({
     boxCount: 1,
     quantityPerBox: 1,
     frontImage: '',
-    backImage: ''
+    backImage: '',
+    box: {
+        thickness: 1000,
+        height: 1000,
+        width: 2000
+    }
 });
 const adCard = ref([
     {
@@ -75,16 +80,16 @@ const payout = ref({
 })
 const prizeMark = ref([])
 onMounted(() => {
-    let data = localStorage.getItem('submitData');
-    if (data) {
-        let initData = JSON.parse(data);
-        console.log(initData);
-        general.value = initData.general;
-        smallCard.value = initData.smallCard;
-        adCard.value = initData.adCard;
-        payout.value = initData.payout;
-        prizeMark.value = initData.prizeMark;
-    }
+    // let data = localStorage.getItem('submitData');
+    // if (data) {
+    //     let initData = JSON.parse(data);
+    //     console.log(initData);
+    //     general.value = initData.general;
+    //     smallCard.value = initData.smallCard;
+    //     adCard.value = initData.adCard;
+    //     payout.value = initData.payout;
+    //     prizeMark.value = initData.prizeMark;
+    // }
 })
 const handleSubmit = () => {
     console.log(general.value);
@@ -365,7 +370,7 @@ const handleSubmit = () => {
         payout: payout.value,
         prizeMark: prizeMark.value
     }
-    localStorage.setItem('submitData', JSON.stringify(submitData));
+    //localStorage.setItem('submitData', JSON.stringify(submitData));
     serviceClass.CreateOrder(submitData).then(res => {
         console.log(res);
         ElMessageBox.alert(res.msg, '提交结果', {

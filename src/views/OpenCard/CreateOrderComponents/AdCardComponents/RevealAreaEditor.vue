@@ -1,4 +1,7 @@
 <template>
+    <div class="auto-action">
+        <el-button @click="clearArea" type="danger" plain>清空</el-button>
+    </div>
     <div class="reveal-area-editor" ref="editorRef" @contextmenu.prevent="handleContextMenu($event)">
         <canvas ref="canvasRef" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp"
             @mouseleave="handleMouseLeave"></canvas>
@@ -9,9 +12,7 @@
             <li @click="deleteArea">删除</li>
         </ul>
     </div>
-    <div class="auto-action">
-        <el-button @click="clearArea" type="danger" plain>清空</el-button>
-    </div>
+    
 </template>
 
 <script setup>
@@ -147,7 +148,181 @@ const drawCanvas = async () => {
             ctx.fillRect(line.x * scale, line.y * scale, line.width, line.height);
         });
     }
+    // 如果有活动区域，画线和距离
+    if (activeArea.value) {
+        drawDistanceLines(ctx, activeArea.value);
+    }
 };
+const drawDistanceLines = (ctx, area) => {
+    ctx.strokeStyle = 'blue';
+    ctx.fillStyle = 'blue';
+    ctx.font = '12px Arial';
+    ctx.lineWidth = 1;
+
+    const paddingX = 5;
+    const paddingY = 3;
+
+    const dpi = 96; //每英寸像素数
+    const pxToMm = (px) => px * 25.4 / dpi;
+
+    const edges = [
+        { side: 'top', x1: area.x * scale + area.width * scale / 2, y1: area.y * scale, x2: area.x * scale + area.width * scale / 2, y2: 0 },
+        { side: 'bottom', x1: area.x * scale + area.width * scale / 2, y1: (area.y + area.height) * scale, x2: area.x * scale + area.width * scale / 2, y2: canvasRef.value.height },
+        { side: 'left', x1: area.x * scale, y1: area.y * scale + area.height * scale / 2, x2: 0, y2: area.y * scale + area.height * scale / 2 },
+        { side: 'right', x1: (area.x + area.width) * scale, y1: area.y * scale + area.height * scale / 2, x2: canvasRef.value.width, y2: area.y * scale + area.height * scale / 2 }
+    ];
+
+    edges.forEach(edge => {
+        let closestIntersection = null;
+        let closestDistance = Infinity;
+        let closestOtherArea = null;
+
+        //遍历所有区域，找到和当前边最近的交点
+        revealAreas.value.forEach(otherArea => {
+            if (otherArea !== area) {
+                const intersections = getIntersections(edge, otherArea);
+                intersections.forEach(intersection => {
+                    const distance = getDistance(edge.x1, edge.y1, intersection.x, intersection.y);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestIntersection = intersection;
+                        closestOtherArea = otherArea;
+                    }
+                });
+            }
+        });
+
+        //如果找到了最近的交点，画线到交点，否则画到边的另一端
+        ctx.beginPath();
+        ctx.moveTo(edge.x1, edge.y1);
+        if (closestIntersection) {
+            ctx.lineTo(closestIntersection.x, closestIntersection.y);
+            edge.label = `${pxToMm(closestDistance / scale).toFixed(2)} mm`;
+        } else {
+            ctx.lineTo(edge.x2, edge.y2);
+            const distance = edge.side === 'top' || edge.side === 'bottom' ? Math.abs(edge.y1 - edge.y2) : Math.abs(edge.x1 - edge.x2);
+            edge.label = `${pxToMm(distance / scale).toFixed(2)} mm`;
+        }
+        ctx.stroke();
+
+        //计算文本宽度和高度
+        const textWidth = ctx.measureText(edge.label).width;
+        const textHeight = 12;
+
+        //计算文本位置
+        const textX = (edge.x1 + (closestIntersection ? closestIntersection.x : edge.x2)) / 2 - textWidth / 2 - paddingX;
+        const textY = (edge.y1 + (closestIntersection ? closestIntersection.y : edge.y2)) / 2 - textHeight / 2 - paddingY;
+
+        //画文本背景
+        ctx.fillStyle = 'white';
+        ctx.fillRect(textX, textY, textWidth + 2 * paddingX, textHeight + 2 * paddingY);
+
+        //画文本边框
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(textX, textY, textWidth + 2 * paddingX, textHeight + 2 * paddingY);
+
+        //画文本
+        ctx.fillStyle = 'black';
+        ctx.fillText(edge.label, textX + paddingX, textY + textHeight + paddingY / 2);
+    });
+};
+
+//获取线段和矩形的交点
+const getIntersections = (line, rect) => {
+    const intersections = [];
+    const rectLines = [
+        { x1: rect.x * scale, y1: rect.y * scale, x2: (rect.x + rect.width) * scale, y2: rect.y * scale }, // Top
+        { x1: rect.x * scale, y1: (rect.y + rect.height) * scale, x2: (rect.x + rect.width) * scale, y2: (rect.y + rect.height) * scale }, // Bottom
+        { x1: rect.x * scale, y1: rect.y * scale, x2: rect.x * scale, y2: (rect.y + rect.height) * scale }, // Left
+        { x1: (rect.x + rect.width) * scale, y1: rect.y * scale, x2: (rect.x + rect.width) * scale, y2: (rect.y + rect.height) * scale } // Right
+    ];
+
+    rectLines.forEach(rectLine => {
+        const intersection = getLineIntersection(line, rectLine);
+        if (intersection) {
+            intersections.push(intersection);
+        }
+    });
+
+    return intersections;
+};
+
+//获取两条线段的交点
+const getLineIntersection = (line1, line2) => {
+    const { x1: x1, y1: y1, x2: x2, y2: y2 } = line1;
+    const { x1: x3, y1: y3, x2: x4, y2: y4 } = line2;
+
+    const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    if (denom === 0) return null; // 平行
+
+    const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+    const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
+
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+        return {
+            x: x1 + t * (x2 - x1),
+            y: y1 + t * (y2 - y1)
+        };
+    }
+
+    return null;
+};
+
+//获取两点之间的距离
+const getDistance = (x1, y1, x2, y2) => {
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+};
+
+
+
+const checkAlignLine = () => {
+    //检查当前区域的x是否靠近数组中其他区域的x，如果是，则吸附到该区域的x，并赋值对齐线的数据给alignLine
+    alignLine.value = [];
+    //吸附像素
+    const snapPixel = 20;
+    revealAreas.value.forEach(area => {
+        if(area === activeArea.value) return;
+        //计算出当前区域靠哪个边最近，左右边为一组，上下边为一组，避免同时靠近左右边和上下边时，拉扯的情况
+        const left = Math.abs(activeArea.value.x - area.x);
+        const right = Math.abs(activeArea.value.x + activeArea.value.width - area.x - area.width);
+        const top = Math.abs(activeArea.value.y - area.y);
+        const bottom = Math.abs(activeArea.value.y + activeArea.value.height - area.y - area.height);
+
+        if (left < snapPixel || right < snapPixel) {
+            //吸附的新x坐标，如果矩形更靠近左边，则吸附到左边，否则吸附到右边
+            if (left < right) {
+                activeArea.value.x = area.x;
+                alignLine.value.push({ x: area.x, y: 0, width: 1, height: canvasRef.value.height });
+                if (activeArea.value.width == area.width) {
+                    alignLine.value.push({ x: area.x + area.width, y: 0, width: 1, height: canvasRef.value.height });
+                }
+            } else {
+                activeArea.value.x = area.x + area.width - activeArea.value.width;
+                alignLine.value.push({ x: area.x + area.width, y: 0, width: 1, height: canvasRef.value.height });
+                if (activeArea.value.width == area.width) {
+                    alignLine.value.push({ x: area.x, y: 0, width: 1, height: canvasRef.value.height });
+                }
+            }
+        }
+        if (top < snapPixel || bottom < snapPixel) {
+            //吸附的新y坐标，如果矩形更靠近上边，则吸附到上边，否则吸附到下边
+            if (top < bottom) {
+                activeArea.value.y = area.y;
+                alignLine.value.push({ x: 0, y: area.y, width: canvasRef.value.width, height: 1 });
+                if (activeArea.value.height == area.height) {
+                    alignLine.value.push({ x: 0, y: area.y + area.height, width: canvasRef.value.width, height: 1 });
+                }
+            } else {
+                activeArea.value.y = area.y + area.height - activeArea.value.height;
+                alignLine.value.push({ x: 0, y: area.y + area.height, width: canvasRef.value.width, height: 1 });
+                if (activeArea.value.height == area.height) {
+                    alignLine.value.push({ x: 0, y: area.y, width: canvasRef.value.width, height: 1 });
+                }
+            }
+        }
+        console.log(alignLine.value)
+    });
+}
 
 onMounted(() => {
     drawCanvas();
@@ -227,53 +402,6 @@ const handleMouseMove = (event) => {
     }
 };
 
-const checkAlignLine = () => {
-    //检查当前区域的x是否靠近数组中其他区域的x，如果是，则吸附到该区域的x，并赋值对齐线的数据给alignLine
-    alignLine.value = [];
-    //吸附像素
-    const snapPixel = 20;
-    revealAreas.value.forEach(area => {
-        //计算出当前区域靠哪个边最近，左右边为一组，上下边为一组，避免同时靠近左右边和上下边时，拉扯的情况
-        const left = Math.abs(activeArea.value.x - area.x);
-        const right = Math.abs(activeArea.value.x + activeArea.value.width - area.x - area.width);
-        const top = Math.abs(activeArea.value.y - area.y);
-        const bottom = Math.abs(activeArea.value.y + activeArea.value.height - area.y - area.height);
-
-        if (area != activeArea.value && (left < snapPixel || right < snapPixel)) {
-            //吸附的新x坐标，如果矩形更靠近左边，则吸附到左边，否则吸附到右边
-            if (left < right) {
-                activeArea.value.x = area.x;
-                alignLine.value.push({ x: area.x, y: 0, width: 1, height: canvasRef.value.height });
-                if (activeArea.value.width == area.width) {
-                    alignLine.value.push({ x: area.x + area.width, y: 0, width: 1, height: canvasRef.value.height });
-                }
-            } else {
-                activeArea.value.x = area.x + area.width - activeArea.value.width;
-                alignLine.value.push({ x: area.x + area.width, y: 0, width: 1, height: canvasRef.value.height });
-                if (activeArea.value.width == area.width) {
-                    alignLine.value.push({ x: area.x, y: 0, width: 1, height: canvasRef.value.height });
-                }
-            }
-        }
-        if (area != activeArea.value && (top < snapPixel || bottom < snapPixel)) {
-            //吸附的新y坐标，如果矩形更靠近上边，则吸附到上边，否则吸附到下边
-            if (top < bottom) {
-                activeArea.value.y = area.y;
-                alignLine.value.push({ x: 0, y: area.y, width: canvasRef.value.width, height: 1 });
-                if (activeArea.value.height == area.height) {
-                    alignLine.value.push({ x: 0, y: area.y + area.height, width: canvasRef.value.width, height: 1 });
-                }
-            } else {
-                activeArea.value.y = area.y + area.height - activeArea.value.height;
-                alignLine.value.push({ x: 0, y: area.y + area.height, width: canvasRef.value.width, height: 1 });
-                if (activeArea.value.height == area.height) {
-                    alignLine.value.push({ x: 0, y: area.y, width: canvasRef.value.width, height: 1 });
-                }
-            }
-        }
-        console.log(alignLine.value)
-    });
-}
 
 const resizeArea = (x, y) => {
     switch (resizeDirection.value) {
@@ -306,30 +434,6 @@ const resizeArea = (x, y) => {
             resizeFromBottom(y);
             break;
     }
-    // //检查当前区域的x是否靠近数组中其他区域的x，如果是，则吸附到该区域的x，并赋值对齐线的数据给alignLine
-    // alignLine.value= null;
-    // revealAreas.value.forEach(area => {
-    //     //判断是否靠近左边
-    //     if (area !== activeArea.value && Math.abs(activeArea.value.x - area.x) < 10) {
-    //         activeArea.value.x = area.x;
-    //         alignLine.value = { x: area.x, y: 0, width: 1, height: canvasRef.value.height };
-    //     }
-    //     //判断是否靠近右边
-    //     if (area !== activeArea.value && Math.abs(activeArea.value.x + activeArea.value.width - area.x - area.width) < 10) {
-    //         activeArea.value.x = area.x + area.width - activeArea.value.width;
-    //         alignLine.value = { x: area.x + area.width, y: 0, width: 1, height: canvasRef.value.height };
-    //     }
-    //     //判断是否靠近上边
-    //     if (area !== activeArea.value && Math.abs(activeArea.value.y - area.y) < 10) {
-    //         activeArea.value.y = area.y;
-    //         alignLine.value = { x: 0, y: area.y, width: canvasRef.value.width, height: 1 };
-    //     }
-    //     //判断是否靠近下边
-    //     if (area !== activeArea.value && Math.abs(activeArea.value.y + activeArea.value.height - area.y - area.height) < 10) {
-    //         activeArea.value.y = area.y + area.height - activeArea.value.height;
-    //         alignLine.value = { x: 0, y: area.y + area.height, width: canvasRef.value.width, height: 1 };
-    //     }
-    // });
 };
 
 const resizeFromTop = (y) => {
@@ -434,13 +538,12 @@ const handleMouseUp = () => {
     activeArea.value = null;
     canvasRef.value.style.cursor = 'default';
     alignLine.value = null;
-    drawCanvas(); // 重新绘制画布以更新显示
+    drawCanvas();
 };
 
 const handleMouseLeave = () => {
     // 同样在鼠标离开时进行过滤
     revealAreas.value = revealAreas.value.filter(area => area.width > 15 && area.height > 15);
-
     dragging.value = false;
     resizing.value = false;
     activeArea.value = null;
@@ -462,13 +565,13 @@ defineExpose({
 .reveal-area-editor {
     background: black;
     flex: 1;
-    height: 600px;
     overflow: auto;
     display: flex;
     justify-content: space-between;
     position: relative;
     border-radius: 4px;
-
+    cursor: not-allowed;
+    height: calc(100vh - 60px - 40px - 16px - 16px - 48px);
 }
 
 .reveal-area-editor canvas {
@@ -481,7 +584,7 @@ defineExpose({
 .auto-action {
     width: 100%;
     height: 50px;
-    margin-top: 10px;
+    margin-bottom: 10px;
     background-color: rgba(0, 0, 0, 0.05);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
