@@ -22,11 +22,13 @@ const route = useRoute();
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@import url('./assets/icon/iconfont.css');
 .page {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  
   .content {
     display: flex;
     flex: 1;

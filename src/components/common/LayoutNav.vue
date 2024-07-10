@@ -5,7 +5,7 @@ const navList = reactive({
     title: "工序",
     actions: [
         {
-            text: "订单列表",
+            text: "订单管理",
             id: 1,
             url: "/opencard/orderlist"
         },

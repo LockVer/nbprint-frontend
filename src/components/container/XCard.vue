@@ -19,6 +19,12 @@ export default defineComponent({
                 return {}
             }
         },
+        headerStyle: {
+            type: Object,
+            default: () => {
+                return {}
+            }
+        }
     },
     setup() {
 
@@ -30,7 +36,7 @@ export default defineComponent({
 </script>
 <template>
     <div class="card-container" :style="cardStyle">
-        <div class="card-header" v-if="title">
+        <div class="card-header" v-if="title" :style="headerStyle">
             <div class="card-title" :style="titleStyle">{{ title }}</div>
         </div>
         <div class="card-content">

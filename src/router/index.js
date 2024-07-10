@@ -20,6 +20,11 @@ const routes = [
     path: '/opencard/orderlist',
     name: 'orderlist',
     component: ()=> import('../views/OpenCard/OrderListView.vue')
+  },
+  {
+    path: '/opencard/orderlist/detail/:id',
+    name: 'detail',
+    component: ()=> import('../views/OpenCard/Detail/detail.vue')
   }
 ]
 
@@ -35,7 +40,7 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
-  next()
+  // next()
 })
 
 export default router
