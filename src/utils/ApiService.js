@@ -4,7 +4,8 @@ import { useRouter } from 'vue-router';
 class ApiService {
   constructor(baseURL) {
     this.api = axios.create({
-      baseURL: baseURL || 'https://nbprint-backend-qqxiwhelwc.cn-shenzhen.fcapp.run', // 你的API基础URL
+      //baseURL: baseURL || 'https://nbprint-backend-qqxiwhelwc.cn-shenzhen.fcapp.run', // 你的API基础URL
+      baseURL: baseURL || 'http://192.168.1.224:8084', // 你的API基础URL
       timeout: 120000, // 请求超时时间
     });
     this.router=useRouter();

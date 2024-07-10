@@ -12,12 +12,13 @@
     </div>
 </template>
 <script setup>
-import { ref, watch, inject } from 'vue';
+import { ref, watch, inject, reactive,defineEmits  } from 'vue';
 
 import { ElMessage } from 'element-plus';
 
-
+const emit = defineEmits(['changeImage']);
 const image = defineModel("image");
+const imageSize = defineModel("size");
 // 注入 commonClass 实例
 const commonClass = inject('commonClass');
 console.log(image.value);
@@ -31,12 +32,26 @@ const handleFileChange = (event) => {
     const files = event.target.files;
     if (files && files.length > 0) {
         const file = files[0];
-
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    imageSize.value = {
+                        width: img.width,
+                        height: img.height
+                    };
+                    console.log(imageSize);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
         commonClass.uploadImages(file).then((res) => {
             componentData.imageSelected = true;
             componentData.imageName = res.data;
             image.value = res.data;
-            console.log(image.value);
+            emit('changeImage');
         }).catch((err) => {
             console.log(err);
             ElMessage.error(err);

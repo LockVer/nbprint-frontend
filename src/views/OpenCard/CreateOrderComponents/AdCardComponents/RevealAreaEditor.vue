@@ -12,7 +12,7 @@
             <li @click="deleteArea">删除</li>
         </ul>
     </div>
-    
+
 </template>
 
 <script setup>
@@ -21,8 +21,29 @@ import { cloneDeep } from 'lodash';
 import { ElMessageBox } from 'element-plus';
 const props = defineProps({
     backgroundImageUrl: String,
-    preAreas: Array
+    preAreas: Array,
+    adCardSize: Array,
+    imageSize: Object
 });
+let adCardWidth = 0;
+let adCardHeight = 0;
+const imageWidth = props.imageSize.width;
+const imageHeight = props.imageSize.height;
+
+console.log(props.adCardSize)
+// 根据图片的宽高和广告卡片的宽高比例，计算广告卡片的宽高
+if (imageWidth > imageHeight) {
+    adCardWidth = Math.max(...(props.adCardSize));
+    adCardHeight = Math.min(...(props.adCardSize));
+} else {
+    adCardWidth = Math.min(...(props.adCardSize));
+    adCardHeight = Math.max(...(props.adCardSize));
+}
+//1mm等于多少像素
+const mmToPx = (mm) => mm * imageWidth / adCardWidth;
+const pxToMm = (px) => px * adCardWidth / imageWidth;
+console.log(mmToPx(1));
+console.log(pxToMm(1));
 
 const canvasRef = ref(null);
 const editorRef = ref(null);
@@ -162,8 +183,7 @@ const drawDistanceLines = (ctx, area) => {
     const paddingX = 5;
     const paddingY = 3;
 
-    const dpi = 96; //每英寸像素数
-    const pxToMm = (px) => px * 25.4 / dpi;
+
 
     const edges = [
         { side: 'top', x1: area.x * scale + area.width * scale / 2, y1: area.y * scale, x2: area.x * scale + area.width * scale / 2, y2: 0 },
@@ -230,13 +250,14 @@ const drawDistanceLines = (ctx, area) => {
 //获取线段和矩形的交点
 const getIntersections = (line, rect) => {
     const intersections = [];
+    //矩形的四条边
     const rectLines = [
         { x1: rect.x * scale, y1: rect.y * scale, x2: (rect.x + rect.width) * scale, y2: rect.y * scale }, // Top
         { x1: rect.x * scale, y1: (rect.y + rect.height) * scale, x2: (rect.x + rect.width) * scale, y2: (rect.y + rect.height) * scale }, // Bottom
         { x1: rect.x * scale, y1: rect.y * scale, x2: rect.x * scale, y2: (rect.y + rect.height) * scale }, // Left
         { x1: (rect.x + rect.width) * scale, y1: rect.y * scale, x2: (rect.x + rect.width) * scale, y2: (rect.y + rect.height) * scale } // Right
     ];
-
+    //遍历矩形的四条边，找到和线段相交的边
     rectLines.forEach(rectLine => {
         const intersection = getLineIntersection(line, rectLine);
         if (intersection) {
@@ -252,12 +273,15 @@ const getLineIntersection = (line1, line2) => {
     const { x1: x1, y1: y1, x2: x2, y2: y2 } = line1;
     const { x1: x3, y1: y3, x2: x4, y2: y4 } = line2;
 
+    // 两条线段的斜率
     const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
     if (denom === 0) return null; // 平行
 
+    // 交点的坐标
     const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
     const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
 
+    // 如果交点在两条线段上，则返回交点坐标
     if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
         return {
             x: x1 + t * (x2 - x1),
@@ -281,7 +305,7 @@ const checkAlignLine = () => {
     //吸附像素
     const snapPixel = 20;
     revealAreas.value.forEach(area => {
-        if(area === activeArea.value) return;
+        if (area === activeArea.value) return;
         //计算出当前区域靠哪个边最近，左右边为一组，上下边为一组，避免同时靠近左右边和上下边时，拉扯的情况
         const left = Math.abs(activeArea.value.x - area.x);
         const right = Math.abs(activeArea.value.x + activeArea.value.width - area.x - area.width);
@@ -324,16 +348,9 @@ const checkAlignLine = () => {
     });
 }
 
-onMounted(() => {
-    drawCanvas();
-});
 
-watch(() => props.backgroundImageUrl, (newVal) => {
-    console.log('watch')
-    if (canvasRef.value && editorRef.value) {
-        drawCanvas();
-    }
-}, { immediate: true });
+
+
 
 const handleMouseDown = (event) => {
     const rect = canvasRef.value.getBoundingClientRect();
@@ -390,6 +407,7 @@ const handleMouseMove = (event) => {
     const y = (event.clientY - rect.top) / scale;
 
     if (dragging.value) {
+        console.log(pxToMm(activeArea.value.width), pxToMm(activeArea.value.height))
         activeArea.value.x = Math.max(0, Math.min(canvasRef.value.width / scale - activeArea.value.width, x - offsetX.value));
         activeArea.value.y = Math.max(0, Math.min(canvasRef.value.height / scale - activeArea.value.height, y - offsetY.value));
         checkAlignLine();
@@ -555,6 +573,19 @@ const getAreas = () => {
     // 返回当前的揭开区域数组，并根据区域的x,y进行排序后返回副本,先按y排序，再按x排序
     return cloneDeep(revealAreas.value).sort((a, b) => a.y - b.y || a.x - b.x);
 };
+
+
+watch(() => props.backgroundImageUrl, (newVal) => {
+    console.log('watch')
+    if (canvasRef.value && editorRef.value) {
+        drawCanvas();
+    }
+}, { immediate: true });
+
+onMounted(() => {
+    drawCanvas();
+});
+
 defineExpose({
     drawCanvas,
     getAreas

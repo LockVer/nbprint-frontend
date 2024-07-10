@@ -3,7 +3,7 @@
 
         <general v-model:initData="general"></general>
         <small-card v-model:initData="smallCard"></small-card>
-        <ad-card v-model:initData="adCard"></ad-card>
+        <ad-card v-model:initData="adCard" v-model:smallCard="smallCard"></ad-card>
         <payout v-model:initData="payout" v-model:generalData="general"></payout>
         <prize-mark v-model:initData="prizeMark"></prize-mark>
         <layout-footer @submit="handleSubmit"></layout-footer>
@@ -53,9 +53,9 @@ const smallCard = ref({
     frontImage: '',
     backImage: '',
     box: {
-        thickness: 1000,
-        height: 1000,
-        width: 2000
+        thickness: 0,
+        height: 0,
+        width: 0
     }
 });
 const adCard = ref([

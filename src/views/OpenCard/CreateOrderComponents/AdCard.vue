@@ -1,12 +1,18 @@
 <template>
     <x-card title="宣传卡信息">
-        <x-component label="宣传卡数量" padding="0 0 18px 0">
-            <el-input-number v-model="adCardQty" :min="1" :max="10" />
-        </x-component>
+        <div class="ad-card-header">
+            <x-component label="宣传卡数量" padding="0 0 18px 0">
+                <el-input-number v-model="adCardQty" :min="1" :max="10" />
+            </x-component>
+
+        </div>
         <div class="ad-card-list" v-for="(item, index) in componentData" :key="index">
+
             <x-component :label="'宣传卡' + (index + 1) + '有无揭开口'" padding="0 0 10px 0">
                 <x-check-box :DataList="isOpenable" v-model="item.type" type="radio"></x-check-box>
             </x-component>
+
+
             <div class="ad-card-info">
                 <div class="row">
                     <x-component label="背景图" width="220px">
@@ -21,10 +27,14 @@
 </el-input>
 <input type="file" :ref="setFileInputRef(index)" @change="(event) => handleFileChange(index, event)"
     style="display: none" /> -->
-                        <x-input-upload v-model:image="item.imageName"></x-input-upload>
+                        <x-input-upload v-model:size="item.imageSize" v-model:image="item.imageName"
+                            @changeImage="changeImage(item)"></x-input-upload>
                     </x-component>
                     <x-component label="是否有揭开区" width="220px">
                         <el-input placeholder="" disabled :model-value="item.type == 'openable' ? '是' : '否'" />
+                    </x-component>
+                    <x-component label="宣传卡尺寸(mm)" width="220px">
+                        <el-input :value="item.adCardSize" disabled></el-input>
                     </x-component>
                     <x-component label="揭开区" width="220px" :hide="item.type != 'openable'">
                         <el-button class="xbutton" type="primary" :disabled="!(item.imageName)"
@@ -60,8 +70,10 @@
         <el-dialog v-model="revealDialogVisible" :destroy-on-close="true" title="添加揭开区" :close-on-click-modal="false"
             :close-on-press-escape="false" :fullscreen="true">
             <!-- 添加揭开区的内容 -->
-            <RevealAreaEditor ref="RAEditor" :pre-areas="componentData[currentEditingIndex].revealAreas"
-                :background-image-url="backgroundImageUrl" />
+            <RevealAreaEditor ref="RAEditor" :ad-card-size="adCardSize"
+                :pre-areas="componentData[currentEditingIndex].revealAreas"
+                :background-image-url="backgroundImageUrl"
+                :image-size="backgroundImageSize" />
             <template #footer>
                 <el-button @click="closeRevealArea">取消</el-button>
                 <el-button type="primary" @click="confirmRevealArea">确定</el-button>
@@ -92,10 +104,11 @@ import RevealAreaEditor from './AdCardComponents/RevealAreaEditor.vue';
 import PrizeAreaEditor from './AdCardComponents/PrizeAreaEditor.vue';
 import XInputUpload from '../../../components/functional/XInputUpload.vue';
 import { ElMessage } from 'element-plus'
-import _ from 'lodash';
+import _, { max } from 'lodash';
 
 
 const initData = defineModel("initData");
+const smallCard = defineModel("smallCard");
 
 console.log("adcard", initData.value)
 
@@ -103,10 +116,11 @@ const RAEditor = ref(null);
 const PAEditor = ref(null);
 const adCardQty = ref(1);
 const backgroundImageUrl = ref('');
+const backgroundImageSize = ref(null);
+const adCardSize = ref(null);
 const revealDialogVisible = ref(false);
 const prizeDialogVisible = ref(false);
 const currentEditingIndex = ref(-1);
-const fileInputRefs = ref({});
 
 const isOpenable = [
     { text: '有', value: 'openable' },
@@ -146,25 +160,104 @@ const populateComponentData = () => {
         return {
             type: item.type,
             imageSelected: item.image ? true : false,
-            imageName: item.image,
             imageFile: new File([], ''),
+            imageName: item.image,
+            imageSize: item.imageSize,
             revealAreas: RAs,
             prizeAreas: PAs,
+            adCardSize: item.adCardSize
         };
     });
     console.log('componentData', componentData.value)
 };
+
+const changeImage = (item) => {
+    item.adCardSize = findMaxRectBWithRatio(smallCard.value.box, item.imageSize);
+}
+
+const findMaxRectBWithRatio = (rectA, image) => {
+    /**
+     * 根据矩形A的尺寸、矩形B的尺寸限制和图片的原始宽高比，找出矩形B的最大可能尺寸，
+     * 同时保持图片的原始比例不变。
+     *
+     * 参数:
+     * rectA (Array): 矩形A的尺寸，格式为[width, height]。
+     * sizeLimits (Array): 矩形B的最大尺寸限制，格式为[maxShortSide, maxLongSide]。
+     * originalRatio (Number): 图片的原始宽高比。
+     *
+     * 返回:
+     * Array: 矩形B的最大可能尺寸，格式为[width, height]。
+     */
+    console.log('findMaxRectBWithRatio', rectA, image)
+    if (!image || !rectA)
+        return false;
+    if (!image.width || !image.height) {
+        return false;
+    }
+    if (!rectA.width || !rectA.height || !rectA.thickness) {
+        return false;
+    }
+    const sizeLimits = [456, 310]; //刀模最大限制480x310，纸张最大限制470x325，渲染器最大限制456x320，这里取最小值
+    // 将三个数放入数组
+    let numbers = [rectA.width, rectA.height, rectA.thickness];
+
+    // 对数组进行排序，从大到小
+    numbers.sort(function (x, y) {
+        return y - x;
+    });
+    rectA = [numbers[0], numbers[1]]
+
+    // 确定短边和长边
+    let shortSide, longSide;
+    if (image.width > image.height) {
+        shortSide = image.height;
+        longSide = image.width;
+    } else {
+        shortSide = image.width;
+        longSide = image.height;
+    }
+
+    // 计算短边/长边的比例
+    const originalRatio = shortSide / longSide;
+    // 确保rectA的宽度总是小于等于高度
+    rectA.sort((a, b) => a - b);
+
+    // 初始化矩形B的最大可能尺寸为尺寸限制
+    let maxRectB = [...sizeLimits].sort((a, b) => a - b);
+
+    // 调整尺寸以保持原始比例
+    maxRectB[0] = Math.min(maxRectB[0], maxRectB[1] * originalRatio);
+    maxRectB[1] = Math.min(maxRectB[1], maxRectB[0] / originalRatio);
+
+    // 检查在保持比例的情况下，尺寸是否仍然适合矩形A
+    if (maxRectB[0] > rectA[0] || maxRectB[1] > rectA[1]) {
+        // 如果不适合，根据矩形A的尺寸重新调整尺寸
+        maxRectB[0] = Math.min(rectA[0], maxRectB[1] * originalRatio);
+        maxRectB[1] = Math.min(rectA[1], maxRectB[0] / originalRatio);
+    }
+    //尺寸向下取整
+    maxRectB = maxRectB.map((size) => Math.floor(size));
+    console.log('maxRectB', maxRectB)
+    return maxRectB;
+}
+
 onMounted(() => {
     populateComponentData();
+
 });
 
 watch(initData, (newVal, oldVal) => {
-    console.log('initData', newVal,oldVal)
-    if(JSON.stringify(newVal) !== JSON.stringify(oldVal)){
+    console.log('initData', newVal, oldVal)
+    if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
         populateComponentData();
     }
 });
-
+watch(smallCard, (newVal, oldVal) => {
+    console.log(componentData.value)
+    componentData.value.forEach((item) => {
+        item.adCardSize = findMaxRectBWithRatio(smallCard.value.box, item.imageSize);
+    });
+}, { deep: true });
 watch(adCardQty, (newVal, oldVal) => {
     const difference = newVal - oldVal;
     if (difference > 0) {
@@ -173,8 +266,9 @@ watch(adCardQty, (newVal, oldVal) => {
             componentData.value.push({
                 type: 'non-openable',
                 imageSelected: false,
-                imageName: '',
+                imageName: 0,
                 imageFile: new File([], ''),
+                imageSize: "",
                 revealAreas: [],
                 prizeAreas: []
             });
@@ -185,9 +279,8 @@ watch(adCardQty, (newVal, oldVal) => {
     }
 });
 
-watch(componentData, async (newVal) => {
+watch(componentData, async (newVal, oldVal) => {
     //将数据还原成initData的格式
-
     console.log('componentData', newVal)
     let pageInitData = newVal.map((item) => {
         let openReigion = item.revealAreas.map((region) => ({
@@ -210,7 +303,9 @@ watch(componentData, async (newVal) => {
         return {
             type: item.type,
             name: 'Ad Card',
+            adCardSize: item.adCardSize,
             image: item.imageName,
+            imageSize: item.imageSize,
             comment: item.comment,
             openReigion: openReigion,
         };
@@ -236,66 +331,13 @@ const getPrizeAreaCount = (index) => {
 };
 
 
-
-
-
-const addComponent = () => {
-    for (let i = 0; i < adCardQty.value; i++) {
-        componentData.value.push({
-            type: 'non-openable',
-            imageSelected: false,
-            imageName: '',
-            imageFile: new File([], ''),
-            revealAreas: [],
-            prizeAreas: []
-        })
-    }
-}
-
-const setFileInputRef = (index) => (el) => {
-    if (el) {
-        fileInputRefs.value[index] = el;
-    }
-};
-
-const selectImage = (index) => {
-    currentEditingIndex.value = index;
-    console.log('selectImage', index)
-    fileInputRefs.value[index].click();
-}
-
-const handleFileChange = (index, event) => {
-    console.log('handleFileChange', index)
-    const fileInput = event.target;
-    if (fileInput.files && fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        if (index >= 0) {
-            componentData.value[index].imageSelected = true;
-            componentData.value[index].imageName = file.name;
-            componentData.value[index].imageFile = file;
-            componentData.value[index].revealAreas = [];
-            componentData.value[index].prizeAreas = [];
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                console.log('reader', reader.result)
-                backgroundImageUrl.value = reader.result;
-            };
-            reader.readAsDataURL(file);
-            // console.log(componentData.value)
-        }
-    }
-}
-
 const addRevealArea = (index) => {
     currentEditingIndex.value = index;
     revealDialogVisible.value = true;
     backgroundImageUrl.value = componentData.value[index].imageName;
-    // const reader = new FileReader();
-    // reader.onloadend = () => {
-    //     backgroundImageUrl.value = '';
-    //     backgroundImageUrl.value = reader.result;
-    // };
-    // reader.readAsDataURL(componentData.value[index].imageFile);
+    backgroundImageSize.value = componentData.value[index].imageSize;
+    adCardSize.value = componentData.value[index].adCardSize;
+    console.log("addRevealArea", backgroundImageSize, adCardSize)
 }
 
 const confirmRevealArea = async () => {
@@ -317,17 +359,6 @@ const addPrizeArea = (index) => {
     prizeDialogVisible.value = true;
     backgroundImageUrl.value = componentData.value[index].imageName;
 
-    // //使用正则判断imageName是否是网络图片
-    // const reg = /^http(s)?:\/\//;
-    // if (reg.test(componentData.value[index].imageName)) {
-    //     backgroundImageUrl.value = componentData.value[index].imageName;
-    // } else {
-    //     const reader = new FileReader();
-    //     reader.onloadend = () => {
-    //         backgroundImageUrl.value = reader.result;
-    //     };
-    //     reader.readAsDataURL(componentData.value[index].imageFile);
-    // }
 }
 
 const confirmPrizeArea = () => {
@@ -354,6 +385,12 @@ const closePrizeArea = () => {
     display: flex;
     flex-direction: column;
     margin-bottom: 18px;
+
+    .row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-gap: 10px;
+    }
 }
 
 .row {
@@ -376,5 +413,11 @@ const closePrizeArea = () => {
         margin-left: 20px;
         padding: 10px;
     }
+}
+
+.ad-card-header {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
 }
 </style>

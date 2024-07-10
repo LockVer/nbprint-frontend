@@ -9,27 +9,27 @@
         <x-component label="小卡单价" width="220px" padding="0 0 18px 0">
             <el-input v-model="initData.price" placeholder="请输入小卡单价" />
         </x-component>
+        <x-component label="刀模开口方向" padding="0 0 10px 0">
+            <x-check-box v-model="initData.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
+        </x-component>
+        <x-component label="盒号" padding="0 0 18px 0" width="220px">
+            <el-input v-model="initData.boxCode" />
+        </x-component>
+        <x-component label="盒号位置" padding="0 0 10px 0">
+            <x-check-box v-model="initData.boxCodePosition" :DataList="boxCodePositionList" type="radio"></x-check-box>
+        </x-component>
         <x-component label="盒数" padding="0 0 18px 0">
             <el-input-number v-model="initData.boxCount" :min="1" />
         </x-component>
         <x-component label="每盒数量" padding="0 0 18px 0">
-            <el-input-number v-model="initData.quantityPerBox" :min="1"/>
+            <el-input-number v-model="initData.quantityPerBox" :min="1" />
         </x-component>
         <div class="calcBox">
             <x-component label="列数" padding="0 0 18px 0" width="220px">
-                <el-input-number v-model="initData.columnCount" :min="1" />
+                <el-input-number :step="1" v-model="initData.columnCount" :min="1" />
             </x-component>
             <x-component label="每列数量" padding="0 0 18px 0" width="220px">
                 <el-input-number v-model="initData.columnQuantity" :min="1" />
-            </x-component>
-            <x-component label="盒子宽度(mm)" padding="0 0 18px 0" width="220px">
-                <el-input v-model="initData.box.thickness" disabled/>
-            </x-component>
-            <x-component label="盒子高度(mm)" padding="0 0 18px 0" width="220px">
-                <el-input v-model="initData.box.height" disabled/>
-            </x-component>
-            <x-component label="盒子长度(mm)" padding="0 0 18px 0" width="220px">
-                <el-input v-model="initData.box.width" disabled/>
             </x-component>
         </div>
         <div class="bg-img">
@@ -40,7 +40,6 @@
                 <x-image-upload v-model="initData.backImage"></x-image-upload>
             </x-component>
         </div>
-        <el-button type="primary" @click="calcRowCount">计算列数</el-button>
         <div class="canvas-container">
             <canvas ref="boxCanvas" width="500" height="500"></canvas>
         </div>
@@ -74,6 +73,19 @@ const cardOpenList = [
     { text: '5', value: 5 }
 ];
 
+const openDirectionList = [
+    { text: '上', value: 'T' },
+    { text: '下', value: 'B' },
+    { text: '左', value: 'L' },
+    { text: '右', value: 'R' }
+];
+
+const boxCodePositionList = [
+    { text: '下左', value: 'bottomleft' },
+    { text: '下中', value: 'bottomcenter' },
+    { text: '下右', value: 'bottomright' },
+];
+
 const calcRowCount = () => {
     const box = {
         width: 0,
@@ -94,6 +106,7 @@ const calcRowCount = () => {
         const height = initData.value.size.height;  //小卡高度
         const thickness = 0.67;                      //小卡厚度
         const quantityPerBox = initData.value.quantityPerBox;  //每盒数量
+        columnCount = columnCount;  //列数
         //在最高条件等级时，判断每列数量是否大于500，如果大于500不计算
         if (level == 0) {
             if (quantityPerBox / columnCount > 500) return;  //每列数量大于500不计算
@@ -119,23 +132,49 @@ const calcRowCount = () => {
             initData.value.box = box;
         }
     }
+    //首先看看是否能找到整数的每列数量
+    divisors.forEach((divisor) => {
+        if (box.width !== 0) return;
+        findBox(divisor, 9999);    //找到整数的每列数量为最高优先级，所以其他的条件全部无效
+    });
     //条件等级,0为最高，1为次高
     let level = 0;
     while (box.width == 0 && level < 2) {
-        //首先看看是否能找到整数的每列数量
-        divisors.forEach((divisor) => {
-            if (box.width !== 0) return;
-            findBox(divisor, level);
-        });
         if (box.width === 0) {
-            //首先计算出在多少列的情况下，长宽比最接近1，假如最小为1列，最大为10000列
-            for (let columnCount = 1; columnCount <= 20; columnCount++) {
+            //首先计算出在多少列的情况下，长宽比最接近1，假如最小为1列，最大为1000列
+            for (let columnCount = 1; columnCount <= 1000; columnCount++) {
                 findBox(columnCount, level);
                 if (box.width !== 0) break;
             }
         }
         level++;
     }
+}
+
+//手动计算尺寸
+const calcBoxSize = (columnCount, columnQuantity) => {
+    const width = initData.value.size.width;    //小卡宽度
+    const height = initData.value.size.height;  //小卡高度
+    const thickness = 0.67;                      //小卡厚度
+    if (!columnQuantity) {
+        columnQuantity = initData.value.quantityPerBox / columnCount;  
+    }
+    if (!columnCount) {
+        columnCount = initData.value.quantityPerBox / columnQuantity;
+    }
+    initData.value.columnQuantity = columnQuantity;
+    initData.value.columnCount = Math.ceil(columnCount);
+    const calcBox = {
+        width: width * columnCount,
+        height: height,
+        thickness: thickness * columnQuantity + 15//每列厚度,15为固定值（生产要求）
+    }
+    const box = {
+        width: Math.ceil(calcBox.width),
+        height: Math.ceil(calcBox.height),
+        thickness: Math.ceil(calcBox.thickness)
+    }
+    initData.value.box = box;
 }
 //计算最大公约数
 const findDivisors = (A) => {
@@ -147,82 +186,77 @@ const findDivisors = (A) => {
     }
     return divisors;
 }
-// Function to draw the 3D box on the canvas
-const draw3DBox = () => {
+
+
+// Function to draw 3D box
+const draw3DBox = (box) => {
     const canvas = boxCanvas.value;
-    if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    // Calculate the maximum scale that fits the box within the canvas
+    const maxWidthScale = canvasWidth / (box.width + box.thickness);
+    const maxHeightScale = canvasHeight / (box.height + box.thickness);
+    const maxDepthScale = canvasHeight / (box.height + box.thickness); // Depth is considered in height for perspective
 
-    // Clear previous drawing
+    // Use the smallest scale to ensure the box fits in both dimensions
+    const scale = Math.min(maxWidthScale, maxHeightScale, maxDepthScale) * 0.8; // Leave some margin
+    const x = canvas.width / 2;
+    const y = canvas.height / 2;
+    const w = box.width * scale;
+    const h = box.height * scale;
+    const d = box.thickness * scale * 0.5; //厚度
+
+    // 清除画布
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Get box dimensions
-    const { width, height, thickness } = initData.value.box;
-
-    // Calculate scale to fit the box in the canvas
-    const scale = Math.min(canvas.width / (width + thickness), canvas.height / (height + thickness));
-
-    // Scaled dimensions
-    const scaledWidth = width * scale;
-    const scaledHeight = height * scale;
-    const scaledThickness = thickness * scale;
-
-    // Coordinates for the front face
-    const frontTopLeft = { x: scaledThickness, y: scaledThickness };
-    const frontTopRight = { x: scaledThickness + scaledWidth, y: scaledThickness };
-    const frontBottomLeft = { x: scaledThickness, y: scaledThickness + scaledHeight };
-    const frontBottomRight = { x: scaledThickness + scaledWidth, y: scaledThickness + scaledHeight };
-
-    // Coordinates for the top face
-    const topTopLeft = { x: 0, y: 0 };
-    const topTopRight = { x: scaledWidth, y: 0 };
-    const topBottomLeft = { x: scaledThickness, y: scaledThickness };
-    const topBottomRight = { x: scaledThickness + scaledWidth, y: scaledThickness };
-
-    // Coordinates for the side face
-    const sideTopLeft = { x: scaledWidth, y: 0 };
-    const sideTopRight = { x: scaledWidth + scaledThickness, y: scaledThickness };
-    const sideBottomLeft = { x: scaledThickness + scaledWidth, y: scaledThickness };
-    const sideBottomRight = { x: scaledWidth + scaledThickness, y: scaledHeight + scaledThickness };
-
-    // Draw top face
+    //绘制底部
     ctx.beginPath();
-    ctx.moveTo(topTopLeft.x, topTopLeft.y);
-    ctx.lineTo(topTopRight.x, topTopRight.y);
-    ctx.lineTo(topBottomRight.x, topBottomRight.y);
-    ctx.lineTo(topBottomLeft.x, topBottomLeft.y);
+    ctx.moveTo(x - w / 2, y - h / 2);
+    ctx.lineTo(x + w / 2, y - h / 2);
+    ctx.lineTo(x + w / 2, y + h / 2);
+    ctx.lineTo(x - w / 2, y + h / 2);
     ctx.closePath();
     ctx.stroke();
 
-    // Draw front face
+    // 绘制上侧面
+    ctx.setLineDash([2, 2]);
     ctx.beginPath();
-    ctx.moveTo(frontTopLeft.x, frontTopLeft.y);
-    ctx.lineTo(frontTopRight.x, frontTopRight.y);
-    ctx.lineTo(frontBottomRight.x, frontBottomRight.y);
-    ctx.lineTo(frontBottomLeft.x, frontBottomLeft.y);
+    ctx.moveTo(x - w / 2 + d, y - h / 2 - d);
+    ctx.lineTo(x + w / 2 + d, y - h / 2 - d);
+    ctx.lineTo(x + w / 2 + d - h, y + h / 2 - d);
+    ctx.lineTo(x - w / 2 + d, y + h / 2 - d);
     ctx.closePath();
     ctx.stroke();
+    ctx.setLineDash([]);
 
-    // Draw side face
+    // 绘制左侧面
+    ctx.setLineDash([2, 2]);
     ctx.beginPath();
-    ctx.moveTo(sideTopLeft.x, sideTopLeft.y);
-    ctx.lineTo(sideTopRight.x, sideTopRight.y);
-    ctx.lineTo(sideBottomRight.x, sideBottomRight.y);
-    ctx.lineTo(sideBottomLeft.x, sideBottomLeft.y);
-    ctx.closePath();
+    ctx.moveTo(x - w / 2, y - h / 2);
+    ctx.lineTo(x - w / 2 + d, y - h / 2 - d);
+    ctx.moveTo(x - w / 2 + h, y + h / 2 - h);
+    ctx.lineTo(x - w / 2 + d, y + h / 2 - d);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 绘制右侧面
+
+    ctx.beginPath();
+    ctx.moveTo(x + w / 2, y - h / 2);
+    ctx.lineTo(x + w / 2 + d, y - h / 2 - d);
+    ctx.lineTo(x + w / 2 + d, y + h / 2 - d);
+    ctx.lineTo(x + w / 2, y + h / 2);
+    ctx.closePath(); 
     ctx.stroke();
 
-    // Draw dimensions
-    ctx.font = '16px Arial';
-    ctx.fillText(`${width}mm`, scaledThickness + scaledWidth / 2, scaledThickness / 2);
-    ctx.fillText(`${height}mm`, scaledThickness / 2, scaledThickness + scaledHeight / 2);
-    ctx.fillText(`${thickness}mm`, scaledThickness + scaledWidth / 2, scaledThickness + scaledHeight);
+    //绘制尺寸
+    ctx.font = '14px Arial';
+    ctx.fillText(`长: ${box.width}mm`, x, y + h);
+    ctx.fillText(`高: ${box.height}mm`, x + w / 2 + 10, y + h / 2);
+    ctx.fillText(`宽: ${box.thickness}mm`, x - w / 2 - d, y + h / 2 - d - 10);
 };
 
-
-// Watch for changes in box data and draw the box
 watch(() => initData.value.box, draw3DBox, { deep: true });
 
 watch(() => initData.value.size, (newVal) => {
@@ -231,6 +265,14 @@ watch(() => initData.value.size, (newVal) => {
 watch(() => initData.value.quantityPerBox, (newVal) => {
     calcRowCount();
 });
+
+watch(() => initData.value.columnCount, (newVal) => {
+    calcBoxSize(newVal, null);
+});
+watch(() => initData.value.columnQuantity, (newVal) => {
+    calcBoxSize(null, newVal);
+});
+
 </script>
 
 <style lang="scss" scoped>
@@ -241,14 +283,19 @@ watch(() => initData.value.quantityPerBox, (newVal) => {
 }
 
 .calcBox {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
 }
+
 .canvas-container {
     margin-top: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 999;
 }
 </style>

@@ -61,6 +61,8 @@ export default defineComponent({
         }
     }
 
-    .card-content {}
+    .card-content {
+        position: relative;
+    }
 }
 </style>
