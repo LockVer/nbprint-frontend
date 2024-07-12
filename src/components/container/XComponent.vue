@@ -15,6 +15,10 @@ export default defineComponent({
             type: String,
             default: "0px"
         },
+        marginBottom:{
+            type: String,
+            default: "0px"
+        },
         hide: {
             type: Boolean,
             default: false
@@ -26,6 +30,14 @@ export default defineComponent({
         isFullWidth: {
             type: Boolean,
             default: false
+        },
+        titleStyle: {
+            type: String,
+            default: ""
+        },
+        titleBottom: {
+            type: String,
+            default: '8px'
         }
     },
     setup() {
@@ -37,9 +49,9 @@ export default defineComponent({
 })
 </script>
 <template>
-    <div class="xcomponent-container" :class="{ 'hide': hide, 'full': isFullWidth }" :style="{ width: width, padding: padding }">
+    <div class="xcomponent-container" :class="{ 'hide': hide, 'full': isFullWidth }" :style="{ width: width, padding: padding,marginBottom:marginBottom }">
         <div class="xcomponent-header">
-            <div class="xcomponent-title" :style="{ 'font-weight': fontWeight }" :class="{'hide':!label}">{{ label||"无" }}</div>
+            <div class="xcomponent-title" :style="{ 'font-weight': fontWeight, 'color': titleStyle,'margin-bottom':titleBottom }" :class="{'hide':!label}">{{ label||"无" }}</div>
 
         </div>
         <div class="xcomponent-content">
@@ -63,7 +75,7 @@ export default defineComponent({
     .xcomponent-header {
         display: flex;
         align-items: center;
-        margin-bottom: 8px;
+        /* margin-bottom: 8px; */
         font-weight: bold;
 
         .xcomponent-title {

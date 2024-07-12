@@ -1,5 +1,5 @@
 <template>
-    <x-card title="订单管理">
+    <x-card title="工厂审核">
         <div class="general-content">
             <x-component label="名称">
                 <el-input v-model="searchForm.name" placeholder="请输入名称" />
@@ -38,8 +38,6 @@
             <el-table-column prop="customerName" label="客户名字" />
             <el-table-column prop="status" label="状态">
                 <template #default="scope">
-                    <!-- 渲染中（无下载按钮） -->
-                    <!-- 渲染失败（无下载按钮） -->
                     <el-tag :type="['primary', 'danger', 'warning', 'danger', 'success'][scope.row.status]">{{ ["渲染中",
                         "渲染失败", "待审核", "未通过",
                         "已通过"][scope.row.status] }}</el-tag>
@@ -56,18 +54,17 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column fixed="right" label="操作">
+            <el-table-column fixed="right" label="操作" width="80">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click.stop="editOrder(scope.row)">
-                        编辑
-                    </el-button>
-                    <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)">
-                        删除
-                    </el-button>
                     <el-link type="primary" :href="scope.row.pdfOss" v-if="scope.row.status == 1"
                         @click.stop="downloadFile(scope.row)">
                         下载
                     </el-link>
+                </template>
+            </el-table-column>
+            <el-table-column fixed="right" label="审核" width="100">
+                <template #default="scope">
+                    <button class="btn">审核</button>
                 </template>
             </el-table-column>
         </el-table>
@@ -112,9 +109,9 @@ watch(searchForm, (newVal) => {
 const rowClick = (row) => {
     // console.log(row);
     // 跳转到详情页面
-    localStorage.setItem('orderDetails', JSON.stringify(row));
-    router.push(`/opencard/orderlist/detail/${row.id}`);
-};
+    localStorage.setItem('auditDetails', JSON.stringify(row));
+    router.push(`/factory/detail/${row.id}`);
+}
 
 const loadData = () => {
     serviceClass.GetList({
@@ -180,10 +177,11 @@ const downloadFile = (row) => {
 .el-button+.el-button {
     margin-left: 12px;
     margin-right: 12px;
+    color: #4D64B8;
 }
 
 a {
-    color: #029;
+    color: #4D64B8;
     font-family: "Helvetica Neue";
     font-size: 12px;
 }
@@ -206,5 +204,14 @@ a {
 
 :deep(.el-select__wrapper) {
     padding: 4px 8px;
+}
+
+.btn {
+    padding: 5px 16px;
+    text-align: center;
+    color: white;
+    border-radius: 4px;
+    background: rgba(0, 34, 153, 0.70);
+    border: 0px solid transparent;
 }
 </style>

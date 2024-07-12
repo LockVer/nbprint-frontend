@@ -1,3 +1,11 @@
+<template>
+    <div class="xradio-list">
+        <div class="xradio-item" v-for="(item, index) in localDataList" :key="index"
+            :style="{ width: width, height: height }" :class="{ 'checked': item.checked }" @click="selectItem(item)">
+            <span>{{ item.text }}</span>
+        </div>
+    </div>
+</template>
 <script lang="ts">
 import { defineComponent, onMounted, ref, watch } from 'vue';
 
@@ -36,12 +44,14 @@ export default defineComponent({
 
         onMounted(() => {
             localDataList.value = localDataList.value.map(item => {
+                // console.log(props)
                 return { ...item, checked: isEqual(item.value, props.modelValue) };
             });
         });
 
         watch(() => props.modelValue, (newVal) => {
             localDataList.value = localDataList.value.map((item) => {
+                // console.log(newVal)
                 return { ...item, checked: isEqual(item.value, newVal) };
             });
         });
@@ -81,15 +91,6 @@ export default defineComponent({
     }
 });
 </script>
-
-<template>
-    <div class="xradio-list">
-        <div class="xradio-item" v-for="(item, index) in localDataList" :key="index"
-            :style="{ width: width, height: height }" :class="{ 'checked': item.checked }" @click="selectItem(item)">
-            <span>{{ item.text }}</span>
-        </div>
-    </div>
-</template>
 
 <style scoped lang="scss">
 @import '../../styles/variables.scss';

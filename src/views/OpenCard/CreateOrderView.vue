@@ -5,7 +5,7 @@
         <small-card v-model:initData="smallCard"></small-card>
         <ad-card v-model:initData="adCard" v-model:smallCard="smallCard"></ad-card>
         <payout v-model:initData="payout" v-model:generalData="general"></payout>
-        <prize-mark v-model:initData="prizeMark"></prize-mark>
+        <prize-mark v-model:initData="prizeMark" class="prize-mark"></prize-mark>
         <layout-footer @submit="handleSubmit"></layout-footer>
     </div>
 </template>
@@ -387,6 +387,9 @@ const handleSubmit = () => {
 }
 </script>
 <style lang="scss" scoped>
+.prize-mark{
+    margin-bottom: 90px
+}
 @import '../../styles/variables.scss';
 
 .create-order {

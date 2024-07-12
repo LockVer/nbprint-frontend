@@ -62,6 +62,7 @@ export default defineComponent({
         margin-bottom: 18px;
 
         .card-title {
+            color: rgba(0, 0, 0, 0.80);
             font-size: 24px;
             font-weight: bold;
         }
