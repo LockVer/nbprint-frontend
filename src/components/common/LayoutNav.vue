@@ -1,6 +1,6 @@
 <template>
     <div class="layout-nav">
-        <el-menu :default-active="menuActive" router>
+        <el-menu :default-active="menuActive" router @select="handleSelect">
             <el-sub-menu index="1">
                 <template #title>
                     <div class="nav-title">
@@ -20,8 +20,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import FactoryService from '@/services/FactoryService';
+const serviceClass = new FactoryService();
 
 const navList = reactive({
     title: "工序",
@@ -29,16 +31,16 @@ const navList = reactive({
         {
             text: "订单管理",
             id: '1',
-            url: "/opencard/orderlist"
+            url: "/opencard"
         },
-        {
-            text: "创建订单",
-            id: '2',
-            url: "/opencard/createorder"
-        },
+        // {
+        //     text: "创建订单",
+        //     id: '2',
+        //     url: "/opencard/createorder"
+        // },
         {
             text: "工厂审核",
-            id: '3',
+            id: '2',
             url: "/factory"
         }
     ]
@@ -47,12 +49,36 @@ const navList = reactive({
 const route = useRoute();
 const menuActive = ref('');
 
-// 监听路由变化，更新menuActive
+// 初始化menuActive
+const updateMenuActive = (path) => {
+    let activePath = path.split('/')[1];
+    menuActive.value = `/${activePath}`;
+    if (menuActive.value == '/') {
+        menuActive.value = '/opencard'
+    }
+};
+
 watch(route, (newRoute) => {
-    let path = newRoute.path.split('/')[1];
-    menuActive.value = `/${path}`;
+    updateMenuActive(newRoute.path);
 }, { immediate: true });
+
+onMounted(() => {
+    updateMenuActive(route.path);
+});
+
+const handleSelect = () => {
+    if (route.name == "auditDetails") {
+        if (route.params.id) {
+            serviceClass.CheckUnlock(route.params.id).then((res) => {
+                console.log(res)
+            }).catch((err) => {
+                console.log(err)
+            })
+        }
+    }
+}
 </script>
+
 <style scoped lang="scss">
 .layout-nav {
     width: 100%;

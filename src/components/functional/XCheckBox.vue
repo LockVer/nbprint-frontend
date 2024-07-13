@@ -44,14 +44,12 @@ export default defineComponent({
 
         onMounted(() => {
             localDataList.value = localDataList.value.map(item => {
-                // console.log(props)
                 return { ...item, checked: isEqual(item.value, props.modelValue) };
             });
         });
 
         watch(() => props.modelValue, (newVal) => {
             localDataList.value = localDataList.value.map((item) => {
-                // console.log(newVal)
                 return { ...item, checked: isEqual(item.value, newVal) };
             });
         });
@@ -64,6 +62,7 @@ export default defineComponent({
         };
 
         const selectItem = (item: DataItem) => {
+            // console.log(item);
             switch (props.type) {
                 case "radio":
                     localDataList.value = localDataList.value.map((i) => {

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, reactive } from 'vue';
+import { ElMessage } from 'element-plus';
 export default defineComponent({
     name: "LayoutHeader",
     setup() {
@@ -7,8 +8,20 @@ export default defineComponent({
             title: "揭开卡",
             actions: [
                 {
-                    text: "订单管理",
+                    text: "综观",
+                    isActive: false
+                },
+                {
+                    text: "工序",
                     isActive: true
+                },
+                {
+                    text: "创建订单",
+                    isActive: false
+                },
+                {
+                    text: "印前工具",
+                    isActive: false
                 }
             ]
         });
@@ -18,10 +31,20 @@ export default defineComponent({
                 action.isActive = i === index;
             });
         }
+        const goOutHandler = () => {
+            ElMessage({
+                type: 'success',
+                message: '退出成功',
+            });
+            localStorage.clear(),
+            window.location.reload();
+        }
         return {
             headerData,
-            handleClick
+            handleClick,
+            goOutHandler
         }
+
     }
 })
 </script>
@@ -46,7 +69,7 @@ export default defineComponent({
                     <el-dropdown-item @click="console.log(111)">帮助文档</el-dropdown-item>
                     <el-dropdown-item @click="console.log(222)">意见反馈</el-dropdown-item>
                     <el-dropdown-item>个人设置</el-dropdown-item>
-                    <el-dropdown-item>登出</el-dropdown-item>
+                    <el-dropdown-item @click="goOutHandler">登出</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>

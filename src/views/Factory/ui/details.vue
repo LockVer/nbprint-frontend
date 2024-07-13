@@ -1,93 +1,48 @@
 <template>
-    <x-card v-for="(item, index) in audit" :key="index" :title="item.title" :cardStyle="{ 'height': 'auto' }">
+    <x-card v-for="(item, index) in audits" :key="index" :title="item.title" :cardStyle="{ 'height': 'auto' }">
         <div class="generalInfo">
-            <x-component  v-for="(value, index) in item.items" :key="index" :label="value.label" :titleStyle="'#484848'" :width="'15%'">
-                <div class="value">Happy-Friday</div>
+            <x-component v-for="(value, index) in item.items" :key="index" :label="value.label" :titleStyle="'#484848'"
+                :width="'15%'">
+                <div class="value">{{ value.datas }}</div>
             </x-component>
         </div>
     </x-card>
-    <x-card :title="'审核内容'" :cardStyle="{ 'height': 'auto' }" class="audit">
-        <div class="audit-card">
-            <div class="audit-title">基本审核项</div>
+    <x-card v-for="(item, index) in auditCordData" :key="index" :title="item.title" :cardStyle="{ 'height': 'auto' }"
+        class="audit">
+        <div class="audit-card" v-for="(value, index) in item.items" :key="index">
+            <div class="audit-title">
+                <span>{{ value.adTitle }}</span>
+            </div>
             <div class="audit-content">
                 <div class="generalInfo">
-                    <x-component label="产品信息" :width="'15%'" :titleStyle="'#484848'" :titleBottom="'12px'"
-                        :marginBottom="'16px'">
-                        <x-check-box v-model="initData.type" :DataList="cardSizeList" type="radio"></x-check-box>
-                    </x-component>
-                    <x-component label="装盒参数" :width="'15%'" :titleStyle="'#484848'" :titleBottom="'12px'"
-                        :marginBottom="'16px'">
-                        <x-check-box v-model="initData.type" :DataList="cardSizeList" type="radio"></x-check-box>
-                    </x-component>
-                    <x-component label="产品名称" :width="'15%'" :titleStyle="'#484848'" :titleBottom="'12px'"
-                        :marginBottom="'16px'">
-                        <x-check-box v-model="initData.type" :DataList="cardSizeList" type="radio"></x-check-box>
-                    </x-component>
-                    <x-component label="产品名称" :width="'15%'" :titleStyle="'#484848'" :titleBottom="'12px'"
-                        :marginBottom="'16px'">
-                        <x-check-box v-model="initData.type" :DataList="cardSizeList" type="radio"></x-check-box>
-                    </x-component>
-                    <x-component label="产品名称" :width="'15%'" :titleStyle="'#484848'" :titleBottom="'12px'"
-                        :marginBottom="'16px'">
-                        <x-check-box v-model="initData.type" :DataList="cardSizeList" type="radio"></x-check-box>
+                    <x-component v-for="(adItem, adIndex) in value.adItem" :key="adIndex" :label="adItem.label"
+                        :width="'15%'" :titleStyle="'#484848'" :titleBottom="'12px'" :marginBottom="'16px'">
+                        <x-check-box v-model="adItem.selectedValue" :DataList="cardSizeList" type="radio"
+                            @update:modelValue="handleExceptionChange(adItem, value.adTitle)" />
+                        <div v-if="adItem.errorMessage" class="error-message">{{ adItem.errorMessage }}</div>
                     </x-component>
                 </div>
             </div>
         </div>
-        <div class="audit-card">
+        <div v-if="hasException" class="audit-card">
             <div class="audit-title">修改意见</div>
             <div class="exception">
                 <div class="exception-title">异常项</div>
                 <div class="items">
-                    <el-tag color="#0022991A">装盒参数</el-tag>
-                    <el-tag color="#0022991A">装盒参数</el-tag>
+                    <el-tag v-for="(label, index) in exceptionLabels" :key="index" color="#0022991A">{{ label
+                        }}</el-tag>
                 </div>
             </div>
             <div class="remark">
                 <div class="remark-title">异常描述（必填）</div>
                 <div class="items">
-                    <el-input v-model="textarea1" style="width: 100%" autosize type="textarea"
-                        placeholder="备注" />
+                    <el-input v-model="textarea1" style="width: 100%" autosize type="textarea" placeholder="备注" />
+                    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
                 </div>
             </div>
         </div>
-        <div class="audit-card">
-            <div class="audit-title">修改意见</div>
-            <div class="exception">
-                <div class="exception-title">异常项</div>
-                <div class="items">
-                    <el-tag color="#0022991A">装盒参数</el-tag>
-                    <el-tag color="#0022991A">装盒参数</el-tag>
-                </div>
-            </div>
-            <div class="remark">
-                <div class="remark-title">异常描述（必填）</div>
-                <div class="items">
-                    <el-input v-model="textarea1" style="width: 100%" autosize type="textarea"
-                        placeholder="备注" />
-                </div>
-            </div>
-        </div>
-        <div class="audit-card">
-            <div class="audit-title">修改意见</div>
-            <div class="exception">
-                <div class="exception-title">异常项</div>
-                <div class="items">
-                    <el-tag color="#0022991A">装盒参数</el-tag>
-                    <el-tag color="#0022991A">装盒参数</el-tag>
-                </div>
-            </div>
-            <div class="remark">
-                <div class="remark-title">异常描述（必填）</div>
-                <div class="items">
-                    <el-input v-model="textarea1" style="width: 100%" autosize type="textarea"
-                        placeholder="备注" />
-                </div>
-            </div>
-        </div>
-        
     </x-card>
-    <layout-footer @submit="handleSubmit" @back="router.go(-1)"></layout-footer>
+    <layout-footer @submit="handleSubmit" @back="backHandler"></layout-footer>
 </template>
 
 <script setup>
@@ -96,26 +51,164 @@ import XComponent from '@/components/container/XComponent.vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
 import LayoutFooter from '@/components/common/LayoutFooter.vue';
 import audit from '@/config/audit';
-import { reactive,ref } from 'vue';
-import { useRouter } from 'vue-router';
+import auditCord from '@/config/auditCord';
+import { reactive, ref, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import FactoryService from '@/services/FactoryService';
 
 const router = useRouter()
+const route = useRoute()
 const textarea1 = ref('')
-const initData = reactive({
-    type: "1"
-})
-const cardSizeList = [
+const cardSizeList = reactive([
     { text: '正常', value: "1" },
     { text: '异常', value: "0" }
-]
+])
+const audits = reactive([...audit]);
+const auditCordData = reactive([...auditCord]);
+const hasException = ref(false);
+const exceptionLabels = ref([]);
+const errorMessage = ref('');
+const serviceClass = new FactoryService();
+
+watch(() => textarea1.value, (newVal) => {
+    if (newVal) {
+        errorMessage.value = '';
+    }
+})
+
+onMounted(() => {
+    let resdata = JSON.parse(localStorage.getItem('orderDetails'))
+    console.log(resdata)
+    audits.forEach((item) => {
+        item.items.forEach((value) => {
+            if (resdata[value.name]) {
+                value.datas = resdata[value.name]
+            }
+        })
+    })
+})
+
+const handleExceptionChange = (adItem, adTitle) => {
+    if (adItem.selectedValue === "0") {
+        if (!exceptionLabels.value.includes(adItem.label)) {
+            exceptionLabels.value.push(adItem.label);
+        }
+        hasException.value = true;
+    } else {
+        const index = exceptionLabels.value.indexOf(adItem.label);
+        if (index !== -1) {
+            exceptionLabels.value.splice(index, 1);
+        }
+        hasException.value = exceptionLabels.value.length > 0;
+    }
+};
 
 const handleSubmit = () => {
-    console.log(initData);
+    let isComplete = true;
+
+    auditCordData.forEach((card) => {
+        card.items.forEach((item) => {
+            item.adItem.forEach((adItem) => {
+                if (!adItem.selectedValue) {
+                    adItem.errorMessage = `${adItem.label} 为必填项`;
+                    isComplete = false;
+                } else {
+                    adItem.errorMessage = '';
+                }
+            });
+        });
+    });
+
+    if (!isComplete) {
+        ElMessage.error('请检查必填项');
+        return;
+    }
+
+    if (hasException.value && !textarea1.value) {
+        ElMessage.error('请填写异常描述');
+        errorMessage.value = `请填写异常描述`;
+        return;
+    }
+
+    // 如果所有选项都已选择，继续提交
+    postDatas();
+};
+
+const postDatas = () => {
+    let data = []
+    auditCordData.forEach((card) => {
+        card.items.forEach((item) => {
+            item.adItem.forEach((adItem) => {
+                data.push(adItem)
+            })
+        })
+    })
+    data = {
+        id: route.params.id,
+        ...data,
+        change: {
+            exceptionLabels: exceptionLabels.value,
+            remark: textarea1.value
+        }
+    }
+    console.log(data)
+}
+
+const backHandler = () => {
+    serviceClass.CheckUnlock(route.params.id).then((res) => {
+        console.log(res)
+        router.go(-1)
+    }).catch((err) => {
+        console.log(err)
+    })
 }
 
 </script>
 
+<style>
+.audit-card {
+    margin-bottom: 20px;
+}
+
+.audit-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.exception,
+.remark {
+    margin-top: 20px;
+}
+
+.exception-title,
+.remark-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.error-message {
+    color: red;
+    margin-top: 5px;
+}
+</style>
+
+
+
+
 <style lang="scss" scoped>
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
 .generalInfo {
     display: flex;
     column-gap: 30px;
@@ -128,7 +221,8 @@ const handleSubmit = () => {
         font-size: 12px;
     }
 }
-.audit{
+
+.audit {
     margin-bottom: 90px;
 }
 

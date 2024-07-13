@@ -38,13 +38,16 @@
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%">
-            <el-table-column prop="chineseName" label="名字" />
+            <el-table-column prop="productName" label="名字">
+                <template #default="scope">
+                    <div>{{ scope.row.productName }}（{{ scope.row.chineseName }}）</div>
+                </template>
+            </el-table-column>
             <el-table-column prop="customerName" label="客户名字" />
             <el-table-column prop="status" label="状态">
                 <template #default="scope">
-                    <el-tag :type="['primary', 'danger', 'warning', 'danger', 'success'][scope.row.status]">{{ ["渲染中",
-                        "渲染失败", "待审核", "未通过",
-                        "已通过"][scope.row.status] }}</el-tag>
+                    <el-tag :type="['warning', 'warning', 'success', 'danger'][scope.row.checkStatus]">{{ ["待审核",
+                        "待审核", "已通过", "未通过"][scope.row.checkStatus] }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="total" label="数量" />
@@ -68,7 +71,10 @@
             </el-table-column>
             <el-table-column fixed="right" label="审核" width="100">
                 <template #default="scope">
-                    <button class="btn" @click="checkOrder(scope.row)">审核</button>
+                    <button class="btn" :disabled="scope.row.checkStatus == 2 || scope.row.checkStatus == 3"
+                        :class="{ 'btn-disabled': scope.row.checkStatus == 2 || scope.row.checkStatus == 3 }"
+                        @click="checkOrder(scope.row)">{{ ["审核",
+                            "审核", "已审核", "已审核"][scope.row.checkStatus] }}</button>
                 </template>
             </el-table-column>
         </el-table>
@@ -81,14 +87,17 @@
 </template>
 
 <script setup>
-import { onMounted, ref, reactive, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { onMounted,onBeforeMount, ref, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import XCard from '../../components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
 import OpenCardService from '../../services/OpenCardService';
 import XComponent from '../../components/container/XComponent.vue';
 import searchService from '../../services/searchService';
+import FactoryService from '../../services/FactoryService';
+
+
 const router = useRouter();
 const tableData = ref([]);
 const totalPage = ref(0);
@@ -96,6 +105,7 @@ const errorMessage = ref('');
 const options = ref('');
 const serviceClass = new OpenCardService();
 const searchServiceClass = new searchService();
+const factoryServiceClass = new FactoryService();
 const searchForm = reactive({
     chineseName: '',
     customerName: '',
@@ -107,7 +117,12 @@ const searchForm = reactive({
 });
 
 const currentPage = ref(1);
-const pageSize = ref(5);
+const pageSize = ref(12);
+
+onBeforeMount(() => {
+  console.log('Component before mount');
+});
+
 
 watch(searchForm, (newVal) => {
     if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {
@@ -139,8 +154,12 @@ watch(searchForm, (newVal) => {
 });
 
 const checkOrder = (row) => {
-    console.log(row);
-    router.push(`/factory/detail/${row.id}`);
+    factoryServiceClass.CheckLock(row.id).then(res => {
+        localStorage.setItem('orderDetails', JSON.stringify(res.data));
+        router.push(`/factory/detail/${row.id}`);
+    }).catch(err => {
+        ElMessage.error(err);
+    })
 }
 
 
@@ -152,7 +171,7 @@ const loadData = (data) => {
     if (data) {
         params = Object.assign(params, data);
     }
-    serviceClass.GetList(params).then((res) => {
+    factoryServiceClass.GetFactoryList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
@@ -234,11 +253,19 @@ a {
 .btn {
     padding: 5px 16px;
     text-align: center;
+    cursor: pointer;
     color: white;
     border-radius: 4px;
     background: rgba(0, 34, 153, 0.70);
     border: 0px solid transparent;
 }
+
+.btn-disabled {
+    cursor: not-allowed;
+    background: white;
+    color: #ccc;
+}
+
 /* 数量 */
 .number-range-container {
     width: 200px;

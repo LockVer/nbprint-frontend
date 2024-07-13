@@ -79,7 +79,6 @@ class ApiService {
   }
   // API 调用方法
   get(url, params, requireAuth = true) {
-
     this.$loading.push(ElLoading.service({
       lock: true,
       text: '处理中...',
@@ -90,8 +89,6 @@ class ApiService {
     return new Promise((resolve, reject) => {
       this.api.get(url, { params, requireAuth }).then(response => {
         //EventBus.$emit('closeloading');
-        // console.log(response);
-        // console.log(this.$loading);
         this.$loading.forEach(item => {
           item.close();
         })

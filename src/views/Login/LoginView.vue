@@ -16,7 +16,7 @@
     </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted,onBeforeUnmount} from 'vue';
 import UserService from '../../services/UserService';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus'
@@ -25,6 +25,17 @@ const username = ref('');
 const password = ref('');
 const errorMsg = ref('');
 const router = useRouter();
+onMounted(() => {
+    window.addEventListener('keyup', handleKeyup);
+})
+onBeforeUnmount(() => {
+    window.removeEventListener('keyup', handleKeyup);
+})
+const handleKeyup = (event) => {
+    if (event.key === 'Enter') {
+        login();
+    }
+}
 const login = () => {
     if (username.value === '' || password.value === '') {
         ElMessage.error('用户名或密码不能为空');
@@ -36,12 +47,11 @@ const login = () => {
     }).then((res) => {
         console.log(res);
         localStorage.setItem('token', res.data.token);
-        router.push('/opencard/orderlist');
+        router.push('/opencard');
     }).catch((err) => {
         console.log(err);
         ElMessage.error(err);
     });
-
 }
 
 </script>

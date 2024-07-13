@@ -1,5 +1,5 @@
 <template>
-    <x-card title="订单管理">
+    <x-card title="订单管理" @createOrder="createOrderHandler">
         <div class="general-content">
             <x-component label="产品名称">
                 <el-input v-model="searchForm.productName" placeholder="请输入产品名称" />
@@ -32,13 +32,17 @@
                     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
                 </div>
             </x-component>
-            <x-component label="创建时间" >
+            <x-component label="创建时间">
                 <el-date-picker v-model="searchForm.createTime" type="daterange" start-placeholder="开始日期"
-                    end-placeholder="结束日期"  :default-value="[new Date(), new Date()]" />
+                    end-placeholder="结束日期" :default-value="[new Date(), new Date()]" />
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%" @row-click="rowClick">
-            <el-table-column prop="chineseName" label="产品名称" />
+            <el-table-column prop="productName" label="产品名称">
+                <template #default="scope">
+                    <div>{{ scope.row.productName }}（{{ scope.row.chineseName }}）</div>
+                </template>
+            </el-table-column>
             <el-table-column prop="customerName" label="客户名字" />
             <el-table-column prop="status" label="状态">
                 <template #default="scope">
@@ -94,7 +98,6 @@ import moment from 'moment';
 import OpenCardService from '../../services/OpenCardService';
 import searchService from '../../services/searchService';
 import XComponent from '../../components/container/XComponent.vue';
-// import NumSelect from '@/components/container/NumSelect.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -144,9 +147,12 @@ watch(searchForm, (newVal) => {
         newVal.endTime = formattedDates[1];
         delete newVal.createTime;
     }
-    // console.log(newVal);
     loadData(newVal);
 });
+
+const createOrderHandler = () => {
+    router.push(`/opencard/createorder`);
+}
 
 
 const rowClick = (row) => {
@@ -167,6 +173,7 @@ const loadData = (data) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
+        console.log(err);
         ElMessage.error(err);
     });
 };

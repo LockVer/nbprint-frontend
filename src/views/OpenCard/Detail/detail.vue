@@ -22,7 +22,7 @@
     </x-card>
     <x-card title="通用信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
         <div class="generalInfo">
-            <x-component label="产品名称" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+            <x-component  label="产品名称" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
                 <div class="value">Happy-Friday</div>
             </x-component>
             <x-component label="产品名称" :width="'15%'" :titleStyle="'#484848'">

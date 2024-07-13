@@ -379,7 +379,7 @@ const handleSubmit = () => {
             confirmButtonText: 'OK',
             callback: (action) => {
                 if (action === 'confirm') {
-                    useRouter().push('/opencard/orderlist');
+                    useRouter().push('/opencard');
                 }
             },
         })

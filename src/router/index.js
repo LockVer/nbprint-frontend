@@ -4,7 +4,7 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    redirect: '/opencard/createorder',
+    redirect: '/opencard',
     component: HomeView
   },
   {
@@ -18,7 +18,7 @@ const routes = [
     component: ()=> import('../views/OpenCard/CreateOrderView.vue')
   },
   {
-    path: '/opencard/orderlist',
+    path: '/opencard',
     name: 'orderlist',
     component: ()=> import('../views/OpenCard/OrderListView.vue')
   },
