@@ -68,7 +68,7 @@
             </el-table-column>
             <el-table-column fixed="right" label="审核" width="100">
                 <template #default="scope">
-                    <button class="btn" @click="checkOrder(scope.row)">审核</button>
+                    <button class="btn">审核</button>
                 </template>
             </el-table-column>
         </el-table>
@@ -138,11 +138,12 @@ watch(searchForm, (newVal) => {
     loadData(newVal);
 });
 
-const checkOrder = (row) => {
-    console.log(row);
-    router.push(`/factory/detail/${row.id}`);
-}
-
+// const rowClick = (row) => {
+//     // console.log(row);
+//     // 跳转到详情页面
+//     localStorage.setItem('auditDetails', JSON.stringify(row));
+//     router.push(`/factory/detail/${row.id}`);
+// }
 
 const loadData = (data) => {
     let params = {

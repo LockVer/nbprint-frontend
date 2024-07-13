@@ -10,6 +10,9 @@ class OpenCardService {
     GetList(data) {
         return this.apiService.post('/uncardOrder/getList', data, true);
     }
+    DeleteOrder(orderId) {
+        return this.apiService.post('/uncardOrder/delete?id='+orderId, true);
+    }
     DownloadPDF(orderId) {
         return this.apiService.downloadFile('/ossFile/downloadPdf?orderId='+orderId,false)
     }

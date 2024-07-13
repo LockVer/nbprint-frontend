@@ -1,23 +1,8 @@
 <template>
-    <x-card :title="'订单信息'" :cardStyle="{ 'height': 'auto' }">
+    <x-card v-for="(item, index) in audit" :key="index" :title="item.title" :cardStyle="{ 'height': 'auto' }">
         <div class="generalInfo">
-            <x-component label="产品名称" :titleStyle="'#484848'" :width="'15%'">
+            <x-component  v-for="(value, index) in item.items" :key="index" :label="value.label" :titleStyle="'#484848'" :width="'15%'">
                 <div class="value">Happy-Friday</div>
-            </x-component>
-            <x-component label="客户名称" :titleStyle="'#484848'" :width="'15%'">
-                <div class="value">Admin-Wang</div>
-            </x-component>
-            <x-component label="业务员" :titleStyle="'#484848'" :width="'15%'">
-                <div class="value">王红梅</div>
-            </x-component>
-            <x-component label="产品名称" :titleStyle="'#484848'" :width="'15%'">
-                <div class="value">Happy-Friday</div>
-            </x-component>
-            <x-component label="创建时间" :titleStyle="'#484848'" :width="'15%'">
-                <div class="value">2024-06-09 12:00:13</div>
-            </x-component>
-            <x-component label="审核人" :titleStyle="'#484848'" :width="'15%'">
-                <div class="value">王山山</div>
             </x-component>
         </div>
     </x-card>
@@ -110,6 +95,7 @@ import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
 import LayoutFooter from '@/components/common/LayoutFooter.vue';
+import audit from '@/config/audit';
 import { reactive,ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -132,8 +118,8 @@ const handleSubmit = () => {
 <style lang="scss" scoped>
 .generalInfo {
     display: flex;
-    /* column-gap: 30px; */
-    justify-content: space-between;
+    column-gap: 30px;
+    justify-content: flex-start;
     flex-wrap: wrap;
 
     .value {
