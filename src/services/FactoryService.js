@@ -15,6 +15,10 @@ class FactoryService {
     CheckUnlock(data) {
         return this.apiService.post(`/check/unlock?id=${data}`, {}, true);
     }
+    // 提交工厂审核
+    SubmitFactoryCheck(data) {
+        return this.apiService.post('/check/submit', data, true);
+    }
 }
 
 export default FactoryService;

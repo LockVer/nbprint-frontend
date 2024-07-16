@@ -33,8 +33,8 @@
                 </div>
             </x-component>
             <x-component label="创建时间">
-                <el-date-picker v-model="searchForm.createTime" type="daterange" start-placeholder="开始日期"
-                    end-placeholder="结束日期" :default-value="[new Date(), new Date()]" />
+                <el-date-picker v-model="createTime" type="daterange" start-placeholder="开始日期"
+                    end-placeholder="结束日期" :default-value="[new Date(), new Date()]" @change="changeHandler"  />
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%" @row-click="rowClick">
@@ -99,7 +99,6 @@ import OpenCardService from '../../services/OpenCardService';
 import searchService from '../../services/searchService';
 import XComponent from '../../components/container/XComponent.vue';
 
-const route = useRoute();
 const router = useRouter();
 const tableData = ref([]);
 const totalPage = ref(0);
@@ -112,11 +111,12 @@ const searchForm = reactive({
     customerName: '',
     businessPeople: '',
     smallCardSize: '',
-    createTime: '',
     minTotal: null,
     maxTotal: null,
 });
-
+const createTime = ref(null);
+const startTime = ref('');
+const endTime = ref('');
 
 const currentPage = ref(1);
 const pageSize = ref(20);
@@ -132,8 +132,15 @@ watch(searchForm, (newVal) => {
             delete newVal[key];
         }
     }
-    if (newVal.createTime) {
-        const formattedDates = newVal.createTime.map(date => {
+    searchHandler({
+        ...newVal,
+        startTime: startTime.value,
+        endTime: endTime.value
+    });
+});
+const changeHandler = (value) => {
+    if (value) {
+        const formattedDates = value.map(date => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
@@ -143,12 +150,29 @@ watch(searchForm, (newVal) => {
 
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         });
-        newVal.startTime = formattedDates[0];
-        newVal.endTime = formattedDates[1];
-        delete newVal.createTime;
+        startTime.value = formattedDates[0];
+        endTime.value = formattedDates[1];
+    } else {
+        startTime.value = '';
+        endTime.value = '';
     }
-    loadData(newVal);
-});
+    searchHandler({
+        ...searchForm,
+        startTime: startTime.value,
+        endTime: endTime.value
+    })
+}
+
+const searchHandler = (value) => {
+    for (const key in value) {
+        if (value[key] === '' || value[key] === null) {
+            delete value[key];
+        }
+    }
+    loadData(value)
+}
+
+
 
 const createOrderHandler = () => {
     router.push(`/opencard/createorder`);
@@ -169,7 +193,9 @@ const loadData = (data) => {
     if (data) {
         params = Object.assign(params, data);
     }
+    console.log(params);
     serviceClass.GetList(params).then((res) => {
+        console.log(res.data);
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {

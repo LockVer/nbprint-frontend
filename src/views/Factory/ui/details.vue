@@ -29,7 +29,7 @@
             <div class="exception">
                 <div class="exception-title">异常项</div>
                 <div class="items">
-                    <el-tag v-for="(label, index) in exceptionLabels" :key="index" color="#0022991A">{{ label
+                    <el-tag v-for="(items, index) in exceptionLabels" :key="index" color="#0022991A">{{ items.label
                         }}</el-tag>
                 </div>
             </div>
@@ -78,8 +78,7 @@ watch(() => textarea1.value, (newVal) => {
 })
 
 onMounted(() => {
-    let resdata = JSON.parse(localStorage.getItem('orderDetails'))
-    console.log(resdata)
+    let resdata = JSON.parse(localStorage.getItem('orderDetails'));
     audits.forEach((item) => {
         item.items.forEach((value) => {
             if (resdata[value.name]) {
@@ -87,21 +86,30 @@ onMounted(() => {
             }
         })
     })
+    // let exception = JSON.parse(sessionStorage.getItem('exceptionLabels'));
+    // if(exception){
+    //     exceptionLabels.value = exception;
+    //     hasException.value = exceptionLabels.value.length > 0;
+    // }
 })
 
-const handleExceptionChange = (adItem, adTitle) => {
+const handleExceptionChange = (adItem) => {
     if (adItem.selectedValue === "0") {
-        if (!exceptionLabels.value.includes(adItem.label)) {
-            exceptionLabels.value.push(adItem.label);
+        if (!exceptionLabels.value.some(item => item.label === adItem.label)) {
+            exceptionLabels.value.push({
+                label: adItem.label,
+                name: adItem.name
+            });
         }
         hasException.value = true;
     } else {
-        const index = exceptionLabels.value.indexOf(adItem.label);
+        const index = exceptionLabels.value.findIndex(item => item.label === adItem.label);
         if (index !== -1) {
             exceptionLabels.value.splice(index, 1);
         }
         hasException.value = exceptionLabels.value.length > 0;
     }
+    // sessionStorage.setItem('exceptionLabels', JSON.stringify(exceptionLabels.value));
 };
 
 const handleSubmit = () => {
@@ -136,23 +144,32 @@ const handleSubmit = () => {
 };
 
 const postDatas = () => {
-    let data = []
+    let data = {}
     auditCordData.forEach((card) => {
         card.items.forEach((item) => {
             item.adItem.forEach((adItem) => {
-                data.push(adItem)
+                data[adItem.name] = adItem.selectedValue
             })
         })
     })
     data = {
-        id: route.params.id,
+        id: Number(route.params.id),
         ...data,
-        change: {
-            exceptionLabels: exceptionLabels.value,
-            remark: textarea1.value
-        }
+        exceptionItem:  exceptionLabels.value.map(item => item.name).join(','),
+        remark: textarea1.value
     }
-    console.log(data)
+    // console.log(data)
+    serviceClass.SubmitFactoryCheck(data).then((res) => {
+        ElMessage({
+            type: 'success',
+            message: '提交成功',
+            onClose: () => {
+                router.go(-1)
+            }
+        })
+    }).catch((err) => {
+        console.log(err)
+    })
 }
 
 const backHandler = () => {

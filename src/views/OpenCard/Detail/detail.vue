@@ -19,6 +19,10 @@
                 <span>无</span>
             </div>
         </div>
+        <div class="auditPerson">
+            <div class="auditPerson-title">审核人</div>
+            <span>张萨捍</span>
+        </div>
     </x-card>
     <x-card title="通用信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
         <div class="generalInfo">
@@ -217,16 +221,16 @@ onMounted(() => {
 }
 
 .exception,
-.remark {
+.remark, .auditPerson {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 18px;
     font-family: "Helvetica Neue";
     font-size: 12px;
     font-weight: 700;
     color: var(--Grey-70, #484848);
+    margin-bottom: 18px;
 
     .items {
         display: flex;
@@ -240,9 +244,10 @@ onMounted(() => {
     }
 }
 
-.remark {
-    margin: 0px;
-
+.auditPerson{
+    margin-bottom: 0;
+}
+.remark,.auditPerson {
     span {
         font-weight: 400;
     }

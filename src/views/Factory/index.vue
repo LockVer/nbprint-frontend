@@ -33,8 +33,8 @@
                 </div>
             </x-component>
             <x-component label="创建时间">
-                <el-date-picker v-model="searchForm.createTime" type="daterange" start-placeholder="开始日期"
-                    end-placeholder="结束日期" :default-value="[new Date(), new Date()]" />
+                <el-date-picker v-model="createTime" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
+                    :append-to-body="true" :default-value="[new Date(), new Date()]" @change="changeHandler" />
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%">
@@ -63,7 +63,7 @@
             </el-table-column>
             <el-table-column fixed="right" label="操作" width="80">
                 <template #default="scope">
-                    <el-link type="primary" :href="scope.row.pdfOss" v-if="scope.row.status == 1"
+                    <el-link type="primary" :href="scope.row.pdfOss" 
                         @click.stop="downloadFile(scope.row)">
                         下载
                     </el-link>
@@ -87,12 +87,11 @@
 </template>
 
 <script setup>
-import { onMounted,onBeforeMount, ref, reactive, watch } from 'vue';
+import { onMounted, onBeforeMount, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import XCard from '../../components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
-import OpenCardService from '../../services/OpenCardService';
 import XComponent from '../../components/container/XComponent.vue';
 import searchService from '../../services/searchService';
 import FactoryService from '../../services/FactoryService';
@@ -103,7 +102,6 @@ const tableData = ref([]);
 const totalPage = ref(0);
 const errorMessage = ref('');
 const options = ref('');
-const serviceClass = new OpenCardService();
 const searchServiceClass = new searchService();
 const factoryServiceClass = new FactoryService();
 const searchForm = reactive({
@@ -111,16 +109,19 @@ const searchForm = reactive({
     customerName: '',
     businessPeople: '',
     smallCardSize: '',
-    createTime: '',
     minTotal: null,
     maxTotal: null,
 });
+
+const createTime = ref(null);
+const startTime = ref('');
+const endTime = ref('');
 
 const currentPage = ref(1);
 const pageSize = ref(12);
 
 onBeforeMount(() => {
-  console.log('Component before mount');
+    console.log('Component before mount');
 });
 
 
@@ -135,8 +136,15 @@ watch(searchForm, (newVal) => {
             delete newVal[key];
         }
     }
-    if (newVal.createTime) {
-        const formattedDates = newVal.createTime.map(date => {
+    searchHandler({
+        ...newVal,
+        startTime: startTime.value,
+        endTime: endTime.value
+    });
+});
+const changeHandler = (value) => {
+    if (value) {
+        const formattedDates = value.map(date => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
@@ -146,12 +154,27 @@ watch(searchForm, (newVal) => {
 
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         });
-        newVal.startTime = formattedDates[0];
-        newVal.endTime = formattedDates[1];
-        delete newVal.createTime;
+        startTime.value = formattedDates[0];
+        endTime.value = formattedDates[1];
+    } else {
+        startTime.value = '';
+        endTime.value = '';
     }
-    loadData(newVal);
-});
+    searchHandler({
+        ...searchForm,
+        startTime: startTime.value,
+        endTime: endTime.value
+    })
+}
+
+const searchHandler = (value) => {
+    for (const key in value) {
+        if (value[key] === '' || value[key] === null) {
+            delete value[key];
+        }
+    }
+    loadData(value)
+}
 
 const checkOrder = (row) => {
     factoryServiceClass.CheckLock(row.id).then(res => {
@@ -176,7 +199,7 @@ const loadData = (data) => {
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
         console.log(err);
-        ElMessage.error(err);
+        // ElMessage.error(err);
     });
 };
 
