@@ -33,97 +33,33 @@
             </x-component>
         </div>
     </x-card>
-    <x-card title="宣传卡信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
-        <div class="generalInfo">
-            <x-component label="宣传卡数量" :width="'100%'" :titleStyle="'#484848'" :marginBottom="'16px'">
-                <div class="value-number">{{ adCord.adNumber }}</div>
-            </x-component>
-        </div>
-        <div class="generalInfo" v-for="(items, key) in adCord.item" :key="key">
-            <x-component :label="'宣传卡' + (key + 1) + ' 有无揭开口'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
-                <div class="value">{{ items.adUncover }}</div>
-            </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 背景图'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
-                <el-tooltip popper-class="tooltip-width"
-                    :content="items.adImage"
-                    placement="bottom" effect="light">
-                    <div class="value">{{ items.adImage }}</div>
-                </el-tooltip>
-            </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 是否有揭开区'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
-                <div class="value">{{ items.adOpenRegion }}</div>
-            </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 揭开区数量'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
-                <div class="value">{{ items.adOpenNumber }}</div>
-            </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 备注'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
-                <el-tooltip popper-class="tooltip-width"
-                    :content="items.adComment"
-                    placement="bottom" effect="light">
-                    <div class="value">{{ items.adComment }}</div>
-                </el-tooltip>
-            </x-component>
-        </div>
-    </x-card>
 </template>
 
 <script setup>
 import XCard from '../../../components/container/XCard.vue';
 import XComponent from '../../../components/container/XComponent.vue';
-import { onMounted, ref, reactive, watch, computed } from 'vue';
+import { onMounted, ref, reactive, watch } from 'vue';
 import OpenCardService from '../../../services/OpenCardService';
 import { checkDetail, general, smallCard } from '@/config/orderCordDatas'
-// console.log(adCardItems)
+
 const serviceClass = new OpenCardService();
 const status = ref('')
 const isShow = ref(false)
 const orderDetails = reactive({
     checkDetail: reactive(checkDetail.map(item => ({ ...item, datas: null }))),
     general: reactive(general.map(item => ({ ...item, datas: null }))),
-    smallCard: reactive(smallCard.map(item => ({ ...item, datas: null }))),
+    smallCard: reactive(smallCard.map(item => ({ ...item, datas: null })))
 })
 
-const adCord = reactive({
-    'adNumber': 3,
-    'item': [
-        {
-            'adUncover': 2,
-            'adImage': 'Instant-cash-1.jpg',
-            'adOpenRegion': '是',
-            'adOpenNumber': 3,
-            'adComment': 'dasdasdasdas擦撒大大萨达萨达擦口红要塞发v内地富豪更得'
-        },
-        {
-            'adUncover': 2,
-            'adImage': 'Instant-cash-1.jpg',
-            'adOpenRegion': '是',
-            'adOpenNumber': 3,
-            'adComment': 'dasdasdasdas擦撒大大萨达萨达擦口红要塞发v内地富豪更得'
-        },
-        {
-            'adUncover': 2,
-            'adImage': 'Instant-cash-1.jpg',
-            'adOpenRegion': '是',
-            'adOpenNumber': 3,
-            'adComment': 'dasdasdasdas擦撒大大萨达萨达擦口红要塞发v内地富豪更得'
-        }
-    ]
-})
 onMounted(() => {
     let id = JSON.parse(localStorage.getItem('orderDetails'));
     id = id.id
     servicesHandle(id)
 })
-const raaa = []
+
 const servicesHandle = (id) => {
     serviceClass.GetDetails(id).then(res => {
         delete res.data.id
-        
         dataClear(res.data)
     })
 }
@@ -153,11 +89,6 @@ const dataClear = (res) => {
 }
 </script>
 
-<style lang="scss">
-.tooltip-width {
-    max-width: 228px;
-}
-</style>
 <style lang="scss" scoped>
 .title {
     margin-bottom: 20px;
@@ -225,20 +156,13 @@ const dataClear = (res) => {
     flex-wrap: wrap;
     column-gap: 30px;
 
-    .value,
-    .value-number {
+    .value {
         color: rgba(0, 0, 0, 0.80);
         font-family: "Helvetica Neue";
         font-size: 12px;
-        width: 126px;
         overflow: hidden; //超出的文本隐藏
         text-overflow: ellipsis; //溢出用省略号显示
         white-space: nowrap; //溢出不换行
-        /* margin-bottom: 18px; */
-    }
-
-    .value-number {
-        margin-bottom: 0;
     }
 }
 
@@ -265,7 +189,7 @@ const dataClear = (res) => {
         }
 
         &:not(:last-child) {
-            /* padding-bottom: 16px; */
+            padding-bottom: 16px;
         }
 
         .item-title {

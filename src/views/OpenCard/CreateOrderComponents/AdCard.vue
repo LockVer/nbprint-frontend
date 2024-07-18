@@ -132,14 +132,14 @@ const populateComponentData = () => {
         return;
     }
     componentData.value = initData.value.map((item) => {
-        let RAs = item.openReigion.map((region) => ({
+        let RAs = item.openRegion.map((region) => ({
             x: region.x,
             y: region.y,
             width: region.width,
             height: region.height,
         }));
 
-        let PAs = item.openReigion.flatMap((region) =>
+        let PAs = item.openRegion.flatMap((region) =>
             region.mark
                 ? region.mark.map((mark) => ({
                     x: mark.x,
@@ -283,7 +283,7 @@ watch(componentData, async (newVal, oldVal) => {
     //将数据还原成initData的格式
     console.log('componentData', newVal)
     let pageInitData = newVal.map((item) => {
-        let openReigion = item.revealAreas.map((region) => ({
+        let openRegion = item.revealAreas.map((region) => ({
             x: region.x,
             y: region.y,
             width: region.width,
@@ -307,7 +307,7 @@ watch(componentData, async (newVal, oldVal) => {
             image: item.imageName,
             imageSize: item.imageSize,
             comment: item.comment,
-            openReigion: openReigion,
+            openRegion: openRegion,
         };
     });
 

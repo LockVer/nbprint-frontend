@@ -16,6 +16,9 @@ class OpenCardService {
     DownloadPDF(orderId) {
         return this.apiService.downloadFile('/ossFile/downloadPdf?orderId='+orderId,false)
     }
+    GetDetails(id) {
+        return this.apiService.get(`/uncardOrder/getInfo?id=${id}`,{},true);
+    }
 }
 
 export default OpenCardService;

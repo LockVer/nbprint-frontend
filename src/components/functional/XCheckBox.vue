@@ -19,7 +19,7 @@ export default defineComponent({
     name: "XCheckBox",
     props: {
         modelValue: {
-            type: [String, Object],
+            type: [String, Object,Number],
             default: ""
         },
         DataList: {

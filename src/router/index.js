@@ -1,9 +1,9 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 const routes = [
   {
     path: '/',
-    name: 'home',
+    name: 'index',
     redirect: '/opencard',
     component: HomeView
   },
@@ -36,11 +36,16 @@ const routes = [
     path: '/factory/detail/:id',
     name: 'auditDetails',
     component: ()=> import('../views/Factory/ui/details.vue')
+  },
+  {
+    path: '/hrm',
+    name: 'hrm',
+    component: ()=> import('../views/hrm/index.vue')
   }
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
 })
 

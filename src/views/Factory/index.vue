@@ -38,7 +38,7 @@
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%">
-            <el-table-column prop="productName" label="名字">
+            <el-table-column prop="productName" label="产品名称">
                 <template #default="scope">
                     <div>{{ scope.row.productName }}（{{ scope.row.chineseName }}）</div>
                 </template>
@@ -259,6 +259,7 @@ a {
     margin-bottom: 20px;
 }
 
+/* 下拉框样式 */
 :deep(.el-select__suffix) {
     width: 20px;
     height: 20px;
@@ -275,6 +276,8 @@ a {
 
 .btn {
     padding: 5px 16px;
+    width: 72px;
+    box-sizing: border-box;
     text-align: center;
     cursor: pointer;
     color: white;

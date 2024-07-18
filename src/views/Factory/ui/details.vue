@@ -1,48 +1,50 @@
 <template>
-    <x-card v-for="(item, index) in audits" :key="index" :title="item.title" :cardStyle="{ 'height': 'auto' }">
-        <div class="generalInfo">
-            <x-component v-for="(value, index) in item.items" :key="index" :label="value.label" :titleStyle="'#484848'"
-                :width="'15%'">
-                <div class="value">{{ value.datas }}</div>
-            </x-component>
-        </div>
-    </x-card>
-    <x-card v-for="(item, index) in auditCordData" :key="index" :title="item.title" :cardStyle="{ 'height': 'auto' }"
-        class="audit">
-        <div class="audit-card" v-for="(value, index) in item.items" :key="index">
-            <div class="audit-title">
-                <span>{{ value.adTitle }}</span>
+    <div class="factory-details">
+        <x-card v-for="(item, index) in audits" :key="index" :title="item.title" :cardStyle="{ 'height': 'auto' }">
+            <div class="generalInfo">
+                <x-component v-for="(value, index) in item.items" :key="index" :label="value.label" :titleStyle="'#484848'"
+                    :width="'15%'">
+                    <div class="value">{{ value.datas }}</div>
+                </x-component>
             </div>
-            <div class="audit-content">
-                <div class="generalInfo">
-                    <x-component v-for="(adItem, adIndex) in value.adItem" :key="adIndex" :label="adItem.label"
-                        :width="'15%'" :titleStyle="'#484848'" :titleBottom="'12px'" :marginBottom="'16px'">
-                        <x-check-box v-model="adItem.selectedValue" :DataList="cardSizeList" type="radio"
-                            @update:modelValue="handleExceptionChange(adItem, value.adTitle)" />
-                        <div v-if="adItem.errorMessage" class="error-message">{{ adItem.errorMessage }}</div>
-                    </x-component>
+        </x-card>
+        <x-card v-for="(item, index) in auditCordData" :key="index" :title="item.title" :cardStyle="{ 'height': 'auto' }"
+            class="audit">
+            <div class="audit-card" v-for="(value, index) in item.items" :key="index">
+                <div class="audit-title">
+                    <span>{{ value.adTitle }}</span>
+                </div>
+                <div class="audit-content">
+                    <div class="generalInfo">
+                        <x-component v-for="(adItem, adIndex) in value.adItem" :key="adIndex" :label="adItem.label"
+                            :width="'15%'" :titleStyle="'#484848'" :titleBottom="'12px'" :marginBottom="'16px'">
+                            <x-check-box v-model="adItem.selectedValue" :DataList="cardSizeList" type="radio"
+                                @update:modelValue="handleExceptionChange(adItem, value.adTitle)" />
+                            <div v-if="adItem.errorMessage" class="error-message">{{ adItem.errorMessage }}</div>
+                        </x-component>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div v-if="hasException" class="audit-card">
-            <div class="audit-title">修改意见</div>
-            <div class="exception">
-                <div class="exception-title">异常项</div>
-                <div class="items">
-                    <el-tag v-for="(items, index) in exceptionLabels" :key="index" color="#0022991A">{{ items.label
-                        }}</el-tag>
+            <div v-if="hasException" class="audit-card">
+                <div class="audit-title">修改意见</div>
+                <div class="exception">
+                    <div class="exception-title">异常项</div>
+                    <div class="items">
+                        <el-tag v-for="(items, index) in exceptionLabels" :key="index" color="#0022991A">{{ items.label
+                            }}</el-tag>
+                    </div>
+                </div>
+                <div class="remark">
+                    <div class="remark-title">异常描述（必填）</div>
+                    <div class="items">
+                        <el-input v-model="textarea1" style="width: 100%" autosize type="textarea" placeholder="备注" />
+                        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+                    </div>
                 </div>
             </div>
-            <div class="remark">
-                <div class="remark-title">异常描述（必填）</div>
-                <div class="items">
-                    <el-input v-model="textarea1" style="width: 100%" autosize type="textarea" placeholder="备注" />
-                    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-                </div>
-            </div>
-        </div>
-    </x-card>
-    <layout-footer @submit="handleSubmit" @back="backHandler"></layout-footer>
+        </x-card>
+        <layout-footer @submit="handleSubmit" @back="backHandler"></layout-footer>
+    </div>
 </template>
 
 <script setup>
@@ -54,7 +56,7 @@ import audit from '@/config/audit';
 import auditCord from '@/config/auditCord';
 import { reactive, ref, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElLoading } from 'element-plus';
 import FactoryService from '@/services/FactoryService';
 
 const router = useRouter()
@@ -114,7 +116,6 @@ const handleExceptionChange = (adItem) => {
 
 const handleSubmit = () => {
     let isComplete = true;
-
     auditCordData.forEach((card) => {
         card.items.forEach((item) => {
             item.adItem.forEach((adItem) => {
@@ -155,7 +156,7 @@ const postDatas = () => {
     data = {
         id: Number(route.params.id),
         ...data,
-        exceptionItem:  exceptionLabels.value.map(item => item.name).join(','),
+        exceptionItem: exceptionLabels.value.map(item => item.label).join(','),
         remark: textarea1.value
     }
     // console.log(data)
@@ -163,7 +164,9 @@ const postDatas = () => {
         ElMessage({
             type: 'success',
             message: '提交成功',
+            duration: 1000,
             onClose: () => {
+                clearData()
                 router.go(-1)
             }
         })
@@ -171,6 +174,28 @@ const postDatas = () => {
         console.log(err)
     })
 }
+
+
+const clearData = () => {
+    textarea1.value = '';
+    audits.forEach((item) => {
+        item.items.forEach((value) => {
+            value.datas = '';
+        });
+    });
+    auditCordData.forEach((card) => {
+        card.items.forEach((item) => {
+            item.adItem.forEach((adItem) => {
+                adItem.selectedValue = '';
+                adItem.errorMessage = '';
+            });
+        });
+    });
+    exceptionLabels.value = [];
+    hasException.value = false;
+    errorMessage.value = '';
+};
+
 
 const backHandler = () => {
     serviceClass.CheckUnlock(route.params.id).then((res) => {
@@ -183,43 +208,10 @@ const backHandler = () => {
 
 </script>
 
-<style>
-.audit-card {
-    margin-bottom: 20px;
-}
-
-.audit-title {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.exception,
-.remark {
-    margin-top: 20px;
-}
-
-.exception-title,
-.remark-title {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.error-message {
-    color: red;
-    margin-top: 5px;
-}
-</style>
-
-
-
-
 <style lang="scss" scoped>
+.factory-details {
+    position: relative;
+}
 .error-message {
     color: red;
     font-size: 12px;
@@ -258,9 +250,9 @@ const backHandler = () => {
     }
 
     .audit-content {
-        width: 100%;
+        /* width: 100%; */
         /* display: flex; */
-        gap: 18px;
+        /* gap: 18px; */
 
         .generalInfo {
             width: 100%;
