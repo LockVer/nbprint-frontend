@@ -119,6 +119,7 @@ onMounted(() => {
     id = id.id
     servicesHandle(id)
 })
+
 const raaa = []
 const servicesHandle = (id) => {
     serviceClass.GetDetails(id).then(res => {
