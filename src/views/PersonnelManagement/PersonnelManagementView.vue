@@ -7,8 +7,8 @@
 </template>
 
 <script setup>
-import hrmNav from './ui/hrmNav.vue';
-import hrmTabel from './ui/hrmTabel.vue';
+import hrmNav from './ManagementCompontents/ManagementNavView.vue';
+import hrmTabel from './ManagementCompontents/ManagementTableView.vue';
 import { ref, reactive, onMounted } from 'vue';
 import HrmService from '@/services/HrmService';
 const servicesClass = new HrmService()
