@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, reactive } from 'vue';
+import { defineComponent, ref, reactive,onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 export default defineComponent({
     name: "LayoutHeader",
@@ -25,6 +25,10 @@ export default defineComponent({
                 }
             ]
         });
+        const name = ref(localStorage.getItem('name'))
+        onMounted(() => {
+            localStorage.getItem('name')
+        })
 
         const handleClick = (index: number) => {
             headerData.actions.forEach((action, i) => {
@@ -42,7 +46,8 @@ export default defineComponent({
         return {
             headerData,
             handleClick,
-            goOutHandler
+            goOutHandler,
+            name
         }
 
     }
@@ -60,7 +65,7 @@ export default defineComponent({
         </div>
         <el-dropdown>
             <span class="user-info">
-                <span class="user-name">admin</span>
+                <span class="user-name">{{ name }}</span>
                 <el-avatar shape="square" :size="45" fit="fill"
                     src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg" />
             </span>

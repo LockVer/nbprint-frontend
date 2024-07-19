@@ -37,7 +37,7 @@
                     end-placeholder="结束日期" :default-value="[new Date(), new Date()]" @change="changeHandler"  />
             </x-component>
         </div>
-        <el-table :data="tableData" style="width: 100%" @row-click="rowClick">
+        <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
             <el-table-column prop="productName" label="产品名称">
                 <template #default="scope">
                     <div>{{ scope.row.productName }}（{{ scope.row.chineseName }}）</div>
@@ -69,10 +69,10 @@
                         编辑
                     </el-button>
                     <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)"
-                        :class="{ 'btn-disable': scope.row.status == 0 }" :disabled="scope.row.status == 0">
+                        :class="{ 'btn-disable': scope.row.status == 0 }" >
                         删除
                     </el-button>
-                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop="downloadFile(scope.row)"
+                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop
                         :class="{ 'btn-disable': scope.row.status == 0 || scope.row.status == 4 }"
                         :disabled="scope.row.status == 0 || scope.row.status == 4">
                         下载

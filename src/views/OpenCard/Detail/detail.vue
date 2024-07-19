@@ -9,8 +9,11 @@
         </div>
         <div v-if="isShow" class="exception" v-for="items in orderDetails.checkDetail" :key="items.name">
             <div class="exception-title">{{ items.label }}</div>
+            <!-- items.label === '异常项' ||  -->
             <div class="items" v-if="items.label === '异常项'">
-                <el-tag color="#0022991A" v-for="(items, index) in items.datas" :key="index">{{ items }}</el-tag>
+                <el-tag color="#0022991A" v-if="Array.isArray(items.datas)" v-for="(tags, index) in items.datas"
+                    :key="index">{{ tags }}</el-tag>
+                <el-tag v-else color="#0022991A">{{ items.datas }}</el-tag>
             </div>
             <div class="items" v-else>
                 <span>{{ items.datas }}</span>
@@ -36,19 +39,17 @@
     <x-card title="宣传卡信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
         <div class="generalInfo">
             <x-component label="宣传卡数量" :width="'100%'" :titleStyle="'#484848'" :marginBottom="'16px'">
-                <div class="value-number">{{ adCord.adNumber }}</div>
+                <div class="value-number">{{ adCardInfo.adNumber }}</div>
             </x-component>
         </div>
-        <div class="generalInfo" v-for="(items, key) in adCord.item" :key="key">
+        <div class="generalInfo" v-for="(items, key) in adCardInfo.adCard" :key="key">
             <x-component :label="'宣传卡' + (key + 1) + ' 有无揭开口'" :width="'15%'" :titleStyle="'#484848'"
                 :marginBottom="'16px'">
                 <div class="value">{{ items.adUncover }}</div>
             </x-component>
             <x-component :label="'宣传卡' + (key + 1) + ' 背景图'" :width="'15%'" :titleStyle="'#484848'"
                 :marginBottom="'16px'">
-                <el-tooltip popper-class="tooltip-width"
-                    :content="items.adImage"
-                    placement="bottom" effect="light">
+                <el-tooltip popper-class="tooltip-width" :content="items.adImage" placement="bottom" effect="light">
                     <div class="value">{{ items.adImage }}</div>
                 </el-tooltip>
             </x-component>
@@ -58,16 +59,52 @@
             </x-component>
             <x-component :label="'宣传卡' + (key + 1) + ' 揭开区数量'" :width="'15%'" :titleStyle="'#484848'"
                 :marginBottom="'16px'">
-                <div class="value">{{ items.adOpenNumber }}</div>
+                <div class="value">{{ items.adOpenRegionNumber }}</div>
             </x-component>
             <x-component :label="'宣传卡' + (key + 1) + ' 备注'" :width="'15%'" :titleStyle="'#484848'"
                 :marginBottom="'16px'">
-                <el-tooltip popper-class="tooltip-width"
-                    :content="items.adComment"
-                    placement="bottom" effect="light">
+                <el-tooltip popper-class="tooltip-width" :content="items.adComment" placement="bottom" effect="light">
                     <div class="value">{{ items.adComment }}</div>
                 </el-tooltip>
             </x-component>
+        </div>
+    </x-card>
+    <x-card title="奖符" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }"
+        v-if="prizeMarkInfo.length > 0">
+        <div class="prize-card" v-for="(award, key) in prizeMarkInfo" :key="key">
+            <div class="prize-title">{{ ["现金奖", "HOLD卡", "不中奖", "自定义玩法"][award.markType] }}</div>
+            <div class="item" v-for="(items, key) in award.prizeMark" :key="key">
+                <div class="item-title">
+                    <div class="dot"></div>
+                    <span>{{ ["现金奖", "HOLD卡", "不中奖", "自定义玩法"][award.markType] }}{{ key + 1 }}</span>
+                </div>
+                <div class="generalInfo">
+                    <x-component label="名称" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                        <div class="value">{{ items.markName }}</div>
+                    </x-component>
+                    <x-component label="文件" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                        <el-tooltip popper-class="tooltip-width" :content="items.markImage" placement="bottom"
+                            effect="light">
+                            <div class="value">{{ items.markImage }}</div>
+                        </el-tooltip>
+                    </x-component>
+                    <x-component label="金额" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                        <div class="value">{{ items.markAmount }}</div>
+                    </x-component>
+                    <x-component label="数量" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                        <div class="value">{{ items.markCount }}</div>
+                    </x-component>
+                    <x-component label="合计" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                        <div class="value">{{ items.markTotal }}</div>
+                    </x-component>
+                    <x-component label="备注" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                        <el-tooltip popper-class="tooltip-width" :content="items.markComment" placement="bottom"
+                            effect="light">
+                            <div class="value">{{ items.markComment }}</div>
+                        </el-tooltip>
+                    </x-component>
+                </div>
+            </div>
         </div>
     </x-card>
 </template>
@@ -75,10 +112,9 @@
 <script setup>
 import XCard from '../../../components/container/XCard.vue';
 import XComponent from '../../../components/container/XComponent.vue';
-import { onMounted, ref, reactive, watch, computed } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import OpenCardService from '../../../services/OpenCardService';
 import { checkDetail, general, smallCard } from '@/config/orderCordDatas'
-// console.log(adCardItems)
 const serviceClass = new OpenCardService();
 const status = ref('')
 const isShow = ref(false)
@@ -88,43 +124,47 @@ const orderDetails = reactive({
     smallCard: reactive(smallCard.map(item => ({ ...item, datas: null }))),
 })
 
-const adCord = reactive({
-    'adNumber': 3,
-    'item': [
-        {
-            'adUncover': 2,
-            'adImage': 'Instant-cash-1.jpg',
-            'adOpenRegion': '是',
-            'adOpenNumber': 3,
-            'adComment': 'dasdasdasdas擦撒大大萨达萨达擦口红要塞发v内地富豪更得'
-        },
-        {
-            'adUncover': 2,
-            'adImage': 'Instant-cash-1.jpg',
-            'adOpenRegion': '是',
-            'adOpenNumber': 3,
-            'adComment': 'dasdasdasdas擦撒大大萨达萨达擦口红要塞发v内地富豪更得'
-        },
-        {
-            'adUncover': 2,
-            'adImage': 'Instant-cash-1.jpg',
-            'adOpenRegion': '是',
-            'adOpenNumber': 3,
-            'adComment': 'dasdasdasdas擦撒大大萨达萨达擦口红要塞发v内地富豪更得'
-        }
-    ]
-})
+const adCardInfo = ref({})
+const prizeMarkInfo = ref([])
 onMounted(() => {
     let id = JSON.parse(localStorage.getItem('orderDetails'));
     id = id.id
     servicesHandle(id)
 })
-
-const raaa = []
 const servicesHandle = (id) => {
     serviceClass.GetDetails(id).then(res => {
         delete res.data.id
-        
+        if (res.data.adCardInfo) {
+            adCardInfo.value = res.data.adCardInfo
+            adCardInfo.value.adCard.forEach((item) => {
+                for (const key in item) {
+                    if (item[key] === null) {
+                        item[key] = '无'
+                    }
+                }
+            })
+        }
+        if (res.data.prizeMarkInfo) {
+            prizeMarkInfo.value = res.data.prizeMarkInfo
+            prizeMarkInfo.value.forEach((item) => {
+                if (item.markType === 'cash') {
+                    item.markType = 0
+                } else if (item.markType === 'holdCard') {
+                    item.markType = 1
+                } else if (item.markType === 'noPrize') {
+                    item.markType = 2
+                } else if (item.markType === 'userDefined') {
+                    item.markType = 3
+                }
+                item.prizeMark.forEach((item) => {
+                    for (const key in item) {
+                        if (item[key] === null || item[key] === '') {
+                            item[key] = '无'
+                        }
+                    }
+                })
+            })
+        }
         dataClear(res.data)
     })
 }
@@ -138,7 +178,9 @@ const dataClear = (res) => {
     }
     Object.keys(orderDetails).forEach(key => {
         orderDetails[key].forEach(item => {
-            item.datas = res[key][item.name];
+            if (res[key] && res[key][item.name]) {
+                item.datas = res[key][item.name];
+            }
             if (item.datas == null || item.datas == '') {
                 item.datas = '无'
             } else if (item.datas == 'CNY') {
@@ -146,11 +188,34 @@ const dataClear = (res) => {
             } else if (item.datas == 'USD') {
                 item.datas = '$'
             } else {
+                // console.log(String(item.datas).split(','))
                 item.datas = String(item.datas).includes(',') ? item.datas.split(',') : item.datas;
-
+            }
+            if (item.name == 'direction' || item.name == 'boxCodePosition') {
+                directions(item)
             }
         });
     });
+}
+
+const directions = (items) => {
+    const direct = [
+        { text: '上', value: 'T' },
+        { text: '下', value: 'B' },
+        { text: '左', value: 'L' },
+        { text: '右', value: 'R' }
+    ]
+    const boxCodePositionList = [
+        { text: '下左', value: 'bottomleft' },
+        { text: '下中', value: 'bottomcenter' },
+        { text: '下右', value: 'bottomright' },
+    ]
+    if(items.name == 'direction'){
+        // console.log(items.datas)
+        items.datas = direct.filter(item => item.value == items.datas) ? direct.filter(item => item.value == items.datas)[0].text : items.datas
+    } else{
+        // items.datas = boxCodePositionList.filter(item => item.value == items.datas) ? boxCodePositionList.filter(item => item.value == items.datas)[0].text : items.datas
+    }
 }
 </script>
 

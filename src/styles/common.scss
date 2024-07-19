@@ -71,6 +71,22 @@ html {
   }
 }
 
+
+.el-table {
+  color: rgba(0, 0, 0, 0.80);
+  font-family: "Helvetica Neue";
+  // font-size: 12px;
+
+  th {
+    color: rgba(0, 0, 0, 0.80);
+    font-family: "Helvetica Neue";
+    // font-size: 14px;
+    font-weight: 700;
+    background: rgba(0, 34, 153, 0.04) !important;
+
+  }
+}
+
 .el-popper {
   // max-width: 228px;
 }

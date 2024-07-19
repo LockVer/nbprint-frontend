@@ -1,6 +1,5 @@
 <template>
     <div class="create-order">
-
         <general v-model:initData="general"></general>
         <small-card v-model:initData="smallCard"></small-card>
         <ad-card v-model:initData="adCard" v-model:smallCard="smallCard"></ad-card>

@@ -1,8 +1,6 @@
-
 <template>
     <div class="login-page">
         <div class="cover">
-
         </div>
         <div class="login-box">
             <div class="title">登录</div>
@@ -16,7 +14,7 @@
     </div>
 </template>
 <script setup>
-import { ref, onMounted,onBeforeUnmount} from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import UserService from '../../services/UserService';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus'
@@ -47,6 +45,7 @@ const login = () => {
     }).then((res) => {
         console.log(res);
         localStorage.setItem('token', res.data.token);
+        localStorage.setItem('name', res.data.name);
         router.push('/opencard');
     }).catch((err) => {
         console.log(err);
@@ -59,11 +58,13 @@ const login = () => {
 .login-page {
     display: flex;
     height: 100vh;
+
     .cover {
         flex: 1;
         background: url('../../assets/login-bg.png') no-repeat center center;
         background-size: cover;
     }
+
     .login-box {
         width: 400px;
         padding: 30px;
@@ -71,26 +72,30 @@ const login = () => {
         display: flex;
         flex-direction: column;
         justify-content: center;
+
         .title {
             font-size: 36px;
             margin-bottom: 20px;
             font-weight: bold;
         }
-        .ebutton{
+
+        .ebutton {
             margin-bottom: 20px;
         }
-        p{
+
+        p {
             padding: 0;
             margin: 0;
             margin-bottom: 5px;
             color: #909090;
             font-size: 14px;
         }
+
         .error-msg {
             color: red;
             font-size: 14px;
             margin-bottom: 20px;
         }
     }
-}   
+}
 </style>
