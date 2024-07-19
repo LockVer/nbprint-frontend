@@ -27,6 +27,8 @@ const route = useRoute();
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: min-content;
+  min-width: 100%;
   .content {
     display: flex;
     flex: 1;

@@ -49,6 +49,7 @@ const login = () => {
 .login-page {
     display: flex;
     height: 100vh;
+    width: 100vw;
     .cover {
         flex: 1;
         background: url('../../assets/login-bg.png') no-repeat center center;

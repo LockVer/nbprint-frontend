@@ -1,24 +1,55 @@
 <template>
     <div class="auto-action">
+        <x-check-box v-model="mode" margin="0px 8px 0px 0px" :DataList="modeList" type="radio"></x-check-box>
+        <el-button v-if="selectedAreas.length > 0 && mode === 'select'" @click="createGameArea"
+            type="primary">创建游戏区</el-button>
+        <el-button v-if="mode === 'select'" @click="allSelect" type="primary" plain>全选</el-button>
+        <el-button v-if="mode === 'select'" @click="allNotSelect" type="primary" plain>取消全选</el-button>
         <el-button @click="clearArea" type="danger" plain>清空</el-button>
     </div>
     <div class="reveal-area-editor" ref="editorRef" @contextmenu.prevent="handleContextMenu($event)">
         <canvas ref="canvasRef" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp"
             @mouseleave="handleMouseLeave"></canvas>
-
+        <div v-if="mode === 'select'" class="game-area">
+            <p class="title">游戏区</p>
+            <div class="game-area-list">
+                <div v-for="area in gameAreas" :key="area.id" class="game-area-item"
+                    :class="{ selected: selectedGameArea && selectedGameArea.id === area.id }"
+                    @click="toggleGameAreaSelection(area)">
+                    <span>{{ area.name }}</span>
+                    <span class="iconfont icon-close" @click.stop="removeGameArea(area)"></span>
+                </div>
+            </div>
+        </div>
+        <div class="pa-input" v-if="selectedGameArea">
+            <!--关闭面板图标-->
+            <p>游戏区名称</p>
+            <el-input placeholder="请输入游戏区名称" v-model="selectedGameArea.name" @keydown="addRange" />
+            <p>奖符数据</p>
+            <el-tooltip class="box-item" effect="dark" content="输入数据后，按【回车】按键添加" placement="right">
+                <el-input ref="inputRef" placeholder="请输入奖符数据" v-model="PAInput" @keydown="addRange" />
+            </el-tooltip>
+            <p>奖符数据列表</p>
+            <div class="data-list">
+                <el-tag type="primary" :key="index" @close="removeRange(index)" closable
+                    v-for="(item, index) in selectedGameArea?.range">{{ item
+                    }}</el-tag>
+            </div>
+        </div>
         <ul v-if="showContextMenu" class="context-menu"
             :style="{ top: `${contextMenuPosition.y}px`, left: `${contextMenuPosition.x}px` }">
             <li @click="copyArea">复制</li>
             <li @click="deleteArea">删除</li>
         </ul>
     </div>
-
 </template>
 
 <script setup>
 import { ref, onMounted, watch, defineProps, defineExpose } from 'vue';
 import { cloneDeep } from 'lodash';
-import { ElMessageBox } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import XCheckBox from '../../../../components/functional/XCheckBox.vue';
+import { v4 as uuidv4 } from 'uuid'; // 导入uuid库
 const props = defineProps({
     backgroundImageUrl: String,
     preAreas: Array,
@@ -49,7 +80,14 @@ const canvasRef = ref(null);
 const editorRef = ref(null);
 
 const revealAreas = ref(cloneDeep(props.preAreas || []));
-
+const gameAreas = ref([]); // 存储游戏区的数组
+const selectedGameArea = ref(null); // 当前选中的游戏区
+const mode = ref('create'); // 当前模式：'select' 或 'create'
+const modeList = [
+    { text: '选择模式', value: "select" },
+    { text: '创建模式', value: "create" }
+];
+const selectedAreas = ref([]); // 被选中的区域数组
 const activeArea = ref(null);
 const dragging = ref(false);
 const resizing = ref(false);
@@ -59,8 +97,86 @@ const offsetY = ref(0);
 const alignLine = ref([]);
 const showContextMenu = ref(false);
 const contextMenuPosition = ref({ x: 0, y: 0 });
+const PAInput = ref('');
+const PAInputClass = ref('');
 let rightClickedArea = null;
 let scale = 1;
+
+const allSelect = () => {
+    selectedAreas.value = revealAreas.value;
+    drawCanvas();
+};
+const allNotSelect = () => {
+    selectedAreas.value = [];
+    drawCanvas();
+};
+
+// 切换游戏区选中状态
+const toggleGameAreaSelection = (area) => {
+    if (selectedGameArea.value && selectedGameArea.value.id === area.id) {
+        selectedGameArea.value = null;
+    } else {
+        selectedGameArea.value = area;
+    }
+    drawCanvas();
+};
+
+
+// 删除游戏区
+const removeGameArea = (area) => {
+    gameAreas.value = gameAreas.value.filter(gameArea => gameArea.id !== area.id);
+    revealAreas.value.push(...area.areas);
+    if (selectedGameArea.value && selectedGameArea.value.id === area.id) {
+        selectedGameArea.value = null;
+    }
+    drawCanvas();
+};
+
+// 创建游戏区
+const createGameArea = () => {
+    const newGameArea = {
+        id: uuidv4(),
+        name: `游戏区${gameAreas.value.length + 1}`,
+        areas: selectedAreas.value,
+        range: [],
+        selected: false
+    };
+    gameAreas.value.push(newGameArea);
+    revealAreas.value = revealAreas.value.filter(area => !selectedAreas.value.includes(area));
+    selectedAreas.value = [];
+    drawCanvas();
+};
+const addRange = (e) => {
+    if (e.key === 'Enter') {
+        const range = PAInput.value.trim();
+        if (range) {
+            if (!selectedGameArea.value.range) {
+                selectedGameArea.value.range = [];
+            }
+            //判断是否重复
+            // if (selectedGameArea.value.range.includes(range)) {
+            //     //提示重复
+            //     ElMessage.error('奖符数据重复！')
+            //     return;
+            // }
+            selectedGameArea.value.range.push(range);
+            PAInput.value = '';
+        }
+    }
+};
+const removeRange = (index) => {
+    selectedGameArea.value.range.splice(index, 1);
+    console.log(selectedGameArea.value.range)
+};
+// 切换模式时的处理
+watch(mode, (newMode) => {
+    if (newMode === 'create') {
+        selectedGameArea.value = null;
+        selectedAreas.value = [];
+        drawCanvas();
+    }
+});
+
 
 const handleContextMenu = (event) => {
     const rect = canvasRef.value.getBoundingClientRect();
@@ -156,24 +272,49 @@ const drawCanvas = async () => {
 
         ctx.drawImage(img, 0, 0, canvasRef.value.width, canvasRef.value.height);
     }
-    revealAreas.value.forEach(area => {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
-        ctx.strokeStyle = area === activeArea.value ? 'red' : '#FFF';
-        ctx.strokeRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
-    });
-    // 绘制对齐线
+
+    if (mode.value === 'create') {
+        revealAreas.value.forEach(area => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
+            ctx.strokeStyle = area === activeArea.value ? 'red' : '#FFF';
+            ctx.strokeRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
+        });
+    } else if (mode.value === 'select') {
+        if (selectedGameArea.value) {
+            selectedGameArea.value.areas.forEach(area => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
+                ctx.strokeStyle = area === activeArea.value ? 'red' : '#FFF';
+                ctx.strokeRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
+            });
+        } else {
+            revealAreas.value.forEach(area => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
+                ctx.strokeStyle = area === activeArea.value ? 'red' : '#FFF';
+                ctx.strokeRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
+            });
+        }
+    }
+
     if (alignLine.value) {
         ctx.fillStyle = 'red';
         alignLine.value.forEach(line => {
             ctx.fillRect(line.x * scale, line.y * scale, line.width, line.height);
         });
     }
-    // 如果有活动区域，画线和距离
     if (activeArea.value) {
         drawDistanceLines(ctx, activeArea.value);
     }
+    if (mode.value === 'select') {
+        ctx.strokeStyle = 'red';
+        selectedAreas.value.forEach((area) => {
+            ctx.strokeRect(area.x * scale, area.y * scale, area.width * scale, area.height * scale);
+        });
+    }
 };
+
 const drawDistanceLines = (ctx, area) => {
     ctx.strokeStyle = 'blue';
     ctx.fillStyle = 'blue';
@@ -353,35 +494,67 @@ const checkAlignLine = () => {
 
 
 const handleMouseDown = (event) => {
-    const rect = canvasRef.value.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / scale;
-    const y = (event.clientY - rect.top) / scale;
 
-    dragging.value = false;
-    resizing.value = false;
-    activeArea.value = null;
+    if (mode.value === 'create') {
+        const rect = canvasRef.value.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / scale;
+        const y = (event.clientY - rect.top) / scale;
 
-    revealAreas.value.forEach(area => {
-        if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
-            offsetX.value = x - area.x;
-            offsetY.value = y - area.y;
-            activeArea.value = area;
-            if (x > area.x + area.width - 10 || x < area.x + 10 || y > area.y + area.height - 10 || y < area.y + 10) {
-                resizing.value = true;
-                resizeDirection.value = determineResizeDirection(x, y, area);
-            } else {
-                dragging.value = true;
+        dragging.value = false;
+        resizing.value = false;
+        activeArea.value = null;
+        revealAreas.value.forEach(area => {
+            if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
+                offsetX.value = x - area.x;
+                offsetY.value = y - area.y;
+                activeArea.value = area;
+                if (x > area.x + area.width - 10 || x < area.x + 10 || y > area.y + area.height - 10 || y < area.y + 10) {
+                    resizing.value = true;
+                    resizeDirection.value = determineResizeDirection(x, y, area);
+                } else {
+                    dragging.value = true;
+                }
             }
-        }
-    });
+        });
 
-    if (!activeArea.value) {
-        const newArea = { x, y, width: 0, height: 0 };
-        revealAreas.value.push(newArea);
-        activeArea.value = newArea;
-        resizing.value = true;
-        resizeDirection.value = 'bottom-right';
+        if (!activeArea.value) {
+            const newArea = { x, y, width: 0, height: 0 };
+            revealAreas.value.push(newArea);
+            activeArea.value = newArea;
+            resizing.value = true;
+            resizeDirection.value = 'bottom-right';
+        }
+    } else if (mode.value === 'select') {
+        // 选择模式下的逻辑
+        const rect = canvasRef.value.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / scale;
+        const y = (event.clientY - rect.top) / scale;
+        let areaAlreadySelected = false;
+
+        // 检查点击的区域是否已经被选中
+        selectedAreas.value.forEach((selectedArea) => {
+            if (x >= selectedArea.x && x <= selectedArea.x + selectedArea.width && y >= selectedArea.y && y <= selectedArea.y + selectedArea.height) {
+                areaAlreadySelected = true;
+            }
+        });
+
+        // 如果点击的区域未被选中，则添加到 selectedAreas 数组
+        if (!areaAlreadySelected) {
+            revealAreas.value.forEach((area) => {
+                if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
+                    selectedAreas.value.push(area);
+                }
+            });
+        } else {
+            // 如果点击的区域已被选中，则取消选中
+            selectedAreas.value = selectedAreas.value.filter((area) => {
+                return !(x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height);
+            });
+        }
+        drawCanvas();
     }
+
+
 };
 
 const determineResizeDirection = (x, y, area) => {
@@ -570,8 +743,13 @@ const handleMouseLeave = () => {
 };
 
 const getAreas = () => {
+    if (revealAreas.value.length > 0) {
+        ElMessage.error('还有区域未绑定游戏区！');
+        return [];
+    }
+    console.log(gameAreas.value)
     // 返回当前的揭开区域数组，并根据区域的x,y进行排序后返回副本,先按y排序，再按x排序
-    return cloneDeep(revealAreas.value).sort((a, b) => a.y - b.y || a.x - b.x);
+    return cloneDeep(gameAreas.value);
 };
 
 
@@ -591,7 +769,6 @@ defineExpose({
     getAreas
 })
 </script>
-
 <style lang="scss" scoped>
 .reveal-area-editor {
     background: black;
@@ -632,15 +809,155 @@ defineExpose({
     border-radius: 5px;
     padding: 10px;
     list-style: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 }
 
 .context-menu li {
-    padding: 5px 15px;
+    padding: 5px 10px;
     cursor: pointer;
 }
 
-.context-menu li:hover {
-    background-color: #f0f0f0;
+.game-area {
+    background-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    width: 150px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    height: calc(100% - 20px);
+    padding: 10px;
+    overflow-y: auto;
+    background: #f0f0f0; // 增加背景颜色以增强显示对比度
+}
+
+.game-area .title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.game-area-list {
+    margin-top: 10px;
+}
+
+.game-area-item {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff; // 增加背景颜色以增强显示对比度
+}
+
+.game-area-item.selected {
+    background-color: #409eff;
+    color: #fff;
+}
+
+.iconfont {
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.icon-close {
+    color: #ff4d4f;
+}
+
+.reveal-area-editor p {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.selected {
+    background-color: #409eff;
+    color: #fff;
+}
+
+.pa-input {
+    position: absolute;
+    z-index: 111;
+    width: 200px;
+    min-height: 200px;
+    background: white;
+    padding: 10px;
+    top: 10px;
+    right: 10px;
+    border-radius: 4px;
+
+    p {
+        text-align: left;
+    }
+
+    .icon-close {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    p {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .data-list {
+        display: flex;
+        flex-wrap: wrap;
+
+        .el-tag {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+    }
+
+}
+
+@keyframes appear-tv {
+    0% {
+        opacity: 0;
+        transform: scaleY(0) scaleX(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(1);
+    }
+}
+
+@keyframes disappear-tv {
+    0% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scaleY(0) scaleX(1);
+    }
 }
 </style>
