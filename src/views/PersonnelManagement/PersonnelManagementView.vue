@@ -2,7 +2,7 @@
     <div class="container">
         <hrm-nav v-model="departmentValue" @checkChange="handleCheckChange" ref="hrmNavRef" />
         <!-- <hrm-tabel :title="title" v-model="members"  /> -->
-        <hrm-tabel :title="title" />
+        <hrm-tabel :title="title" :titleId="titleId" />
     </div>
 </template>
 
@@ -18,7 +18,7 @@ const departmentValue = ref([])
 
 const hrmNavRef = ref(null);
 const title = ref('');
-
+const titleId = ref(1);
 
 
 onMounted(() => {
@@ -32,6 +32,7 @@ onMounted(() => {
 
 const handleCheckChange = (data) => {
     title.value = data.deptName
+    titleId.value = data.deptId
 }
 </script>
 <style lang="scss" scoped>

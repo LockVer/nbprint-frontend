@@ -199,7 +199,7 @@ const dataClear = (res) => {
 }
 
 const directions = (items) => {
-    const direct = [
+    const directList = [
         { text: '上', value: 'T' },
         { text: '下', value: 'B' },
         { text: '左', value: 'L' },
@@ -210,11 +210,16 @@ const directions = (items) => {
         { text: '下中', value: 'bottomcenter' },
         { text: '下右', value: 'bottomright' },
     ]
-    if(items.name == 'direction'){
-        // console.log(items.datas)
-        items.datas = direct.filter(item => item.value == items.datas) ? direct.filter(item => item.value == items.datas)[0].text : items.datas
-    } else{
-        // items.datas = boxCodePositionList.filter(item => item.value == items.datas) ? boxCodePositionList.filter(item => item.value == items.datas)[0].text : items.datas
+    if (items.name == 'direction') {
+        let directs = directList.filter(item => item.value == items.datas)
+        if (directs.length > 0) {
+            items.datas = directs[0].text
+        }
+    } else {
+        let boxCodePosition = boxCodePositionList.filter(item => item.value == items.datas)
+        if (boxCodePosition.length > 0) {
+            items.datas = boxCodePosition[0].text
+        }
     }
 }
 </script>

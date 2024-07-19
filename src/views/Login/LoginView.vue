@@ -39,7 +39,7 @@ const login = () => {
         ElMessage.error('用户名或密码不能为空');
         return;
     }
-    userService.Login({
+    userService.Login({  
         username: username.value,
         password: password.value
     }).then((res) => {

@@ -74,7 +74,7 @@ export default defineComponent({
                     <el-dropdown-item @click="console.log(111)">帮助文档</el-dropdown-item>
                     <el-dropdown-item @click="console.log(222)">意见反馈</el-dropdown-item>
                     <el-dropdown-item>个人设置</el-dropdown-item>
-                    <el-dropdown-item @click="goOutHandler">登出</el-dropdown-item>
+                    <el-dropdown-item @click="goOutHandler">退出</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>

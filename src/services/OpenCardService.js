@@ -1,5 +1,4 @@
 import ApiService from '../utils/ApiService';
-import { v4 as uuidv4 } from 'uuid';
 class OpenCardService {
     constructor() {
         this.apiService = new ApiService();

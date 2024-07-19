@@ -63,10 +63,7 @@
             </el-table-column>
             <el-table-column fixed="right" label="操作" width="80">
                 <template #default="scope">
-                    <el-link type="primary" :href="scope.row.pdfOss" 
-                        @click.stop="downloadFile(scope.row)">
-                        下载
-                    </el-link>
+                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop>下载</el-link>
                 </template>
             </el-table-column>
             <el-table-column fixed="right" label="审核" width="100">
@@ -179,7 +176,7 @@ const searchHandler = (value) => {
 const checkOrder = (row) => {
     factoryServiceClass.CheckLock(row.id).then(res => {
         localStorage.setItem('orderDetails', JSON.stringify(res.data));
-        router.push(`/factory/detail/${row.id}`);
+        router.push(`/factoryaudit/detail/${row.id}`);
     }).catch(err => {
         ElMessage.error(err);
     })

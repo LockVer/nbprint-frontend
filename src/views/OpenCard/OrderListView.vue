@@ -121,6 +121,8 @@ const endTime = ref('');
 const currentPage = ref(1);
 const pageSize = ref(20);
 
+const queryParams = ref({})
+
 watch(searchForm, (newVal) => {
     if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {
         errorMessage.value = '最大值不能小于最小值';
@@ -169,7 +171,8 @@ const searchHandler = (value) => {
             delete value[key];
         }
     }
-    loadData(value)
+    queryParams.value = value
+    loadData()
 }
 
 
@@ -185,17 +188,17 @@ const rowClick = (row) => {
     router.push(`/opencard/orderlist/detail/${row.id}`);
 };
 
-const loadData = (data) => {
+const loadData = () => {
     let params = {
         "pageSize": pageSize.value,
         "pageNum": currentPage.value
     }
-    if (data) {
-        params = Object.assign(params, data);
+    if (queryParams.value) {
+        params = Object.assign(params, queryParams.value);
     }
     console.log(params);
     serviceClass.GetList(params).then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
@@ -240,14 +243,6 @@ const deleteOrder = (row) => {
     });
 };
 
-const downloadFile = (row) => {
-    serviceClass.DownloadPDF(row.orderId).then((res) => {
-        console.log(res);
-    }).catch((err) => {
-        console.log(err);
-        ElMessage.error(err);
-    });
-};
 </script>
 
 <style lang="scss" scoped>

@@ -41,12 +41,12 @@ const navList = reactive({
         {
             text: "工厂审核",
             id: '2',
-            url: "/factory"
+            url: "/factoryaudit"
         },
         {
             text: "人力资源管理",
             id: '3',
-            url: "/hrm"
+            url: "/PersonnelManagement"
         }
     ]
 });

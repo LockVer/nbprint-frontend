@@ -5,20 +5,20 @@
                 <el-input v-model="searchForm.id" placeholder="请输入ID" />
             </x-component>
             <x-component label="姓名" :width="'15%'">
-                <el-input v-model="searchForm.name" placeholder="请输入姓名" />
+                <el-input v-model="searchForm.userName" placeholder="请输入姓名" />
             </x-component>
             <x-component label="性别" :width="'15%'">
-                <el-select v-model="searchForm.sex" placeholder="请选择性别">
-                    <el-option label="男" value="man" />
-                    <el-option label="女" value="woman" />
+                <el-select v-model="searchForm.gender" placeholder="请选择性别">
+                    <el-option label="男" value="1" />
+                    <el-option label="女" value="2" />
                 </el-select>
             </x-component>
             <x-component label="职位" :width="'15%'">
-                <el-input v-model="searchForm.positions" placeholder="请输入职位" />
+                <el-input v-model="searchForm.position" placeholder="请输入职位" />
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
-            <el-table-column prop="userId" label="ID" />
+            <el-table-column prop="id" label="ID" />
             <el-table-column prop="userName" label="姓名" />
             <el-table-column prop="gender" label="性别">
                 <template #default="scope">
@@ -34,23 +34,28 @@
                 </template>
             </el-table-column>
         </el-table>
+        <div class="pager">
+            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                :current-page.sync="currentPage" :page-size="pageSize" layout="prev, pager, next" background
+                :page-count="totalPage" />
+        </div>
     </x-card>
     <el-dialog class="new-dialog" v-model="dialogVisible" :close-on-click-modal="false"
-        :title="'个人信息-' + presonData.userName" width="870">
+        :title="'个人信息-' + memberDetails.userName" width="870">
         <x-card title="基础信息" style="padding: 0; box-shadow: none;" :headerStyle="{ 'margin-bottom': '12px' }"
             :titleStyle="{ 'font-size': '18px' }">
             <div class="deInfo">
-                <x-component label="ID" :width="'15%'">{{ presonData.userId }}</x-component>
-                <x-component label="姓名" :width="'15%'">{{ presonData.userName }}</x-component>
-                <x-component label="性别" :width="'15%'">{{ ["-", "男", "女"][presonData.gender] }}</x-component>
-                <x-component label="别名" :width="'15%'">{{ presonData.alias }}</x-component>
-                <x-component label="电话" :width="'15%'">{{ presonData.mobile }}</x-component>
-                <x-component label="座机" :width="'15%'">{{ presonData.telephone }}</x-component>
-                <x-component label="地址" :width="'15%'">{{ presonData.address }}</x-component>
-                <x-component label="企业邮箱" :width="'15%'">{{ presonData.bizMail }}</x-component>
+                <x-component label="ID" :width="'15%'">{{ memberDetails.id }}</x-component>
+                <x-component label="姓名" :width="'15%'">{{ memberDetails.userName }}</x-component>
+                <x-component label="性别" :width="'15%'">{{ ["-", "男", "女"][memberDetails.gender] }}</x-component>
+                <x-component label="别名" :width="'15%'">{{ memberDetails.alias }}</x-component>
+                <x-component label="电话" :width="'15%'">{{ memberDetails.mobile }}</x-component>
+                <x-component label="座机" :width="'15%'">{{ memberDetails.telephone }}</x-component>
+                <x-component label="地址" :width="'15%'">{{ memberDetails.address }}</x-component>
+                <x-component label="企业邮箱" :width="'15%'">{{ memberDetails.bizMail }}</x-component>
                 <x-component label="头像" :width="'15%'">
-                    <el-image v-if="presonData.avatar !== '-'" style="width: 36px; height: 36px"
-                        :src="presonData.avatar" />
+                    <el-image v-if="memberDetails.avatar !== '-'" style="width: 36px; height: 36px"
+                        :src="memberDetails.avatar" />
                     <el-image v-else>
                         <template #error>
                             <div class="image-slot">
@@ -64,9 +69,10 @@
         <x-card title="职务信息" style="padding: 0; box-shadow: none;" :headerStyle="{ 'margin-bottom': '12px' }"
             :titleStyle="{ 'font-size': '18px' }">
             <div class="deInfo">
-                <x-component label="职位" :width="'15%'">{{ presonData.position }}</x-component>
-                <x-component label="所属部门" :width="'15%'">{{ presonData.mainDepartment }}</x-component>
-                <x-component label="直属上级" :width="'15%'">{{ presonData.directLeader }}</x-component>
+                <x-component label="职位" :width="'15%'">{{ memberDetails.position }}</x-component>
+                <x-component label="所属部门" :width="'15%'">{{ memberDetails.mainDepartment }}</x-component>
+                <x-component label="直属上级" :width="'15%'">{{ memberDetails.directLeader == null ? '-' :
+                    memberDetails.directLeader }}</x-component>
             </div>
         </x-card>
     </el-dialog>
@@ -77,29 +83,99 @@ import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import { Picture as IconPicture } from '@element-plus/icons-vue'
 import HrmService from '@/services/HrmService';
-import { ref, reactive, onMounted,watch } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue';
+import { debounce } from 'lodash';
 
 const props = defineProps({
     title: {
         type: String,
         default: ""
+    },
+    titleId: {
+        type: Number,
+        default: 1
     }
 })
 const tableData = ref([])
 const servicesClass = new HrmService()
 const searchForm = reactive({
     id: "",
-    name: "",
-    sex: "",
-    positions: ""
+    userName: "",
+    gender: "",
+    position: ""
 })
 const presonData = ref({})
 const dialogVisible = ref(false)
+const memberDetails = ref({})
+const currentPage = ref(1);
+const pageSize = ref(13);
+const totalPage = ref(0);
+const queryParams = ref({})
 
-watch(() => props.title, () => {
-    console.log(props.title)
-    servicesClass.getMembersList().then(res => {
-        tableData.value = res.data
+watch(() => props.titleId, () => {
+    for (const key in searchForm) {
+        searchForm[key] = ''
+    }
+    loadData()
+})
+watch(searchForm, (newVal) => {
+    debouncedLoadData(newVal)
+})
+// 防抖
+const debouncedLoadData = debounce((newVal) => {
+    const filteredVal = { ...newVal }
+    for (const key in filteredVal) {
+        if (filteredVal[key] === '' || filteredVal[key] === null) {
+            delete filteredVal[key]
+        }
+    }
+    queryParams.value = filteredVal
+    loadData()
+}, 1000)
+
+onMounted(() => {
+    loadData()
+})
+
+const rowClick = (row) => {
+    presonData.value = row
+    dialogVisible.value = true
+    servicesClass.getMembersDetail(row.userId).then(res => {
+        memberDetails.value = res.data
+        for (const key in memberDetails.value) {
+            if (memberDetails.value[key] == null || memberDetails.value[key] == '') {
+                memberDetails.value[key] = '-'
+            }
+        }
+        console.log(memberDetails.value.avatar)
+    })
+}
+
+const handleSizeChange = (newSize) => {
+    pageSize.value = newSize;
+    console.log(4444)
+    loadData();
+};
+
+const handleCurrentChange = (newSize) => {
+    console.log(currentPage.value, newSize, 5555)
+    currentPage.value = newSize;
+    loadData();
+};
+
+const loadData = () => {
+    let params = {
+        "deptId": props.titleId,
+        "pageSize": pageSize.value,
+        "pageNum": currentPage.value
+    }
+    if (queryParams.value) {
+        params = Object.assign(params, queryParams.value);
+    }
+    // console.log(params);
+    servicesClass.getMembersList(params).then((res) => {
+        tableData.value = res.data.userList
+        totalPage.value = res.data.totalPage
         tableData.value.forEach(element => {
             for (const key in element) {
                 if (element[key] == null || element[key] == '') {
@@ -110,36 +186,20 @@ watch(() => props.title, () => {
                 element.gender = 0
             }
         });
-    }).catch(err => {
-        console.log(err)
-    })
-})
-
-onMounted(() => {
-    // servicesClass.getMembersList().then(res => {
-    //     tableData.value = res.data
-    //     tableData.value.forEach(element => {
-    //         for (const key in element) {
-    //             if (element[key] == null || element[key] == '') {
-    //                 element[key] = '-'
-    //             }
-    //         }
-    //         if (element.gender == '-') {
-    //             element.gender = 0
-    //         }
-    //     });
-    // }).catch(err => {
-    //     console.log(err)
-    // })
-})
-
-const rowClick = (row) => {
-    presonData.value = row
-    dialogVisible.value = true
-}
+    }).catch((err) => {
+        console.log(err);
+        // ElMessage.error(err);
+    });
+};
 </script>
 
 <style lang="scss" scoped>
+.pager {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
 .search-content {
     display: flex;
     column-gap: 40px;

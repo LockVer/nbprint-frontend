@@ -25,22 +25,22 @@ const routes = [
   {
     path: '/opencard/orderlist/detail/:id',
     name: 'detail',
-    component: ()=> import('../views/OpenCard/Detail/detail.vue')
+    component: ()=> import('../views/OpenCard/Detail/DetailView.vue')
   },
   {
-    path: '/factory',
-    name: 'factory',
-    component: ()=> import('../views/Factory/index.vue')
+    path: '/factoryaudit',
+    name: 'factoryaudit',
+    component: ()=> import('../views/FactoryAudit/FactoryAuditView.vue')
   },
   {
-    path: '/factory/detail/:id',
+    path: '/factoryaudit/detail/:id',
     name: 'auditDetails',
-    component: ()=> import('../views/Factory/ui/details.vue')
+    component: ()=> import('../views/FactoryAudit/ui/DetailView.vue')
   },
   {
-    path: '/hrm',
-    name: 'hrm',
-    component: ()=> import('../views/hrm/index.vue')
+    path: '/PersonnelManagement',
+    name: 'PersonnelManagement',
+    component: ()=> import('../views/PersonnelManagement/PersonnelManagementView.vue')
   }
 ]
 
