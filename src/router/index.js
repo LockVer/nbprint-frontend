@@ -24,23 +24,23 @@ const routes = [
   },
   {
     path: '/opencard/orderlist/detail/:id',
-    name: 'detail',
-    component: ()=> import('../views/OpenCard/Detail/DetailView.vue')
+    name: 'orderdetails',
+    component: ()=> import('../views/OpenCard/OrderDetail/DetailView.vue')
   },
   {
     path: '/factoryaudit',
     name: 'factoryaudit',
-    component: ()=> import('../views/FactoryAudit/FactoryAuditView.vue')
+    component: ()=> import('../views/OpenCard/FactoryAudit/FactoryAuditView.vue')
   },
   {
     path: '/factoryaudit/detail/:id',
-    name: 'auditDetails',
-    component: ()=> import('../views/FactoryAudit/ui/DetailView.vue')
+    name: 'auditdetails',
+    component: ()=> import('../views/OpenCard/FactoryAudit/AuditDetails/DetailView.vue')
   },
   {
     path: '/PersonnelManagement',
     name: 'PersonnelManagement',
-    component: ()=> import('../views/PersonnelManagement/PersonnelManagementView.vue')
+    component: ()=> import('../views/OpenCard/PersonnelManagement/PersonnelManagementView.vue')
   }
 ]
 

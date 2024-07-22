@@ -9,12 +9,11 @@
 <script setup>
 import hrmNav from './ManagementCompontents/ManagementNavView.vue';
 import hrmTabel from './ManagementCompontents/ManagementTableView.vue';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import HrmService from '@/services/HrmService';
 const servicesClass = new HrmService()
 
 const departmentValue = ref([])
-// const members = ref([])
 
 const hrmNavRef = ref(null);
 const title = ref('');

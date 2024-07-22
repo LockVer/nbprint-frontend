@@ -91,7 +91,7 @@
 
 <script setup>
 import { onMounted, ref, reactive, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import {  useRouter } from 'vue-router';
 import XCard from '../../components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';

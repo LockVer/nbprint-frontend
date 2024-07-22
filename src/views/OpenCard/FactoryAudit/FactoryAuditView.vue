@@ -86,12 +86,12 @@
 <script setup>
 import { onMounted, onBeforeMount, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import XCard from '../../components/container/XCard.vue';
+import XCard from '@/components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
-import XComponent from '../../components/container/XComponent.vue';
-import searchService from '../../services/searchService';
-import FactoryService from '../../services/FactoryService';
+import XComponent from '@/components/container/XComponent.vue';
+import searchService from '@/services/searchService';
+import FactoryService from '@/services/FactoryService';
 
 
 const router = useRouter();
