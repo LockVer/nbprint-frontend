@@ -9,47 +9,39 @@
 
 <script setup>
 import XCard from '@/components/container/XCard.vue';
-// import HrmService from '@/services/HrmService';
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
+// 部门列表数据
 const value = defineModel()
-
+// 搜索框数据
 const filterText = ref('')
 const treeRef = ref(null)
-// const servicesClass = new HrmService()
-
+// 定义 emits，用于发出事件
 const emits = defineEmits(['checkChange'])
 
 
-// onMounted(() => {
-//     servicesClass.getDepartments().then(res => {
-//         servicesClass.getDepartmentsList().then(res => {
-//             console.log(res)
-//         })
-//     })
-// })
-
-
+// 树形结构组件的属性配置
 const defaultProps = {
-    children: 'children',
-    label: 'deptName',
+    children: 'children', // 子节点的属性名
+    label: 'deptName', // 显示文本的属性名
 }
-
+// 监控 filterText 变量的变化，过滤树形节点
 watch(filterText, (val) => {
     treeRef.value.filter(val)
 })
-
-
+// 过滤节点的方法
 const filterNode = (value, data) => {
     console.log(value, data)
+    // 如果没有过滤值，显示所有节点
     if (!value) return true
+    // 根据节点的 deptName 进行匹配，返回是否包含过滤值
     return data.deptName.includes(value)
 }
-
+// 点击事件处理方法
 const checkChangeHandler = (data, checked) => {
     emits('checkChange', data, checked)
 
 }
-
+// 暴露 treeRef，用于外部访问树组件实例
 defineExpose({
     treeRef
 })

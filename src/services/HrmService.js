@@ -1,7 +1,7 @@
 import ApiService from '../utils/ApiService';
 class searchService {
     constructor() {
-        this.apiService = new ApiService('http://192.168.1.224:8084');
+        this.apiService = new ApiService();
     }
     // 获取部门列表层级
     getDepartmentsList() {

@@ -17,7 +17,7 @@ export default defineComponent({
     setup(props, { emit }: any) {
         const isBack = ref(false);
         const route = useRoute();
-        if (route.path.includes('/factory/detail')) {
+        if (route.path.includes('/factoryaudit/detail')) {
             isBack.value = true;
         }
         const handleBack = () => {

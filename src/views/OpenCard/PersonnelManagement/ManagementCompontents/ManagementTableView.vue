@@ -104,12 +104,15 @@ const searchForm = reactive({
     gender: "",
     position: ""
 })
+// 当前选中的员工数据
 const presonData = ref({})
 const dialogVisible = ref(false)
+// 员工详细信息
 const memberDetails = ref({})
 const currentPage = ref(1);
 const pageSize = ref(13);
 const totalPage = ref(0);
+// 查询参数
 const queryParams = ref({})
 
 watch(() => props.titleId, () => {
@@ -138,7 +141,7 @@ onMounted(() => {
 })
 
 const rowClick = (row) => {
-    presonData.value = row
+    // presonData.value = row
     dialogVisible.value = true
     servicesClass.getMembersDetail(row.userId).then(res => {
         memberDetails.value = res.data
@@ -153,12 +156,10 @@ const rowClick = (row) => {
 
 const handleSizeChange = (newSize) => {
     pageSize.value = newSize;
-    console.log(4444)
     loadData();
 };
 
 const handleCurrentChange = (newSize) => {
-    console.log(currentPage.value, newSize, 5555)
     currentPage.value = newSize;
     loadData();
 };
@@ -172,7 +173,6 @@ const loadData = () => {
     if (queryParams.value) {
         params = Object.assign(params, queryParams.value);
     }
-    // console.log(params);
     servicesClass.getMembersList(params).then((res) => {
         tableData.value = res.data.userList
         totalPage.value = res.data.totalPage
@@ -188,7 +188,6 @@ const loadData = () => {
         });
     }).catch((err) => {
         console.log(err);
-        // ElMessage.error(err);
     });
 };
 </script>

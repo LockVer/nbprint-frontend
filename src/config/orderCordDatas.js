@@ -1,5 +1,3 @@
-import { computed } from "vue"
-
 export const checkDetail = [
     {
         label: "异常项",
@@ -103,50 +101,3 @@ export const adCard = [
     }
 ]
 
-
-
-// "prizeMark": [
-//     {
-//         "type": "奖符种类",
-//         "name": "奖符名称",
-//         "image": "奖符图片.jpg",
-//         "amount": 11111,
-//         "count": 12,
-//         "total": 133332,
-//         "comment": "奖符备注"
-//     },
-//     {
-//         "type": "奖符种类",
-//         "name": "奖符名称",
-//         "image": "奖符图片.jpg",
-//         "amount": 11111,
-//         "count": 12,
-//         "total": 133332,
-//         "comment": "奖符备注"
-//     },
-//     {
-//         "type": "奖符种类",
-//         "name": "奖符名称",
-//         "image": "奖符图片.jpg",
-//         "amount": 11111,
-//         "count": 12,
-//         "total": 133332,
-//         "comment": "奖符备注"
-//     }
-// ]
-
-// const prizeMark = [
-//     {
-//         "type": "奖符种类",
-//         item: [
-//             {
-//                 "name": "1",
-//                 "image": "奖符图片.jpg",
-//                 "amount": 11111,
-//                 "count": 12,
-//                 "total": 133332,
-//                 "comment": "奖符备注"
-//             }
-//         ]
-//     }
-// ]

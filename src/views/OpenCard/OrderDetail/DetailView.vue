@@ -114,73 +114,88 @@ import XCard from '../../../components/container/XCard.vue';
 import XComponent from '../../../components/container/XComponent.vue';
 import { onMounted, ref, reactive } from 'vue';
 import OpenCardService from '../../../services/OpenCardService';
-import { checkDetail, general, smallCard } from '@/config/orderCordDatas'
+import { checkDetail, general, smallCard } from '@/config/orderCordDatas';
+
 const serviceClass = new OpenCardService();
-const status = ref('')
-const isShow = ref(false)
+const status = ref('') // 订单状态
+const isShow = ref(false) // 是否显示异常信息
+// 定义订单详情数据结构
 const orderDetails = reactive({
     checkDetail: reactive(checkDetail.map(item => ({ ...item, datas: null }))),
     general: reactive(general.map(item => ({ ...item, datas: null }))),
     smallCard: reactive(smallCard.map(item => ({ ...item, datas: null }))),
 })
-
+// 定义宣传卡和奖符相关信息
 const adCardInfo = ref({})
 const prizeMarkInfo = ref([])
+
 onMounted(() => {
     let id = JSON.parse(localStorage.getItem('orderDetails'));
     id = id.id
+    // 进行获取详情请求
     servicesHandle(id)
 })
+// 获取订单详情数据
 const servicesHandle = (id) => {
     serviceClass.GetDetails(id).then(res => {
-        delete res.data.id
+        delete res.data.id;
+        // 处理宣传卡信息
         if (res.data.adCardInfo) {
-            adCardInfo.value = res.data.adCardInfo
+            adCardInfo.value = res.data.adCardInfo;
+            // 遍历每张宣传卡，处理其中的每个字段
             adCardInfo.value.adCard.forEach((item) => {
                 for (const key in item) {
                     if (item[key] === null) {
-                        item[key] = '无'
+                        item[key] = '无';
                     }
                 }
-            })
+            });
         }
+        // 处理奖符信息
         if (res.data.prizeMarkInfo) {
-            prizeMarkInfo.value = res.data.prizeMarkInfo
+            prizeMarkInfo.value = res.data.prizeMarkInfo;
             prizeMarkInfo.value.forEach((item) => {
+                // 根据 markType 字段值转换为相应的数字
                 if (item.markType === 'cash') {
-                    item.markType = 0
+                    item.markType = 0;
                 } else if (item.markType === 'holdCard') {
-                    item.markType = 1
+                    item.markType = 1;
                 } else if (item.markType === 'noPrize') {
-                    item.markType = 2
+                    item.markType = 2;
                 } else if (item.markType === 'userDefined') {
-                    item.markType = 3
+                    item.markType = 3;
                 }
                 item.prizeMark.forEach((item) => {
                     for (const key in item) {
                         if (item[key] === null || item[key] === '') {
-                            item[key] = '无'
+                            item[key] = '无';
                         }
                     }
-                })
-            })
+                });
+            });
         }
-        dataClear(res.data)
-    })
-}
-
+        // 数据处理
+        dataClear(res.data);
+    });
+};
+// 数据清洗
 const dataClear = (res) => {
+    // 处理审核详情数据
     if (res.checkDetail) {
         status.value = res.checkDetail.checkStatus
+        // 如果状态不是 '0'，则显示异常详情
         if (status.value !== '0') {
             isShow.value = true
         }
     }
+    // 遍历 orderDetails 对象中的每个键值对
     Object.keys(orderDetails).forEach(key => {
         orderDetails[key].forEach(item => {
+            // 如果返回数据中存在对应的字段，则更新 item 的数据
             if (res[key] && res[key][item.name]) {
                 item.datas = res[key][item.name];
             }
+            // 如果数据为 null 或空字符串，则替换为 '无'
             if (item.datas == null || item.datas == '') {
                 item.datas = '无'
             } else if (item.datas == 'CNY') {
@@ -188,16 +203,17 @@ const dataClear = (res) => {
             } else if (item.datas == 'USD') {
                 item.datas = '$'
             } else {
-                // console.log(String(item.datas).split(','))
+                // 如果数据包含逗号，则分割为数组
                 item.datas = String(item.datas).includes(',') ? item.datas.split(',') : item.datas;
             }
+            // 处理方向和盒码位置的显示
             if (item.name == 'direction' || item.name == 'boxCodePosition') {
                 directions(item)
             }
         });
     });
 }
-
+// 处理方向和盒码位置的显示
 const directions = (items) => {
     const directList = [
         { text: '上', value: 'T' },
@@ -211,6 +227,7 @@ const directions = (items) => {
         { text: '下右', value: 'bottomright' },
     ]
     if (items.name == 'direction') {
+        // 如果字段名称为 'direction'，则转换为对应的文本
         let directs = directList.filter(item => item.value == items.datas)
         if (directs.length > 0) {
             items.datas = directs[0].text

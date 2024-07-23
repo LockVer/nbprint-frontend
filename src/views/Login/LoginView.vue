@@ -45,7 +45,7 @@ const login = () => {
     }).then((res) => {
         console.log(res);
         localStorage.setItem('token', res.data.token);
-        localStorage.setItem('name', res.data.name);
+        localStorage.setItem('userInfo', JSON.stringify(res.data.userInfo));
         router.push('/opencard');
     }).catch((err) => {
         console.log(err);

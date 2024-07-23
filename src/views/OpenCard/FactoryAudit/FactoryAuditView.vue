@@ -10,11 +10,6 @@
                         :value="item" />
                 </el-select>
             </x-component>
-            <x-component label="业务员">
-                <el-select v-model="searchForm.businessPeople" placeholder="请选择业务员">
-                    <el-option v-for="(item, index) in options.agentNames" :key="index" :label="item" :value="item" />
-                </el-select>
-            </x-component>
             <x-component label="尺寸">
                 <el-select v-model="searchForm.smallCardSize" placeholder="请选择尺寸">
                     <el-option v-for="(item, index) in options.cardSizes" :key="index" :label="item" :value="item" />
@@ -38,9 +33,9 @@
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%">
-            <el-table-column prop="productName" label="产品名称">
+            <el-table-column prop="productName" label="产品名称" :show-overflow-tooltip="true">
                 <template #default="scope">
-                    <div>{{ scope.row.productName }}（{{ scope.row.chineseName }}）</div>
+                    {{ scope.row.productName }}（{{ scope.row.chineseName }}）
                 </template>
             </el-table-column>
             <el-table-column prop="customerName" label="客户名字" />
@@ -84,7 +79,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeMount, ref, reactive, watch } from 'vue';
+import { onMounted, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import XCard from '@/components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
@@ -104,7 +99,6 @@ const factoryServiceClass = new FactoryService();
 const searchForm = reactive({
     chineseName: '',
     customerName: '',
-    businessPeople: '',
     smallCardSize: '',
     minTotal: null,
     maxTotal: null,
@@ -113,14 +107,9 @@ const searchForm = reactive({
 const createTime = ref(null);
 const startTime = ref('');
 const endTime = ref('');
-
+// 分页参数
 const currentPage = ref(1);
 const pageSize = ref(12);
-
-onBeforeMount(() => {
-    console.log('Component before mount');
-});
-
 
 watch(searchForm, (newVal) => {
     if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {
@@ -172,7 +161,7 @@ const searchHandler = (value) => {
     }
     loadData(value)
 }
-
+// 审核订单处理函数
 const checkOrder = (row) => {
     factoryServiceClass.CheckLock(row.id).then(res => {
         localStorage.setItem('orderDetails', JSON.stringify(res.data));
@@ -181,8 +170,7 @@ const checkOrder = (row) => {
         ElMessage.error(err);
     })
 }
-
-
+// 加载数据函数
 const loadData = (data) => {
     let params = {
         "pageSize": pageSize.value,
@@ -196,7 +184,6 @@ const loadData = (data) => {
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
         console.log(err);
-        // ElMessage.error(err);
     });
 };
 
@@ -217,21 +204,22 @@ onMounted(() => {
     })
     loadData();
 });
-
-
-const downloadFile = (row) => {
-    console.log(row);
-
-    serviceClass.DownloadPDF(row.orderId).then((res) => {
-        console.log(res);
-    }).catch((err) => {
-        console.log(err);
-        ElMessage.error(err);
-    });
-};
-
 </script>
+
 <style lang="scss" scoped>
+::v-deep(.el-popper.is-dark) {
+    max-width: 50% !important;
+    color: black;
+    background-color: white;
+    border: 1px solid #E4E4E4;
+}
+::v-deep(.el-popper__arrow)::before {
+    content: '';
+    display: none;
+    border-top-color:  1px solid transparent;
+    background-color: white !important;
+}
+
 .pager {
     display: flex;
     justify-content: center;
@@ -291,7 +279,7 @@ a {
 
 /* 数量 */
 .number-range-container {
-    width: 200px;
+    width: 300px;
     display: flex;
     flex-direction: column;
     height: 100%;

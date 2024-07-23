@@ -1,5 +1,6 @@
 <template>
     <x-card title="订单管理" @createOrder="createOrderHandler">
+        <!-- 筛选条件 -->
         <div class="general-content">
             <x-component label="产品名称">
                 <el-input v-model="searchForm.productName" placeholder="请输入产品名称" />
@@ -8,11 +9,6 @@
                 <el-select v-model="searchForm.customerName" placeholder="请选择客户">
                     <el-option v-for="(item, index) in options.customerNames" :key="index" :label="item"
                         :value="item" />
-                </el-select>
-            </x-component>
-            <x-component label="业务员">
-                <el-select v-model="searchForm.businessPeople" placeholder="请选择业务员">
-                    <el-option v-for="(item, index) in options.agentNames" :key="index" :label="item" :value="item" />
                 </el-select>
             </x-component>
             <x-component label="尺寸">
@@ -33,14 +29,14 @@
                 </div>
             </x-component>
             <x-component label="创建时间">
-                <el-date-picker v-model="createTime" type="daterange" start-placeholder="开始日期"
-                    end-placeholder="结束日期" :default-value="[new Date(), new Date()]" @change="changeHandler"  />
+                <el-date-picker v-model="createTime" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
+                    :default-value="[new Date(), new Date()]" @change="changeHandler" />
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
-            <el-table-column prop="productName" label="产品名称">
-                <template #default="scope">
-                    <div>{{ scope.row.productName }}（{{ scope.row.chineseName }}）</div>
+            <el-table-column prop="productName" label="产品名称" :show-overflow-tooltip="true">
+                <template #default="scope" >
+                    {{ scope.row.productName }}（{{ scope.row.chineseName }}）
                 </template>
             </el-table-column>
             <el-table-column prop="customerName" label="客户名字" />
@@ -69,7 +65,7 @@
                         编辑
                     </el-button>
                     <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)"
-                        :class="{ 'btn-disable': scope.row.status == 0 }" >
+                        :class="{ 'btn-disable': scope.row.status == 0 }">
                         删除
                     </el-button>
                     <el-link type="primary" :href="scope.row.pdfOss" @click.stop
@@ -91,7 +87,7 @@
 
 <script setup>
 import { onMounted, ref, reactive, watch } from 'vue';
-import {  useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import XCard from '../../components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
@@ -103,26 +99,24 @@ const router = useRouter();
 const tableData = ref([]);
 const totalPage = ref(0);
 const errorMessage = ref('');
-const options = ref('');
+const options = ref(''); // 选择框选项数据
 const serviceClass = new OpenCardService();
 const searchServiceClass = new searchService();
+// 搜索表单数据
 const searchForm = reactive({
     chineseName: '',
     customerName: '',
-    businessPeople: '',
     smallCardSize: '',
     minTotal: null,
     maxTotal: null,
 });
-const createTime = ref(null);
-const startTime = ref('');
-const endTime = ref('');
-
+const createTime = ref(null); // 创建时间范围
+const startTime = ref(''); // 搜索开始时间
+const endTime = ref(''); // 搜索结束时间
 const currentPage = ref(1);
 const pageSize = ref(20);
-
-const queryParams = ref({})
-
+const queryParams = ref({}) // 查询参数
+// 监听搜索表单数据的变化
 watch(searchForm, (newVal) => {
     if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {
         errorMessage.value = '最大值不能小于最小值';
@@ -140,6 +134,7 @@ watch(searchForm, (newVal) => {
         endTime: endTime.value
     });
 });
+// 日期范围变化处理
 const changeHandler = (value) => {
     if (value) {
         const formattedDates = value.map(date => {
@@ -164,7 +159,6 @@ const changeHandler = (value) => {
         endTime: endTime.value
     })
 }
-
 const searchHandler = (value) => {
     for (const key in value) {
         if (value[key] === '' || value[key] === null) {
@@ -174,20 +168,17 @@ const searchHandler = (value) => {
     queryParams.value = value
     loadData()
 }
-
-
-
+// 创建订单处理
 const createOrderHandler = () => {
     router.push(`/opencard/createorder`);
 }
-
-
+// 双击跳转到详情页面
 const rowClick = (row) => {
-    // 跳转到详情页面
     localStorage.setItem('orderDetails', JSON.stringify(row));
     router.push(`/opencard/orderlist/detail/${row.id}`);
 };
 
+// 加载数据处理
 const loadData = () => {
     let params = {
         "pageSize": pageSize.value,
@@ -196,9 +187,7 @@ const loadData = () => {
     if (queryParams.value) {
         params = Object.assign(params, queryParams.value);
     }
-    console.log(params);
     serviceClass.GetList(params).then((res) => {
-        // console.log(res.data);
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
@@ -206,17 +195,16 @@ const loadData = () => {
         ElMessage.error(err);
     });
 };
-
+// 处理每页大小变化
 const handleSizeChange = (newSize) => {
     pageSize.value = newSize;
     loadData();
 };
-
+// 处理当前页码变化
 const handleCurrentChange = (newSize) => {
     currentPage.value = newSize;
     loadData();
 };
-
 
 onMounted(() => {
     searchServiceClass.getOptions().then((res) => {
@@ -226,13 +214,13 @@ onMounted(() => {
     })
     loadData();
 });
-
+// 编辑订单处理函数
 const editOrder = (row) => {
     console.log(row);
     localStorage.setItem('editOrder', JSON.stringify(row));
     router.push('/opencard/createorder');
 };
-
+// 删除订单处理函数
 const deleteOrder = (row) => {
     serviceClass.DeleteOrder(row.id).then((res) => {
         ElMessage.success('删除成功');
@@ -246,6 +234,20 @@ const deleteOrder = (row) => {
 </script>
 
 <style lang="scss" scoped>
+::v-deep(.el-popper.is-dark) {
+    max-width: 50% !important;
+    color: black;
+    background-color: white;
+    border: 1px solid #E4E4E4;
+}
+
+::v-deep(.el-popper__arrow)::before {
+    content: '';
+    display: none;
+    border-top-color: 1px solid transparent;
+    background-color: white !important;
+}
+
 .pager {
     display: flex;
     justify-content: center;
@@ -291,7 +293,7 @@ a {
 
 /* 数量 */
 .number-range-container {
-    width: 200px;
+    width: 300px;
     display: flex;
     flex-direction: column;
     height: 100%;
