@@ -70,7 +70,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <div class="pager">
+        <div class="pager" v-if="totalPage">
             <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
                 :current-page.sync="currentPage" :page-size="pageSize" layout="prev, pager, next" background
                 :page-count="totalPage" />
@@ -183,6 +183,10 @@ const loadData = (data) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
+        // if(err === '没有访问权限'){
+        //     router.go(-1);
+        //     ElMessage.error(err);
+        // }
         console.log(err);
     });
 };

@@ -192,6 +192,7 @@ const dataClear = (res) => {
     Object.keys(orderDetails).forEach(key => {
         orderDetails[key].forEach(item => {
             // 如果返回数据中存在对应的字段，则更新 item 的数据
+            // console.log(item)
             if (res[key] && res[key][item.name]) {
                 item.datas = res[key][item.name];
             }
@@ -213,6 +214,7 @@ const dataClear = (res) => {
         });
     });
 }
+// console.log(orderDetails.general)
 // 处理方向和盒码位置的显示
 const directions = (items) => {
     const directList = [

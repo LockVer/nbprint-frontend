@@ -76,7 +76,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <div class="pager">
+        <div class="pager" v-if="totalPage">
             <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
                 :current-page.sync="currentPage" :page-size="pageSize" layout="prev, pager, next" background
                 :page-count="totalPage" />

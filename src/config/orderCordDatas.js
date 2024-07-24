@@ -16,7 +16,7 @@ export const checkDetail = [
 export const general = [
     {
         label: "产品名称",
-        name: 'name'
+        name: 'productName'
     },
     {
         label: '产品译名',
@@ -39,11 +39,11 @@ export const general = [
 export const smallCard = [
     {
         label: "尺寸",
-        name: 'size'
+        name: 'smallCardSize'
     },
     {
         label: '揭开口数量',
-        name: 'openNumber'
+        name: 'openingNumber'
     },
     {
         label: '小卡单价',
@@ -63,7 +63,7 @@ export const smallCard = [
     },
     {
         label: '盒数',
-        name: 'boxCount'
+        name: 'boxNumber'
     },
     {
         label: '每盒数量',
