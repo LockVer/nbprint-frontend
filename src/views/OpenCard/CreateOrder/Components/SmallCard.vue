@@ -13,10 +13,10 @@
             <x-check-box v-model="initData.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
         </x-component>
         <x-component label="盒号" padding="0 0 18px 0" width="220px">
-            <el-input v-model="initData.smallBoxCode" />
+            <el-input v-model="initData.boxCode" />
         </x-component>
         <x-component label="盒号位置" padding="0 0 10px 0">
-            <x-check-box v-model="initData.smallBoxCodePosition" :DataList="boxCodePositionList" type="radio"></x-check-box>
+            <x-check-box v-model="initData.boxCodePosition" :DataList="boxCodePositionList" type="radio"></x-check-box>
         </x-component>
         <x-component label="盒数" padding="0 0 18px 0">
             <el-input-number v-model="initData.boxCount" :min="1" />
