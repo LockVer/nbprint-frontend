@@ -48,7 +48,8 @@
 import { ref, onMounted, watch, defineProps, defineExpose } from 'vue';
 import { cloneDeep } from 'lodash';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import XCheckBox from '../../../../components/functional/XCheckBox.vue';
+import XCheckBox from '@/components/functional/XCheckBox.vue';
+
 import { v4 as uuidv4 } from 'uuid'; // 导入uuid库
 const props = defineProps({
     backgroundImageUrl: String,
