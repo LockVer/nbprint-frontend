@@ -112,7 +112,6 @@ import XInputUpload from '@/components/functional/XInputUpload.vue';
 import { ElMessage } from 'element-plus'
 import _, { max } from 'lodash';
 
-
 const initData = defineModel("initData");
 const smallCard = defineModel("smallCard");
 
