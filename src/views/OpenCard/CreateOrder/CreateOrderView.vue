@@ -3,7 +3,7 @@
         <general v-model:initData="general"></general>
         <small-card v-model:initData="smallCard"></small-card>
         <ad-card v-model:initData="adCard" v-model:smallCard="smallCard"></ad-card>
-        <payout v-model:initData="payout" v-model:generalData="general"></payout>
+        <payout v-if="false" v-model:initData="payout" v-model:generalData="general"></payout>
         <prize-mark v-model:initData="prizeMark" class="prize-mark"></prize-mark>
         <layout-footer @submit="handleSubmit"></layout-footer>
     </div>
@@ -11,17 +11,18 @@
 
 <script setup>
 import {  ref, onMounted, provide } from 'vue';
-import General from './CreateOrderComponents/General.vue';
-import SmallCard from './CreateOrderComponents/SmallCard.vue';
-import AdCard from './CreateOrderComponents/AdCard.vue';
-import Payout from './CreateOrderComponents/Payout.vue';
-import PrizeMark from './CreateOrderComponents/PrizeMark.vue';
-import LayoutFooter from '../../components/common/LayoutFooter.vue';
-import OpenCardService from '../../services/OpenCardService';
-import { ElMessage, ElMessageBox } from 'element-plus'
+import General from './Components/General.vue';
+import SmallCard from './Components/SmallCard.vue';
+import AdCard from './Components/AdCard.vue';
+import Payout from './Components/Payout.vue';
+import PrizeMark from './Components/PrizeMark.vue';
+import LayoutFooter from '@/components/common/LayoutFooter.vue';
+import OpenCardService from '@/services/OpenCardService';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
-import CommonService from '../../services/CommonService';
+import CommonService from '@/services/CommonService';
+
 
 const orderId = uuidv4();   //生成唯一的orderId，用于后续的提交订单，页面内只有一个orderId，刷新后重新生成
 
@@ -47,6 +48,8 @@ const smallCard = ref({
     openQuantity: 1,
     price: '',
     boxCount: 1,
+    smallBoxCodePosition: 'BL',
+    openDirection: 'T',
     quantityPerBox: 1,
     frontImage: '',
     backImage: '',
@@ -62,7 +65,7 @@ const adCard = ref([
         "name": "",
         "image": "",
         "comment": "",
-        "openRegion": [
+        "openRegions": [
         ]
     }
 ])
@@ -319,15 +322,15 @@ const handleSubmit = () => {
                 ElMessage.error('请上传宣传卡图片');
                 return true;
             }
-            if (!card.openRegion.length) {
+            if (!card.openRegions.length) {
                 ElMessage.error('请添加揭开区域');
                 return true;
             }
-            const incompleteRegion = card.openRegion.find(region => !region.mark.length);
-            if (incompleteRegion) {
-                ElMessage.error('请添加奖符区域');
-                return true;
-            }
+            // const incompleteRegion = card.openRegions.find(region => !region.mark.length);
+            // if (incompleteRegion) {
+            //     ElMessage.error('请添加奖符区域');
+            //     return true;
+            // }
         }
         return false;
     });
@@ -372,7 +375,7 @@ const handleSubmit = () => {
     }
     //localStorage.setItem('submitData', JSON.stringify(submitData));
     console.log(submitData);
-    serviceClass.CreateOrder(submitData).then(res => {
+    serviceClass.createOrder(submitData).then(res => {
         console.log(res);
         ElMessageBox.alert(res.msg, '提交结果', {
             // if you want to disable its autofocus
@@ -391,7 +394,8 @@ const handleSubmit = () => {
 .prize-mark{
     margin-bottom: 90px
 }
-@import '../../styles/variables.scss';
+@import '@/styles/variables.scss';
+
 
 .create-order {
     position: relative;

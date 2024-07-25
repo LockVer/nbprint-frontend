@@ -13,10 +13,11 @@
             <x-check-box v-model="initData.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
         </x-component>
         <x-component label="盒号" padding="0 0 18px 0" width="220px">
-            <el-input v-model="initData.boxCode" />
+            <el-input v-model="initData.smallBoxCode" />
         </x-component>
         <x-component label="盒号位置" padding="0 0 10px 0">
-            <x-check-box v-model="initData.boxCodePosition" :DataList="boxCodePositionList" type="radio"></x-check-box>
+            <x-check-box v-model="initData.smallBoxCodePosition" :DataList="boxCodePositionList"
+                type="radio"></x-check-box>
         </x-component>
         <x-component label="盒数" padding="0 0 18px 0">
             <el-input-number v-model="initData.boxCount" :min="1" />
@@ -48,12 +49,14 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import XCard from '../../../components/container/XCard.vue';
-import XComponent from '../../../components/container/XComponent.vue';
-import XCheckBox from '../../../components/functional/XCheckBox.vue';
-import XImageUpload from '../../../components/functional/XImageUpload.vue';
+import XCard from '@/components/container/XCard.vue';
+import XComponent from '@/components/container/XComponent.vue';
+import XCheckBox from '@/components/functional/XCheckBox.vue';
+import XImageUpload from '@/components/functional/XImageUpload.vue';
+
 
 const initData = defineModel("initData");
+initData.smallBoxCodePosition = initData.smallBoxCodePosition || 'BL';
 const boxCanvas = ref(null);
 
 const cardSizeList = [
@@ -81,9 +84,9 @@ const openDirectionList = [
 ];
 
 const boxCodePositionList = [
-    { text: '下左', value: 'bottomleft' },
-    { text: '下中', value: 'bottomcenter' },
-    { text: '下右', value: 'bottomright' },
+    { text: '下左', value: 'BL' },
+    { text: '下中', value: 'BC' },
+    { text: '下右', value: 'BR' },
 ];
 
 const calcRowCount = () => {
@@ -157,7 +160,7 @@ const calcBoxSize = (columnCount, columnQuantity) => {
     const height = initData.value.size.height;  //小卡高度
     const thickness = 0.67;                      //小卡厚度
     if (!columnQuantity) {
-        columnQuantity = initData.value.quantityPerBox / columnCount;  
+        columnQuantity = initData.value.quantityPerBox / columnCount;
     }
     if (!columnCount) {
         columnCount = initData.value.quantityPerBox / columnQuantity;
@@ -247,7 +250,7 @@ const draw3DBox = (box) => {
     ctx.lineTo(x + w / 2 + d, y - h / 2 - d);
     ctx.lineTo(x + w / 2 + d, y + h / 2 - d);
     ctx.lineTo(x + w / 2, y + h / 2);
-    ctx.closePath(); 
+    ctx.closePath();
     ctx.stroke();
 
     //绘制尺寸

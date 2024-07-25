@@ -15,7 +15,7 @@ const routes = [
   {
     path: '/opencard/createorder',
     name: 'createorder',
-    component: ()=> import('../views/OpenCard/CreateOrderView.vue')
+    component: ()=> import('../views/OpenCard/CreateOrder/CreateOrderView.vue')
   },
   {
     path: '/opencard',

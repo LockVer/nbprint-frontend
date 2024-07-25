@@ -96,10 +96,11 @@
 </template>
 <script setup>
 import { ref, watch } from 'vue';
-import XCard from '../../../components/container/XCard.vue';
-import XComponent from '../../../components/container/XComponent.vue';
-import XCheckBox from '../../../components/functional/XCheckBox.vue';
-import XImageUpload from '../../../components/functional/XImageUpload.vue';
+import XCard from '@/components/container/XCard.vue';
+import XComponent from '@/components/container/XComponent.vue';
+import XCheckBox from '@/components/functional/XCheckBox.vue';
+import XImageUpload from '@/components/functional/XImageUpload.vue';
+
 
 const initData = defineModel("initData");
 const generalData = defineModel("generalData");
@@ -182,7 +183,8 @@ const getTotal = (count, amount) => {
 
 </script>
 <style lang="scss">
-@import '../../../styles/variables.scss';
+@import '@/styles/variables.scss';
+
 
 .line {
     width: 100%;

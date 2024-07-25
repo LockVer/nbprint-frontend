@@ -88,12 +88,13 @@
 <script setup>
 import { onMounted, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import XCard from '../../components/container/XCard.vue';
+import XCard from '@/components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
-import OpenCardService from '../../services/OpenCardService';
-import searchService from '../../services/SearchService';
-import XComponent from '../../components/container/XComponent.vue';
+import OpenCardService from '@/services/OpenCardService';
+import searchService from '@/services/searchService';
+import XComponent from '@/components/container/XComponent.vue';
+
 
 const router = useRouter();
 const tableData = ref([]);
@@ -187,7 +188,7 @@ const loadData = () => {
     if (queryParams.value) {
         params = Object.assign(params, queryParams.value);
     }
-    serviceClass.GetList(params).then((res) => {
+    serviceClass.getList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
@@ -222,7 +223,7 @@ const editOrder = (row) => {
 };
 // 删除订单处理函数
 const deleteOrder = (row) => {
-    serviceClass.DeleteOrder(row.id).then((res) => {
+    serviceClass.deleteOrder(row.id).then((res) => {
         ElMessage.success('删除成功');
         loadData();
     }).catch((err) => {
