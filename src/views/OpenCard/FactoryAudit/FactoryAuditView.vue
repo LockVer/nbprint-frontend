@@ -1,6 +1,5 @@
 <template>
-    <x-card title="订单管理" @createOrder="createOrderHandler">
-        <!-- 筛选条件 -->
+    <x-card title="工厂审核">
         <div class="general-content">
             <x-component label="产品名称">
                 <el-input v-model="searchForm.productName" placeholder="请输入产品名称" />
@@ -30,21 +29,20 @@
             </x-component>
             <x-component label="创建时间">
                 <el-date-picker v-model="createTime" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-                    :default-value="[new Date(), new Date()]" @change="changeHandler" />
+                    :append-to-body="true" :default-value="[new Date(), new Date()]" @change="changeHandler" />
             </x-component>
         </div>
-        <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
+        <el-table :data="tableData" style="width: 100%">
             <el-table-column prop="productName" label="产品名称" :show-overflow-tooltip="true">
-                <template #default="scope" >
+                <template #default="scope">
                     {{ scope.row.productName }}（{{ scope.row.chineseName }}）
                 </template>
             </el-table-column>
             <el-table-column prop="customerName" label="客户名字" />
             <el-table-column prop="status" label="状态">
                 <template #default="scope">
-                    <el-tag :type="['primary', 'warning', 'success', 'danger', 'danger',][scope.row.status]">{{ ["渲染中",
-                        "待审核", "已通过", "未通过", "渲染失败",
-                    ][scope.row.status] }}</el-tag>
+                    <el-tag :type="['warning', 'warning', 'success', 'danger'][scope.row.checkStatus]">{{ ["待审核",
+                        "待审核", "已通过", "未通过"][scope.row.checkStatus] }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="total" label="数量" />
@@ -58,21 +56,17 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column fixed="right" label="操作">
+            <el-table-column fixed="right" label="操作" width="80">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click.stop="editOrder(scope.row)"
-                        :class="{ 'btn-disable': scope.row.status == 0 }" :disabled="scope.row.status == 0">
-                        编辑
-                    </el-button>
-                    <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)"
-                        :class="{ 'btn-disable': scope.row.status == 0 }">
-                        删除
-                    </el-button>
-                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop
-                        :class="{ 'btn-disable': scope.row.status == 0 || scope.row.status == 4 }"
-                        :disabled="scope.row.status == 0 || scope.row.status == 4">
-                        下载
-                    </el-link>
+                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop>下载</el-link>
+                </template>
+            </el-table-column>
+            <el-table-column fixed="right" label="审核" width="100">
+                <template #default="scope">
+                    <button class="btn" :disabled="scope.row.checkStatus == 2 || scope.row.checkStatus == 3"
+                        :class="{ 'btn-disabled': scope.row.checkStatus == 2 || scope.row.checkStatus == 3 }"
+                        @click="checkOrder(scope.row)">{{ ["审核",
+                            "审核", "已审核", "已审核"][scope.row.checkStatus] }}</button>
                 </template>
             </el-table-column>
         </el-table>
@@ -84,25 +78,24 @@
     </x-card>
 </template>
 
-
 <script setup>
 import { onMounted, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import XCard from '../../components/container/XCard.vue';
+import XCard from '@/components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
-import OpenCardService from '../../services/OpenCardService';
-import searchService from '../../services/searchService';
-import XComponent from '../../components/container/XComponent.vue';
+import XComponent from '@/components/container/XComponent.vue';
+import searchService from '@/services/searchService';
+import FactoryService from '@/services/FactoryService';
+
 
 const router = useRouter();
 const tableData = ref([]);
 const totalPage = ref(0);
 const errorMessage = ref('');
-const options = ref(''); // 选择框选项数据
-const serviceClass = new OpenCardService();
+const options = ref('');
 const searchServiceClass = new searchService();
-// 搜索表单数据
+const factoryServiceClass = new FactoryService();
 const searchForm = reactive({
     chineseName: '',
     customerName: '',
@@ -110,13 +103,14 @@ const searchForm = reactive({
     minTotal: null,
     maxTotal: null,
 });
-const createTime = ref(null); // 创建时间范围
-const startTime = ref(''); // 搜索开始时间
-const endTime = ref(''); // 搜索结束时间
+
+const createTime = ref(null);
+const startTime = ref('');
+const endTime = ref('');
+// 分页参数
 const currentPage = ref(1);
-const pageSize = ref(20);
-const queryParams = ref({}) // 查询参数
-// 监听搜索表单数据的变化
+const pageSize = ref(12);
+
 watch(searchForm, (newVal) => {
     if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {
         errorMessage.value = '最大值不能小于最小值';
@@ -134,7 +128,6 @@ watch(searchForm, (newVal) => {
         endTime: endTime.value
     });
 });
-// 日期范围变化处理
 const changeHandler = (value) => {
     if (value) {
         const formattedDates = value.map(date => {
@@ -159,48 +152,49 @@ const changeHandler = (value) => {
         endTime: endTime.value
     })
 }
+
 const searchHandler = (value) => {
     for (const key in value) {
         if (value[key] === '' || value[key] === null) {
             delete value[key];
         }
     }
-    queryParams.value = value
-    loadData()
+    loadData(value)
 }
-// 创建订单处理
-const createOrderHandler = () => {
-    router.push(`/opencard/createorder`);
+// 审核订单处理函数
+const checkOrder = (row) => {
+    factoryServiceClass.CheckLock(row.id).then(res => {
+        localStorage.setItem('orderDetails', JSON.stringify(res.data));
+        router.push(`/factoryaudit/detail/${row.id}`);
+    }).catch(err => {
+        ElMessage.error(err);
+    })
 }
-// 双击跳转到详情页面
-const rowClick = (row) => {
-    localStorage.setItem('orderDetails', JSON.stringify(row));
-    router.push(`/opencard/orderlist/detail/${row.id}`);
-};
-
-// 加载数据处理
-const loadData = () => {
+// 加载数据函数
+const loadData = (data) => {
     let params = {
         "pageSize": pageSize.value,
         "pageNum": currentPage.value
     }
-    if (queryParams.value) {
-        params = Object.assign(params, queryParams.value);
+    if (data) {
+        params = Object.assign(params, data);
     }
-    serviceClass.GetList(params).then((res) => {
+    factoryServiceClass.GetFactoryList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
+        // if(err === '没有访问权限'){
+        //     router.go(-1);
+        //     ElMessage.error(err);
+        // }
         console.log(err);
-        ElMessage.error(err);
     });
 };
-// 处理每页大小变化
+
 const handleSizeChange = (newSize) => {
     pageSize.value = newSize;
     loadData();
 };
-// 处理当前页码变化
 const handleCurrentChange = (newSize) => {
     currentPage.value = newSize;
     loadData();
@@ -214,23 +208,6 @@ onMounted(() => {
     })
     loadData();
 });
-// 编辑订单处理函数
-const editOrder = (row) => {
-    console.log(row);
-    localStorage.setItem('editOrder', JSON.stringify(row));
-    router.push('/opencard/createorder');
-};
-// 删除订单处理函数
-const deleteOrder = (row) => {
-    serviceClass.DeleteOrder(row.id).then((res) => {
-        ElMessage.success('删除成功');
-        loadData();
-    }).catch((err) => {
-        console.log(err);
-        ElMessage.error(err);
-    });
-};
-
 </script>
 
 <style lang="scss" scoped>
@@ -240,11 +217,10 @@ const deleteOrder = (row) => {
     background-color: white;
     border: 1px solid #E4E4E4;
 }
-
 ::v-deep(.el-popper__arrow)::before {
     content: '';
     display: none;
-    border-top-color: 1px solid transparent;
+    border-top-color:  1px solid transparent;
     background-color: white !important;
 }
 
@@ -257,25 +233,22 @@ const deleteOrder = (row) => {
 .el-button+.el-button {
     margin-left: 12px;
     margin-right: 12px;
-}
-
-.btn-disable {
-    color: #CCC !important;
+    color: #4D64B8;
 }
 
 a {
-    color: #029;
+    color: #4D64B8;
     font-family: "Helvetica Neue";
     font-size: 12px;
 }
 
 .general-content {
-    width: 100%;
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
 }
 
+/* 下拉框样式 */
 :deep(.el-select__suffix) {
     width: 20px;
     height: 20px;
@@ -290,6 +263,23 @@ a {
     padding: 4px 8px;
 }
 
+.btn {
+    padding: 5px 16px;
+    width: 72px;
+    box-sizing: border-box;
+    text-align: center;
+    cursor: pointer;
+    color: white;
+    border-radius: 4px;
+    background: rgba(0, 34, 153, 0.70);
+    border: 0px solid transparent;
+}
+
+.btn-disabled {
+    cursor: not-allowed;
+    background: white;
+    color: #ccc;
+}
 
 /* 数量 */
 .number-range-container {

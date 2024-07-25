@@ -1,21 +1,19 @@
 <template>
     <div class="create-order">
-
         <general v-model:initData="general"></general>
         <small-card v-model:initData="smallCard"></small-card>
         <ad-card v-model:initData="adCard" v-model:smallCard="smallCard"></ad-card>
         <payout v-model:initData="payout" v-model:generalData="general"></payout>
-        <prize-mark v-model:initData="prizeMark"></prize-mark>
+        <prize-mark v-model:initData="prizeMark" class="prize-mark"></prize-mark>
         <layout-footer @submit="handleSubmit"></layout-footer>
     </div>
 </template>
 
 <script setup>
-import { defineComponent, ref, reactive, onMounted, provide } from 'vue';
+import {  ref, onMounted, provide } from 'vue';
 import General from './CreateOrderComponents/General.vue';
 import SmallCard from './CreateOrderComponents/SmallCard.vue';
 import AdCard from './CreateOrderComponents/AdCard.vue';
-import XCard from '../../components/container/XCard.vue';
 import Payout from './CreateOrderComponents/Payout.vue';
 import PrizeMark from './CreateOrderComponents/PrizeMark.vue';
 import LayoutFooter from '../../components/common/LayoutFooter.vue';
@@ -24,10 +22,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import CommonService from '../../services/CommonService';
-import { useRoute } from 'vue-router';
 
 const orderId = uuidv4();   //生成唯一的orderId，用于后续的提交订单，页面内只有一个orderId，刷新后重新生成
 
+const router = useRouter();
 const serviceClass = new OpenCardService();
 const commonClass = new CommonService(orderId);
 //提供统一的commonClass给子组件
@@ -92,11 +90,11 @@ onMounted(() => {
     // }
 })
 const handleSubmit = () => {
-    console.log(general.value);
-    console.log(smallCard.value);
-    console.log(adCard.value);
-    console.log(payout.value);
-    console.log(prizeMark.value);
+    // console.log(general.value);
+    // console.log(smallCard.value);
+    // console.log(adCard.value);
+    // console.log(payout.value);
+    // console.log(prizeMark.value);
     /*
     {
     "orderId": "00000000-0000-0000-0000-000000009999test999",
@@ -136,7 +134,7 @@ const handleSubmit = () => {
             "name": "Ad Card",
             "image": "https://nbprint-prod.oss-cn-shenzhen.aliyuncs.com/printing-proof/00000000-0000-0000-0000-000000000999/resources/adCard正面.jpg",
             "comment": "备注区",
-            "openReigion": [
+            "openRegion": [
                 {
                     "x": 0,
                     "y": 100,
@@ -314,7 +312,7 @@ const handleSubmit = () => {
         ElMessage.error('请填写宣传卡信息');
         return;
     }
-    //判断宣传卡信息是否完整，如果有openable类型的宣传卡，需要检查openReigion是否填写完整
+    //判断宣传卡信息是否完整，如果有openable类型的宣传卡，需要检查openRegion是否填写完整
     const incompleteCard = adCard.value.find(card => {
         if (card.type === 'openable') {
             if (!card.image) {
@@ -368,9 +366,12 @@ const handleSubmit = () => {
         smallCard: smallCard.value,
         adCard: adCard.value,
         payout: payout.value,
-        prizeMark: prizeMark.value
+        prizeMark: prizeMark.value,
+        // 新增状态
+        status: '0'
     }
     //localStorage.setItem('submitData', JSON.stringify(submitData));
+    console.log(submitData);
     serviceClass.CreateOrder(submitData).then(res => {
         console.log(res);
         ElMessageBox.alert(res.msg, '提交结果', {
@@ -378,8 +379,8 @@ const handleSubmit = () => {
             // autofocus: false,
             confirmButtonText: 'OK',
             callback: (action) => {
-                if (action === 'confirm') {
-                    useRouter().push('/opencard/orderlist');
+                if (action == 'confirm') {
+                    router.push('/opencard');
                 }
             },
         })
@@ -387,6 +388,9 @@ const handleSubmit = () => {
 }
 </script>
 <style lang="scss" scoped>
+.prize-mark{
+    margin-bottom: 90px
+}
 @import '../../styles/variables.scss';
 
 .create-order {

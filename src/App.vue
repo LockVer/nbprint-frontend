@@ -22,22 +22,26 @@ const route = useRoute();
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@import url('./assets/icon/iconfont.css');
 .page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: min-content;
-  min-width: 100%;
+  
   .content {
     display: flex;
     flex: 1;
+    overflow: hidden;
     .nav {
       width: 280px;
+      min-width: 280px;
     }
     .content-page {
       flex: 1;
       padding: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
       background-color: #E4E4E4;
     }
   }

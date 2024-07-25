@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, ref, reactive } from 'vue';
+import { defineComponent, ref, reactive,onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
 export default defineComponent({
     name: "LayoutHeader",
     setup() {
@@ -7,21 +8,48 @@ export default defineComponent({
             title: "揭开卡",
             actions: [
                 {
-                    text: "订单管理",
+                    text: "综观",
+                    isActive: false
+                },
+                {
+                    text: "工序",
                     isActive: true
+                },
+                {
+                    text: "创建订单",
+                    isActive: false
+                },
+                {
+                    text: "印前工具",
+                    isActive: false
                 }
             ]
         });
+        const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') as string))
+        onMounted(() => {
+            JSON.parse(localStorage.getItem('userInfo') as string)
+        })
 
         const handleClick = (index: number) => {
             headerData.actions.forEach((action, i) => {
                 action.isActive = i === index;
             });
         }
+        const goOutHandler = () => {
+            ElMessage({
+                type: 'success',
+                message: '退出成功',
+            });
+            localStorage.clear(),
+            window.location.reload();
+        }
         return {
             headerData,
-            handleClick
+            handleClick,
+            goOutHandler,
+            userInfo
         }
+
     }
 })
 </script>
@@ -37,7 +65,7 @@ export default defineComponent({
         </div>
         <el-dropdown>
             <span class="user-info">
-                <span class="user-name">admin</span>
+                <span class="user-name">{{ userInfo.userName }}</span>
                 <el-avatar shape="square" :size="45" fit="fill"
                     src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg" />
             </span>
@@ -46,7 +74,7 @@ export default defineComponent({
                     <el-dropdown-item @click="console.log(111)">帮助文档</el-dropdown-item>
                     <el-dropdown-item @click="console.log(222)">意见反馈</el-dropdown-item>
                     <el-dropdown-item>个人设置</el-dropdown-item>
-                    <el-dropdown-item>登出</el-dropdown-item>
+                    <el-dropdown-item @click="goOutHandler">退出</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>

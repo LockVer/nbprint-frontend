@@ -119,10 +119,10 @@ const calcRowCount = () => {
 
         //计算长宽比
         const newRatio = calcBox.width / calcBox.thickness;
-        console.log('newRatio', newRatio, calcBox.width, calcBox.thickness, columnCount, quantityPerBox / columnCount);
+        // console.log('newRatio', newRatio, calcBox.width, calcBox.thickness, columnCount, quantityPerBox / columnCount);
         //如果长宽比在ratio和maxRatio之间，并且尺寸在最大尺寸之内
         if (newRatio >= ratio && newRatio <= maxRatio) {
-            console.log('box', calcBox);
+            // console.log('box', calcBox);
             box.width = Math.ceil(calcBox.width);
             box.height = Math.ceil(calcBox.height);
             box.thickness = Math.ceil(calcBox.thickness);

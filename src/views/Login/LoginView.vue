@@ -1,8 +1,6 @@
-
 <template>
     <div class="login-page">
         <div class="cover">
-
         </div>
         <div class="login-box">
             <div class="title">登录</div>
@@ -16,7 +14,7 @@
     </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import UserService from '../../services/UserService';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus'
@@ -25,23 +23,34 @@ const username = ref('');
 const password = ref('');
 const errorMsg = ref('');
 const router = useRouter();
+onMounted(() => {
+    window.addEventListener('keyup', handleKeyup);
+})
+onBeforeUnmount(() => {
+    window.removeEventListener('keyup', handleKeyup);
+})
+const handleKeyup = (event) => {
+    if (event.key === 'Enter') {
+        login();
+    }
+}
 const login = () => {
     if (username.value === '' || password.value === '') {
         ElMessage.error('用户名或密码不能为空');
         return;
     }
-    userService.Login({
+    userService.Login({  
         username: username.value,
         password: password.value
     }).then((res) => {
         console.log(res);
         localStorage.setItem('token', res.data.token);
-        router.push('/opencard/orderlist');
+        localStorage.setItem('userInfo', JSON.stringify(res.data.userInfo));
+        router.push('/opencard');
     }).catch((err) => {
         console.log(err);
         ElMessage.error(err);
     });
-
 }
 
 </script>
@@ -55,6 +64,7 @@ const login = () => {
         background: url('../../assets/login-bg.png') no-repeat center center;
         background-size: cover;
     }
+
     .login-box {
         width: 400px;
         padding: 30px;
@@ -62,26 +72,30 @@ const login = () => {
         display: flex;
         flex-direction: column;
         justify-content: center;
+
         .title {
             font-size: 36px;
             margin-bottom: 20px;
             font-weight: bold;
         }
-        .ebutton{
+
+        .ebutton {
             margin-bottom: 20px;
         }
-        p{
+
+        p {
             padding: 0;
             margin: 0;
             margin-bottom: 5px;
             color: #909090;
             font-size: 14px;
         }
+
         .error-msg {
             color: red;
             font-size: 14px;
             margin-bottom: 20px;
         }
     }
-}   
+}
 </style>

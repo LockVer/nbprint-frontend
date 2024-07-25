@@ -4,12 +4,13 @@ import { useRouter } from 'vue-router';
 class ApiService {
   constructor(baseURL) {
     this.api = axios.create({
-      //baseURL: baseURL || 'https://nbprint-backend-qqxiwhelwc.cn-shenzhen.fcapp.run', // 你的API基础URL
-      baseURL: baseURL || 'http://192.168.1.224:8084', // 你的API基础URL
+      // baseURL: baseURL || 'https://nbprint-backend-qqxiwhelwc.cn-shenzhen.fcapp.run', // 你的API基础URL
+      baseURL: baseURL || 'http://192.168.1.225:8084', // 你的API基础URL
       timeout: 120000, // 请求超时时间
     });
-    this.router=useRouter();
-    console.log(this.router)
+    this.router = useRouter();
+    this.$loading=[];
+    // console.log(this.router)
     // 请求拦截器
     this.api.interceptors.request.use((config) => {
       if (config.requireAuth === false) return config;
@@ -78,18 +79,19 @@ class ApiService {
   }
   // API 调用方法
   get(url, params, requireAuth = true) {
-    this.$loading = ElLoading.service({
+    this.$loading.push(ElLoading.service({
       lock: true,
       text: '处理中...',
       background: 'rgba(0, 0, 0, 0.7)',
       customClass: 'loading'
-    });
+    }));
     //EventBus.$emit('showloading');
     return new Promise((resolve, reject) => {
       this.api.get(url, { params, requireAuth }).then(response => {
         //EventBus.$emit('closeloading');
-        console.log(response);
-        this.$loading.close();
+        this.$loading.forEach(item => {
+          item.close();
+        })
         if (response.status === 200) {
           switch (response.data.code) {
             case 1:
@@ -115,16 +117,20 @@ class ApiService {
 
   post(url, data, requireAuth = true) {
     //EventBus.$emit('showloading');
-    this.$loading = ElLoading.service({
+    this.$loading.push(ElLoading.service({
       lock: true,
       text: '处理中...',
       background: 'rgba(0, 0, 0, 0.7)',
       customClass: 'loading'
-    });
+    }));
+
     return new Promise((resolve, reject) => {
       this.api.post(url, data, { requireAuth }).then(response => {
         //EventBus.$emit('closeloading');
-        this.$loading.close();
+        // console.log("closeloading");
+        this.$loading.forEach(item => {
+          item.close();
+        })
         if (response.status === 200) {
           switch (response.data.code) {
             case 1:
@@ -143,6 +149,7 @@ class ApiService {
         }
       }).catch(error => {
         //EventBus.$emit('closeloading');
+        // console.log(error)
         reject(error);
       });
     })
