@@ -207,7 +207,7 @@ const handleCurrentChange = (newSize) => {
 };
 
 onMounted(() => {
-    searchServiceClass.GetOptions().then((res) => {
+    searchServiceClass.getOptions().then((res) => {
         options.value = res.data;
     }).catch((err) => {
         console.log(err);

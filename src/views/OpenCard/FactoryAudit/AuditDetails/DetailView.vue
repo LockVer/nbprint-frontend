@@ -183,7 +183,7 @@ const postDatas = () => {
         exceptionItem: exceptionLabels.value.map(item => item.label).join(','),
         remark: textarea1.value
     };
-    serviceClass.SubmitFactoryCheck(data).then((res) => {
+    serviceClass.submitFactoryCheck(data).then((res) => {
         ElMessage({
             type: 'success',
             message: '提交成功',
@@ -227,7 +227,7 @@ const clearData = () => {
 
 // 返回处理
 const backHandler = () => {
-    serviceClass.CheckUnlock(route.params.id).then((res) => {
+    serviceClass.checkUnlock(route.params.id).then((res) => {
         // 打印解锁结果
         console.log(res)
         router.go(-1)

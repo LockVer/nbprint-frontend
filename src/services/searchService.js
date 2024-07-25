@@ -3,7 +3,7 @@ class SearchService {
     constructor() {
         this.apiService = new ApiService();
     }
-    GetOptions() {
+    getOptions() {
         return this.apiService.get('uncardOrder/getOptions', {}, true);
     }
 }

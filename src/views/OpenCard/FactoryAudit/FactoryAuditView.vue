@@ -85,7 +85,7 @@ import XCard from '@/components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
 import XComponent from '@/components/container/XComponent.vue';
-import searchService from '@/services/searchService';
+import searchService from '@/services/SearchService';
 import FactoryService from '@/services/FactoryService';
 
 
@@ -163,7 +163,7 @@ const searchHandler = (value) => {
 }
 // 审核订单处理函数
 const checkOrder = (row) => {
-    factoryServiceClass.CheckLock(row.id).then(res => {
+    factoryServiceClass.checkLock(row.id).then(res => {
         localStorage.setItem('orderDetails', JSON.stringify(res.data));
         router.push(`/factoryaudit/detail/${row.id}`);
     }).catch(err => {
@@ -179,7 +179,7 @@ const loadData = (data) => {
     if (data) {
         params = Object.assign(params, data);
     }
-    factoryServiceClass.GetFactoryList(params).then((res) => {
+    factoryServiceClass.getFactoryList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
@@ -201,7 +201,7 @@ const handleCurrentChange = (newSize) => {
 };
 
 onMounted(() => {
-    searchServiceClass.GetOptions().then((res) => {
+    searchServiceClass.getOptions().then((res) => {
         options.value = res.data;
     }).catch((err) => {
         console.log(err);

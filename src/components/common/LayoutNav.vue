@@ -74,7 +74,7 @@ onMounted(() => {
 const handleSelect = () => {
     if (route.name == "auditDetails") {
         if (route.params.id) {
-            serviceClass.CheckUnlock(route.params.id).then((res) => {
+            serviceClass.checkUnlock(route.params.id).then((res) => {
                 console.log(res)
             }).catch((err) => {
                 console.log(err)
