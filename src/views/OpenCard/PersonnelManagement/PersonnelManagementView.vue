@@ -25,7 +25,7 @@ const titleId = ref(1);
 
 onMounted(() => {
     // 获取部门列表数据
-    servicesClass.getDepartmentsList().then(res => {
+    servicesClass.GetDepartmentsList().then(res => {
         departmentValue.value = res.data
         handleCheckChange(departmentValue.value[0])
     }).catch(err => {

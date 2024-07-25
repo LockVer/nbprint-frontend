@@ -143,7 +143,7 @@ onMounted(() => {
 const rowClick = (row) => {
     // presonData.value = row
     dialogVisible.value = true
-    servicesClass.getMembersDetail(row.userId).then(res => {
+    servicesClass.GetMembersDetail(row.userId).then(res => {
         memberDetails.value = res.data
         for (const key in memberDetails.value) {
             if (memberDetails.value[key] == null || memberDetails.value[key] == '') {
@@ -173,7 +173,7 @@ const loadData = () => {
     if (queryParams.value) {
         params = Object.assign(params, queryParams.value);
     }
-    servicesClass.getMembersList(params).then((res) => {
+    servicesClass.GetMembersList(params).then((res) => {
         tableData.value = res.data.userList
         totalPage.value = res.data.totalPage
         tableData.value.forEach(element => {

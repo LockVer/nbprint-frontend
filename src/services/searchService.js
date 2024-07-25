@@ -1,11 +1,11 @@
 import ApiService from '../utils/ApiService';
-class searchService {
+class SearchService {
     constructor() {
         this.apiService = new ApiService();
     }
-    getOptions() {
+    GetOptions() {
         return this.apiService.get('uncardOrder/getOptions', {}, true);
     }
 }
 
-export default searchService;
+export default SearchService;
