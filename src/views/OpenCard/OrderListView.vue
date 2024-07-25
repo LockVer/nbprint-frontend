@@ -92,7 +92,7 @@ import XCard from '@/components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
 import OpenCardService from '@/services/OpenCardService';
-import searchService from '@/services/searchService';
+import searchService from '@/services/SearchService';
 import XComponent from '@/components/container/XComponent.vue';
 
 

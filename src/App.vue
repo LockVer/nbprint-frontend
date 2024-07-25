@@ -1,10 +1,9 @@
-<script setup lang="ts">
+<script setup>
 import LayoutHeader from './components/common/LayoutHeader.vue';
 import LayoutNav from './components/common/LayoutNav.vue';
 import { onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router';
-import { on } from 'json2csv/JSON2CSVTransform';
 
 const store = useStore();
 const router = useRouter();
