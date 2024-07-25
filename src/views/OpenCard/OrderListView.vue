@@ -188,7 +188,7 @@ const loadData = () => {
     if (queryParams.value) {
         params = Object.assign(params, queryParams.value);
     }
-    serviceClass.GetList(params).then((res) => {
+    serviceClass.getList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
@@ -223,7 +223,7 @@ const editOrder = (row) => {
 };
 // 删除订单处理函数
 const deleteOrder = (row) => {
-    serviceClass.DeleteOrder(row.id).then((res) => {
+    serviceClass.deleteOrder(row.id).then((res) => {
         ElMessage.success('删除成功');
         loadData();
     }).catch((err) => {

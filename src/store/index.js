@@ -20,7 +20,7 @@ export default createStore({
   actions: {
     async getUserInfo({ commit }) {
       try {
-        const response = await userService.GetUserInfo();
+        const response = await userService.getUserInfo();
         commit('SET_USER_INFO', response.data);
       } catch (error) {
         console.error(error);
@@ -28,7 +28,7 @@ export default createStore({
     },
     async getPermissions({ commit }) {
       try {
-        const response = await userService.GetPermissions();
+        const response = await userService.getPermissions();
         commit('SET_PERMISSIONS', response.data);
       } catch (error) {
         console.error(error);

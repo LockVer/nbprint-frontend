@@ -6,19 +6,19 @@ class OpenCardService {
         this.nbUserId = { nbUserId: this.userDatas.id };
     }
 
-    CreateOrder(data) {
+    createOrder(data) {
         return this.apiService.post('/pdf/render', { ...data, ...this.nbUserId}, true);
     }
-    GetList(data) {
+    getList(data) {
         return this.apiService.post('/uncardOrder/getList', { ...data, ...this.nbUserId}, true);
     }
-    DeleteOrder(orderId) {
+    deleteOrder(orderId) {
         return this.apiService.post('/uncardOrder/delete?id=' + orderId, true);
     }
-    DownloadPDF(orderId) {
+    downloadPDF(orderId) {
         return this.apiService.downloadFile('/ossFile/downloadPdf?orderId=' + orderId, false)
     }
-    GetDetails(id) {
+    getDetails(id) {
         return this.apiService.get(`/uncardOrder/getInfo?id=${id}`, {}, true);
     }
 }

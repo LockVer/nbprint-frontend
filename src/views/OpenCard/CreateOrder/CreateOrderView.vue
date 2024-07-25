@@ -3,7 +3,7 @@
         <general v-model:initData="general"></general>
         <small-card v-model:initData="smallCard"></small-card>
         <ad-card v-model:initData="adCard" v-model:smallCard="smallCard"></ad-card>
-        <payout v-model:initData="payout" v-model:generalData="general"></payout>
+        <payout v-if="false" v-model:initData="payout" v-model:generalData="general"></payout>
         <prize-mark v-model:initData="prizeMark" class="prize-mark"></prize-mark>
         <layout-footer @submit="handleSubmit"></layout-footer>
     </div>

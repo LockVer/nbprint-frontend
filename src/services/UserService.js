@@ -3,13 +3,13 @@ class UserService {
     constructor() {
         this.apiService = new ApiService();
     }
-    Login(data) {
+    login(data) {
         return this.apiService.post('/auth/login', data, false);
     }
-    GetUserInfo() {
+    getUserInfo() {
         return this.apiService.get('/auth/getUserinfo',{},true);
     }
-    GetPermissions() {
+    getPermissions() {
         return this.apiService.get('/auth/permissions');
     }
 }
