@@ -6,20 +6,20 @@
                 <el-input v-model="searchForm.productName" placeholder="请输入产品名称" />
             </x-component>
             <x-component label="客户">
-                <el-select v-model="searchForm.customerName" placeholder="请选择客户">
+                <el-select v-model="searchForm.customerName" placeholder="请选择客户" clearable>
                     <el-option v-for="(item, index) in options.customerNames" :key="index" :label="item"
                         :value="item" />
                 </el-select>
             </x-component>
             <x-component label="尺寸">
-                <el-select v-model="searchForm.smallCardSize" placeholder="请选择尺寸">
+                <el-select v-model="searchForm.smallCardSize" placeholder="请选择尺寸" clearable>
                     <el-option v-for="(item, index) in options.cardSizes" :key="index" :label="item" :value="item" />
                 </el-select>
             </x-component>
             <x-component label="数量">
                 <div class="number-range-container">
                     <div class="number-range">
-                        <el-input-number placeholder="最小值" v-model="searchForm.minTotal" :controls="false" />
+                        <el-input-number placeholder="最小值" v-model="searchForm.minTotal" :controls="false"  />
                         <div class="to">
                             <span>-</span>
                         </div>

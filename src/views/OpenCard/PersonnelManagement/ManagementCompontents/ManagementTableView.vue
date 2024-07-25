@@ -8,7 +8,7 @@
                 <el-input v-model="searchForm.userName" placeholder="请输入姓名" />
             </x-component>
             <x-component label="性别" :width="'15%'">
-                <el-select v-model="searchForm.gender" placeholder="请选择性别">
+                <el-select v-model="searchForm.gender" placeholder="请选择性别" clearable>
                     <el-option label="男" value="1" />
                     <el-option label="女" value="2" />
                 </el-select>

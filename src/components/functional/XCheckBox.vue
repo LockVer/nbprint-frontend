@@ -94,16 +94,6 @@ export default defineComponent({
     }
 });
 </script>
-
-<template>
-    <div class="xradio-list">
-        <div class="xradio-item" v-for="(item, index) in localDataList" :key="index"
-            :style="{ width: width, height: height,margin:margin }" :class="{ 'checked': item.checked }" @click="selectItem(item)">
-            <span>{{ item.text }}</span>
-        </div>
-    </div>
-</template>
-
 <style scoped lang="scss">
 @import '../../styles/variables.scss';
 
