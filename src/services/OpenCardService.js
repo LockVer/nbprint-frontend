@@ -3,14 +3,14 @@ class OpenCardService {
     constructor() {
         this.apiService = new ApiService();
         this.userDatas = JSON.parse(localStorage.getItem('userInfo'));
-        this.nbUserId = { nbUserId: this.userDatas.id };
+        this.employeeId = { employeeId: this.userDatas.id };
     }
 
     createOrder(data) {
-        return this.apiService.post('/pdf/render', { ...data, ...this.nbUserId}, true);
+        return this.apiService.post('/pdf/render', { ...data, ...this.employeeId}, true);
     }
     getList(data) {
-        return this.apiService.post('/uncardOrder/getList', { ...data, ...this.nbUserId}, true);
+        return this.apiService.post('/uncardOrder/getList', { ...data, ...this.employeeId}, true);
     }
     deleteOrder(orderId) {
         return this.apiService.post('/uncardOrder/delete?id=' + orderId, true);
