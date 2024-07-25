@@ -24,17 +24,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import XCard from '../../../components/container/XCard.vue';
-import XComponent from '../../../components/container/XComponent.vue';
+import { ref,watch } from 'vue';
+import XCard from '@/components/container/XCard.vue';
+import XComponent from '@/components/container/XComponent.vue';
+import { useStore } from 'vuex';
+
 
 const initData = defineModel("initData");
+const s
+
+watch()
 
 </script>
 
 
 <style lang="scss" scoped>
-@import '../../../styles/variables.scss';
+@import '@/styles/variables.scss';
 
 .general-content {
     display: flex;

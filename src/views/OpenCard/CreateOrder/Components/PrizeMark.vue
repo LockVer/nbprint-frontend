@@ -86,9 +86,9 @@
 
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue';
-import XCard from '../../../components/container/XCard.vue';
-import XComponent from '../../../components/container/XComponent.vue';
-import XInputUpload from '../../../components/functional/XInputUpload.vue';
+import XCard from '@/components/container/XCard.vue';
+import XComponent from '@/components/container/XComponent.vue';
+import XInputUpload from '@/components/functional/XInputUpload.vue';
 import { ElMessageBox } from 'element-plus';
 import { v4 as uuidv4 } from 'uuid';
 

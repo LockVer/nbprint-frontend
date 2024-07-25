@@ -89,12 +89,12 @@
 
 <script setup>
 import { ref, reactive, watch, onMounted, nextTick, computed } from 'vue';
-import XCard from '../../../components/container/XCard.vue';
-import XComponent from '../../../components/container/XComponent.vue';
-import XCheckBox from '../../../components/functional/XCheckBox.vue';
+import XCard from '@/components/container/XCard.vue';
+import XComponent from '@/components/container/XComponent.vue';
+import XCheckBox from '@/components/functional/XCheckBox.vue';
 import RevealAreaEditor from './AdCardComponents/RevealAreaEditor.vue';
 import PrizeAreaEditor from './AdCardComponents/PrizeAreaEditor.vue';
-import XInputUpload from '../../../components/functional/XInputUpload.vue';
+import XInputUpload from '@/components/functional/XInputUpload.vue';
 import { ElMessage } from 'element-plus'
 import _, { max } from 'lodash';
 

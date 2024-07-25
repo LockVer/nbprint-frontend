@@ -11,17 +11,18 @@
 
 <script setup>
 import {  ref, onMounted, provide } from 'vue';
-import General from './CreateOrderComponents/General.vue';
-import SmallCard from './CreateOrderComponents/SmallCard.vue';
-import AdCard from './CreateOrderComponents/AdCard.vue';
-import Payout from './CreateOrderComponents/Payout.vue';
-import PrizeMark from './CreateOrderComponents/PrizeMark.vue';
-import LayoutFooter from '../../components/common/LayoutFooter.vue';
-import OpenCardService from '../../services/OpenCardService';
-import { ElMessage, ElMessageBox } from 'element-plus'
+import General from './Components/General.vue';
+import SmallCard from './Components/SmallCard.vue';
+import AdCard from './Components/AdCard.vue';
+import Payout from './Components/Payout.vue';
+import PrizeMark from './Components/PrizeMark.vue';
+import LayoutFooter from '@/components/common/LayoutFooter.vue';
+import OpenCardService from '@/services/OpenCardService';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
-import CommonService from '../../services/CommonService';
+import CommonService from '@/services/CommonService';
+
 
 const orderId = uuidv4();   //生成唯一的orderId，用于后续的提交订单，页面内只有一个orderId，刷新后重新生成
 
@@ -391,7 +392,8 @@ const handleSubmit = () => {
 .prize-mark{
     margin-bottom: 90px
 }
-@import '../../styles/variables.scss';
+@import '@/styles/variables.scss';
+
 
 .create-order {
     position: relative;

@@ -88,12 +88,13 @@
 <script setup>
 import { onMounted, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import XCard from '../../components/container/XCard.vue';
+import XCard from '@/components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
-import OpenCardService from '../../services/OpenCardService';
-import searchService from '../../services/searchService';
-import XComponent from '../../components/container/XComponent.vue';
+import OpenCardService from '@/services/OpenCardService';
+import searchService from '@/services/searchService';
+import XComponent from '@/components/container/XComponent.vue';
+
 
 const router = useRouter();
 const tableData = ref([]);

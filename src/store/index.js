@@ -1,14 +1,38 @@
-import { createStore } from 'vuex'
-
+// store.js
+import { createStore } from 'vuex';
+import UserService from '@/services/UserService';
+const userService=new UserService();
 export default createStore({
-  state: {
-  },
-  getters: {
+  state() {
+    return {
+      userInfo: {},
+      permissions: []
+    };
   },
   mutations: {
+    SET_USER_INFO(state, userInfo) {
+      state.userInfo = userInfo;
+    },
+    SET_PERMISSIONS(state, permissions) {
+      state.permissions = permissions;
+    }
   },
   actions: {
-  },
-  modules: {
+    async getUserInfo({ commit }) {
+      try {
+        const response = await userService.GetUserInfo();
+        commit('SET_USER_INFO', response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getPermissions({ commit }) {
+      try {
+        const response = await userService.GetPermissions();
+        commit('SET_PERMISSIONS', response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
-})
+});

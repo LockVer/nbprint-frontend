@@ -1,57 +1,46 @@
-<script lang="ts">
-import { defineComponent, ref, reactive,onMounted } from 'vue';
+<script setup>
+import { defineComponent, ref, reactive, computed } from 'vue';
 import { ElMessage } from 'element-plus';
-export default defineComponent({
-    name: "LayoutHeader",
-    setup() {
-        const headerData = reactive({
-            title: "揭开卡",
-            actions: [
-                {
-                    text: "综观",
-                    isActive: false
-                },
-                {
-                    text: "工序",
-                    isActive: true
-                },
-                {
-                    text: "创建订单",
-                    isActive: false
-                },
-                {
-                    text: "印前工具",
-                    isActive: false
-                }
-            ]
-        });
-        const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') as string))
-        onMounted(() => {
-            JSON.parse(localStorage.getItem('userInfo') as string)
-        })
+import { useStore } from 'vuex';
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
 
-        const handleClick = (index: number) => {
-            headerData.actions.forEach((action, i) => {
-                action.isActive = i === index;
-            });
+const headerData = reactive({
+    title: "揭开卡",
+    actions: [
+        {
+            text: "综观",
+            isActive: false
+        },
+        {
+            text: "工序",
+            isActive: true
+        },
+        {
+            text: "创建订单",
+            isActive: false
+        },
+        {
+            text: "印前工具",
+            isActive: false
         }
-        const goOutHandler = () => {
-            ElMessage({
-                type: 'success',
-                message: '退出成功',
-            });
-            localStorage.clear(),
-            window.location.reload();
-        }
-        return {
-            headerData,
-            handleClick,
-            goOutHandler,
-            userInfo
-        }
+    ]
+});
 
-    }
-})
+
+const handleClick = (index) => {
+    headerData.actions.forEach((action, i) => {
+        action.isActive = i === index;
+    });
+}
+const goOutHandler = () => {
+    ElMessage({
+        type: 'success',
+        message: '退出成功',
+    });
+    localStorage.clear(),
+        window.location.reload();
+}
 </script>
 <template>
     <div class="layout-header">

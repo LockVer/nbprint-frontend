@@ -48,10 +48,11 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import XCard from '../../../components/container/XCard.vue';
-import XComponent from '../../../components/container/XComponent.vue';
-import XCheckBox from '../../../components/functional/XCheckBox.vue';
-import XImageUpload from '../../../components/functional/XImageUpload.vue';
+import XCard from '@/components/container/XCard.vue';
+import XComponent from '@/components/container/XComponent.vue';
+import XCheckBox from '@/components/functional/XCheckBox.vue';
+import XImageUpload from '@/components/functional/XImageUpload.vue';
+
 
 const initData = defineModel("initData");
 const boxCanvas = ref(null);
