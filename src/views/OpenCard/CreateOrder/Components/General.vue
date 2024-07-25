@@ -11,7 +11,7 @@
                 <el-input v-model="initData.client.clientName" placeholder="请输入客户名字" />
             </x-component>
             <x-component label="业务员" width="220px">
-                <el-input v-model="initData.sales.employeeName" placeholder="请输入业务员" />
+                <el-input v-model="initData.sales.employeeName" disabled placeholder="请输入业务员" />
             </x-component>
             <x-component label="货币符号" width="220px">
                 <el-select v-model="initData.currency" placeholder="请选择货币符号">
@@ -24,16 +24,25 @@
 </template>
 
 <script setup>
-import { ref,watch } from 'vue';
+import { ref, watch } from 'vue';
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import { useStore } from 'vuex';
 
 
 const initData = defineModel("initData");
-const s
+const store = useStore();
 
-watch()
+initData.value.sales.employeeName = store.state.userInfo.userName;
+initData.value.sales.employeeId = store.state.userInfo.id;
+console.log(store.state.userInfo);
+watch(
+    () => store.state.userInfo,
+    (newUserInfo) => {
+        // 将新数据赋值给 initData
+        console.log(newUserInfo);
+    }
+);
 
 </script>
 

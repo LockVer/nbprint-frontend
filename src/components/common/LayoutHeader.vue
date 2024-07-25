@@ -9,20 +9,8 @@ const headerData = reactive({
     title: "揭开卡",
     actions: [
         {
-            text: "综观",
-            isActive: false
-        },
-        {
             text: "工序",
             isActive: true
-        },
-        {
-            text: "创建订单",
-            isActive: false
-        },
-        {
-            text: "印前工具",
-            isActive: false
         }
     ]
 });

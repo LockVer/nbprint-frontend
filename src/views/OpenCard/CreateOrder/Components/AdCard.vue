@@ -15,6 +15,9 @@
                 <x-check-box :DataList="adCardNoPostionList" v-model="item.adBoxCodePosition"
                     type="radio"></x-check-box>
             </x-component>
+            <x-component label="宣传卡开口方向" padding="0 0 10px 0">
+                <x-check-box v-model="item.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
+            </x-component>
 
             <div class="ad-card-info">
                 <div class="row">
@@ -124,6 +127,13 @@ const adCardNoPostionList = [
     { text: '下中', value: 'BC' },
     { text: '下右', value: 'BR' }
 ];
+
+const openDirectionList = [
+    { text: '上', value: 'T' },
+    { text: '下', value: 'B' },
+    { text: '左', value: 'L' },
+    { text: '右', value: 'R' }
+];
 const componentData = ref([]);
 const populateComponentData = () => {
     if (!initData.value) {
@@ -139,7 +149,8 @@ const populateComponentData = () => {
             revealAreas: item.openRegions,
             adCardSize: item.adCardSize,
             adBoxCode: item.adBoxCode,
-            adBoxCodePosition: item.adBoxCodePosition,
+            adBoxCodePosition: item.adBoxCodePosition || "BL",
+            openDirection: item.openDirection || "T",
             comment: item.comment
         };
     });
@@ -248,6 +259,7 @@ watch(adCardQty, (newVal, oldVal) => {
                 prizeAreas: [],
                 adBoxCode: "",
                 adBoxCodePosition: "BL",
+                openDirection: "T",
                 comment: ""
             });
         }
@@ -270,7 +282,8 @@ watch(componentData, async (newVal, oldVal) => {
             comment: item.comment,
             openRegions: item.revealAreas,
             adBoxCode: item.adBoxCode,
-            adBoxCodePosition: item.adBoxCodePosition
+            adBoxCodePosition: item.adBoxCodePosition,
+            openDirection: item.openDirection
         };
     });
 
