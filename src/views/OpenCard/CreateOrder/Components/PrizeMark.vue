@@ -28,18 +28,6 @@
                             <x-component label="名称" width="220px">
                                 <el-input placeholder="请输入名称" v-model="item.name" />
                             </x-component>
-                            <!-- <x-component label="背景图" width="220px">
-                                <el-button class="xbutton" type="primary" v-if="!item.image" @click="selectImage(item)">
-                                    上传图片
-                                </el-button>
-                                <el-input placeholder="请选择图片" v-model="item.image" readonly v-if="item.image">
-                                    <template #append>
-                                        <el-button type="primary" link @click="selectImage(item)">修改</el-button>
-                                    </template>
-</el-input>
-<input type="file" :ref="el => setFileInputRef(el, item)" @change="(event) => handleFileChange(item, event)"
-    style="display: none" />
-</x-component> -->
                             <x-component label="背景图" width="220px">
                                 <x-input-upload v-model:image="item.image"></x-input-upload>
                             </x-component>
