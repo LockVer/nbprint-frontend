@@ -11,20 +11,27 @@
             <x-component :label="'宣传卡' + (index + 1) + '有无揭开口'" padding="0 0 10px 0">
                 <x-check-box :DataList="isOpenable" v-model="item.type" type="radio"></x-check-box>
             </x-component>
-            <x-component label="卡号位置">
-                <x-check-box :DataList="adCardNoPostionList" v-model="item.adBoxCodePosition"
-                    type="radio"></x-check-box>
-            </x-component>
+
 
             <div class="ad-card-info">
                 <div class="row">
-                    <x-component label="宣传卡卡号" width="220px">
-                        <el-input v-model="item.adBoxCode" placeholder="请输入名称" />
-                    </x-component>
-
                     <x-component label="背景图" width="220px">
+                        <!-- <el-button class="xbutton" type="primary" v-if="!item.imageSelected"
+                            @click="selectImage(index)">
+                            上传图片
+                        </el-button>
+                        <el-input placeholder="请选择图片" v-model="item.imageName" readonly v-if="item.imageSelected">
+                            <template #append>
+                                <el-button type="primary" link @click="selectImage(index)">修改</el-button>
+                            </template>
+</el-input>
+<input type="file" :ref="setFileInputRef(index)" @change="(event) => handleFileChange(index, event)"
+    style="display: none" /> -->
                         <x-input-upload v-model:size="item.imageSize" v-model:image="item.imageName"
                             @changeImage="changeImage(item)"></x-input-upload>
+                    </x-component>
+                    <x-component label="是否有揭开区" width="220px">
+                        <el-input placeholder="" disabled :model-value="item.type == 'openable' ? '是' : '否'" />
                     </x-component>
                     <x-component label="宣传卡尺寸(mm)" width="220px">
                         <el-input :value="item.adCardSize" disabled></el-input>
@@ -42,7 +49,7 @@
                             </template>
                         </el-input>
                     </x-component>
-                    <!-- <x-component label="奖符" width="220px" :hide="item.type != 'openable'">
+                    <x-component label="奖符" width="220px" :hide="item.type != 'openable'">
                         <el-button class="xbutton" :disabled="getRevealAreaCount(index) == 0" type="primary"
                             @click="addPrizeArea(index)" v-if="getPrizeAreaCount(index) == 0">
                             添加奖符
@@ -53,7 +60,7 @@
                                 <el-button type="primary" link @click="addPrizeArea(index)">修改</el-button>
                             </template>
                         </el-input>
-                    </x-component> -->
+                    </x-component>
                 </div>
                 <x-component label="备注" width="100%">
                     <el-input v-model="item.comment" placeholder="" />
@@ -64,7 +71,8 @@
             :close-on-press-escape="false" :fullscreen="true">
             <!-- 添加揭开区的内容 -->
             <RevealAreaEditor ref="RAEditor" :ad-card-size="adCardSize"
-                :pre-areas="componentData[currentEditingIndex].revealAreas" :background-image-url="backgroundImageUrl"
+                :pre-areas="componentData[currentEditingIndex].revealAreas"
+                :background-image-url="backgroundImageUrl"
                 :image-size="backgroundImageSize" />
             <template #footer>
                 <el-button @click="closeRevealArea">取消</el-button>
@@ -118,29 +126,46 @@ const isOpenable = [
     { text: '有', value: 'openable' },
     { text: '无', value: 'non-openable' }
 ];
-
-const adCardNoPostionList = [
-    { text: '下左', value: 'BL' },
-    { text: '下中', value: 'BC' },
-    { text: '下右', value: 'BR' }
-];
 const componentData = ref([]);
 const populateComponentData = () => {
     if (!initData.value) {
         return;
     }
     componentData.value = initData.value.map((item) => {
+        let RAs = item.openRegion.map((region) => ({
+            x: region.x,
+            y: region.y,
+            width: region.width,
+            height: region.height,
+        }));
+
+        let PAs = item.openRegion.flatMap((region) =>
+            region.mark
+                ? region.mark.map((mark) => ({
+                    x: mark.x,
+                    y: mark.y,
+                    width: mark.width,
+                    height: mark.height,
+                    range: mark.range,
+                    parentArea: {
+                        x: region.x,
+                        y: region.y,
+                        width: region.width,
+                        height: region.height,
+                    },
+                }))
+                : []
+        );
+
         return {
             type: item.type,
             imageSelected: item.image ? true : false,
             imageFile: new File([], ''),
             imageName: item.image,
             imageSize: item.imageSize,
-            revealAreas: item.openRegions,
-            adCardSize: item.adCardSize,
-            adBoxCode: item.adBoxCode,
-            adBoxCodePosition: item.adBoxCodePosition,
-            comment: item.comment
+            revealAreas: RAs,
+            prizeAreas: PAs,
+            adCardSize: item.adCardSize
         };
     });
     console.log('componentData', componentData.value)
@@ -245,10 +270,7 @@ watch(adCardQty, (newVal, oldVal) => {
                 imageFile: new File([], ''),
                 imageSize: "",
                 revealAreas: [],
-                prizeAreas: [],
-                adBoxCode: "",
-                adBoxCodePosition: "BL",
-                comment: ""
+                prizeAreas: []
             });
         }
     } else if (difference < 0) {
@@ -261,6 +283,23 @@ watch(componentData, async (newVal, oldVal) => {
     //将数据还原成initData的格式
     console.log('componentData', newVal)
     let pageInitData = newVal.map((item) => {
+        let openRegion = item.revealAreas.map((region) => ({
+            x: region.x,
+            y: region.y,
+            width: region.width,
+            height: region.height,
+            direction: 'L',
+            mark: item.prizeAreas
+                .filter((pa) => pa.parentArea.x == region.x && pa.parentArea.y == region.y)
+                .map((pa) => ({
+                    range: pa.range,
+                    x: pa.x,
+                    y: pa.y,
+                    width: pa.width,
+                    height: pa.height,
+                })),
+        }));
+
         return {
             type: item.type,
             name: 'Ad Card',
@@ -268,9 +307,7 @@ watch(componentData, async (newVal, oldVal) => {
             image: item.imageName,
             imageSize: item.imageSize,
             comment: item.comment,
-            openRegions: item.revealAreas,
-            adBoxCode: item.adBoxCode,
-            adBoxCodePosition: item.adBoxCodePosition
+            openRegion: openRegion,
         };
     });
 
@@ -309,7 +346,6 @@ const confirmRevealArea = async () => {
     if (raAreas.length == 0) {
         return;
     }
-    console.log(raAreas)
     componentData.value[currentEditingIndex.value].revealAreas = raAreas;
     revealDialogVisible.value = false;
     // 这里可以添加更多逻辑来处理揭开区的内容

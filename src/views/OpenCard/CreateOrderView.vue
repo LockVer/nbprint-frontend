@@ -62,7 +62,7 @@ const adCard = ref([
         "name": "",
         "image": "",
         "comment": "",
-        "openRegions": [
+        "openRegion": [
         ]
     }
 ])
@@ -319,15 +319,15 @@ const handleSubmit = () => {
                 ElMessage.error('请上传宣传卡图片');
                 return true;
             }
-            if (!card.openRegions.length) {
+            if (!card.openRegion.length) {
                 ElMessage.error('请添加揭开区域');
                 return true;
             }
-            // const incompleteRegion = card.openRegion.find(region => !region.mark.length);
-            // if (incompleteRegion) {
-            //     ElMessage.error('请添加奖符区域');
-            //     return true;
-            // }
+            const incompleteRegion = card.openRegion.find(region => !region.mark.length);
+            if (incompleteRegion) {
+                ElMessage.error('请添加奖符区域');
+                return true;
+            }
         }
         return false;
     });
