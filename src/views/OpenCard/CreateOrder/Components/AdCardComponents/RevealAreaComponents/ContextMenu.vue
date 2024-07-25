@@ -42,7 +42,6 @@ onUnmounted(() => {
 });
 
 const copyArea = () => {
-    console.log(props.rightClickedArea);
     if (props.rightClickedArea) {
         // 创建一个新的区域对象，位置稍微偏移，以便用户可以看到复制出的新区域
         const newArea = { ...(props.rightClickedArea), x: props.rightClickedArea.x + 10, y: props.rightClickedArea.y + 10 };
@@ -65,7 +64,6 @@ const deleteArea = () => {
 const setPrizeQty = () => {
     setQtyDialogVisible.value = true;
     showContextMenu.value = false;
-    console.log(activeArea.value)
 };
 const removePrizeQty = () => {
     if (activeArea.value.drawData) {

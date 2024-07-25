@@ -259,6 +259,7 @@ watch(adCardQty, (newVal, oldVal) => {
                 prizeAreas: [],
                 adBoxCode: "",
                 adBoxCodePosition: "BL",
+                openDirection: "T",
                 comment: ""
             });
         }
@@ -281,7 +282,8 @@ watch(componentData, async (newVal, oldVal) => {
             comment: item.comment,
             openRegions: item.revealAreas,
             adBoxCode: item.adBoxCode,
-            adBoxCodePosition: item.adBoxCodePosition
+            adBoxCodePosition: item.adBoxCodePosition,
+            openDirection: item.openDirection
         };
     });
 

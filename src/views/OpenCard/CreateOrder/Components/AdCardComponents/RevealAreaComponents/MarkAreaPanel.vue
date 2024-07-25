@@ -28,7 +28,6 @@ const PAInput = ref('');
 
 
 watch(() => selectedGameArea.value, (newVal) => {
-    console.log(newVal)
     if (newVal) {
         PAInput.value = '';
     }
@@ -54,7 +53,6 @@ const addRange = (e) => {
 };
 const removeRange = (index) => {
     selectedGameArea.value.range.splice(index, 1);
-    console.log(selectedGameArea.value.range)
 };
 
 </script>

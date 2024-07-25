@@ -65,7 +65,7 @@ const setQtyDialogVisible = ref(false);
 const rightClickedArea = ref(null);
 const scale = ref(1); // 缩放比例
 
-const distanceDrawer = new DistanceDrawer(pxToMm,revealAreas.value);
+const distanceDrawer = new DistanceDrawer(pxToMm,revealAreas);
 
 const canvasRendererOptions = {
     canvasRef: canvasRef,
@@ -100,9 +100,7 @@ watch(mode, (newMode) => {
 watch(()=>selectedGameArea.value, (newVal) => {
     console.log(newVal)
 });
-
 watch(() => props.backgroundImageUrl, (newVal) => {
-    console.log('watch')
     if (canvasRef.value && editorRef.value) {
         drawCanvas();
     }
@@ -133,12 +131,10 @@ const handleContextMenu = (event) => {
 
         // 计算菜单的位置
         const editorRect = editorRef.value.getBoundingClientRect();
-        console.log(editorRect.top, editorRect.left)
         contextMenuPosition.value = {
             x: event.clientX - editorRect.left + window.scrollX,
             y: event.clientY - editorRect.top   //因为是在弹窗中加载，所以不需要+window.scrollY
         };
-        console.log(event.clientX, event.clientY, editorRect.left, editorRect.top, window.scrollX, window.scrollY, contextMenuPosition.value.x, contextMenuPosition.value.y)
         activeArea.value = rightClickedArea.value; // 设置当前激活的揭开区域
     } else {
         showContextMenu.value = false;
@@ -279,7 +275,6 @@ const getAreas = () => {
             return [];
         }
     }
-    console.log(gameAreas.value)
     // 返回当前的揭开区域数组，并根据区域的x,y进行排序后返回副本,先按y排序，再按x排序
     return cloneDeep(gameAreas.value);
 };

@@ -30,7 +30,6 @@ const toggleGameAreaSelection = (area) => {
     } else {
         selectedGameArea.value = area;
     }
-    console.log(selectedGameArea);
     drawCanvas();
 };
 

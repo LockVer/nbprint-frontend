@@ -48,6 +48,8 @@ const smallCard = ref({
     openQuantity: 1,
     price: '',
     boxCount: 1,
+    smallBoxCodePosition: 'BL',
+    openDirection: 'T',
     quantityPerBox: 1,
     frontImage: '',
     backImage: '',
@@ -63,7 +65,7 @@ const adCard = ref([
         "name": "",
         "image": "",
         "comment": "",
-        "openRegion": [
+        "openRegions": [
         ]
     }
 ])
@@ -320,15 +322,15 @@ const handleSubmit = () => {
                 ElMessage.error('请上传宣传卡图片');
                 return true;
             }
-            if (!card.openRegion.length) {
+            if (!card.openRegions.length) {
                 ElMessage.error('请添加揭开区域');
                 return true;
             }
-            const incompleteRegion = card.openRegion.find(region => !region.mark.length);
-            if (incompleteRegion) {
-                ElMessage.error('请添加奖符区域');
-                return true;
-            }
+            // const incompleteRegion = card.openRegions.find(region => !region.mark.length);
+            // if (incompleteRegion) {
+            //     ElMessage.error('请添加奖符区域');
+            //     return true;
+            // }
         }
         return false;
     });
@@ -373,7 +375,7 @@ const handleSubmit = () => {
     }
     //localStorage.setItem('submitData', JSON.stringify(submitData));
     console.log(submitData);
-    serviceClass.CreateOrder(submitData).then(res => {
+    serviceClass.createOrder(submitData).then(res => {
         console.log(res);
         ElMessageBox.alert(res.msg, '提交结果', {
             // if you want to disable its autofocus
