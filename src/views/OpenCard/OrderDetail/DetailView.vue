@@ -1,7 +1,7 @@
 <template>
     <div class="title">订单详情</div>
     <x-card :cardStyle="{ 'height': 'auto' }">
-        <div class="audit">
+        <div class="audit" :class="{ 'audit-bottom': !isShow }">
             <span class="audit-title">审核详情</span>
             <el-tag v-if="status" :type="['warning', 'warning', 'success', 'danger'][status]">{{ ["待审核", "待审核",
                 "已通过", "未通过"
@@ -23,7 +23,7 @@
     <x-card title="通用信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
         <div class="generalInfo">
             <x-component v-for="items in orderDetails.general" :key="items.name" :label="items.label" :width="'15%'"
-                :titleStyle="'#484848'" :marginBottom="'16px'">
+                :titleStyle="'#484848'" >
                 <div class="value">{{ items.datas }}</div>
             </x-component>
         </div>
@@ -31,38 +31,33 @@
     <x-card title="小卡信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
         <div class="generalInfo">
             <x-component v-for="items in orderDetails.smallCard" :key="items.name" :label="items.label" :width="'15%'"
-                :titleStyle="'#484848'" :marginBottom="'16px'">
+                :titleStyle="'#484848'" >
                 <div class="value">{{ items.datas }}</div>
             </x-component>
         </div>
     </x-card>
     <x-card title="宣传卡信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
         <div class="generalInfo">
-            <x-component label="宣传卡数量" :width="'100%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+            <x-component label="宣传卡数量" :width="'100%'" :titleStyle="'#484848'" :marginBottom="'16px'" >
                 <div class="value-number">{{ adCardInfo.adNumber }}</div>
             </x-component>
         </div>
         <div class="generalInfo" v-for="(items, key) in adCardInfo.adCard" :key="key">
-            <x-component :label="'宣传卡' + (key + 1) + ' 有无揭开口'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
+            <x-component :label="'宣传卡' + (key + 1) + ' 有无揭开口'" :width="'15%'" :titleStyle="'#484848'">
                 <div class="value">{{ items.adUncover }}</div>
             </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 背景图'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
+            <x-component :label="'宣传卡' + (key + 1) + ' 背景图'" :width="'15%'" :titleStyle="'#484848'">
                 <el-tooltip popper-class="tooltip-width" :content="items.adImage" placement="bottom" effect="light">
                     <div class="value">{{ items.adImage }}</div>
                 </el-tooltip>
             </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 是否有揭开区'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
+            <x-component :label="'宣传卡' + (key + 1) + ' 是否有揭开区'" :width="'15%'" :titleStyle="'#484848'">
                 <div class="value">{{ items.adOpenRegion }}</div>
             </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 揭开区数量'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
+            <x-component :label="'宣传卡' + (key + 1) + ' 揭开区数量'" :width="'15%'" :titleStyle="'#484848'">
                 <div class="value">{{ items.adOpenRegionNumber }}</div>
             </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 备注'" :width="'15%'" :titleStyle="'#484848'"
-                :marginBottom="'16px'">
+            <x-component :label="'宣传卡' + (key + 1) + ' 备注'" :width="'15%'" :titleStyle="'#484848'">
                 <el-tooltip popper-class="tooltip-width" :content="items.adComment" placement="bottom" effect="light">
                     <div class="value">{{ items.adComment }}</div>
                 </el-tooltip>
@@ -79,25 +74,25 @@
                     <span>{{ ["现金奖", "HOLD卡", "不中奖", "自定义玩法"][award.markType] }}{{ key + 1 }}</span>
                 </div>
                 <div class="generalInfo">
-                    <x-component label="名称" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                    <x-component label="名称" :width="'15%'" :titleStyle="'#484848'" >
                         <div class="value">{{ items.markName }}</div>
                     </x-component>
-                    <x-component label="文件" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                    <x-component label="文件" :width="'15%'" :titleStyle="'#484848'" >
                         <el-tooltip popper-class="tooltip-width" :content="items.markImage" placement="bottom"
                             effect="light">
                             <div class="value">{{ items.markImage }}</div>
                         </el-tooltip>
                     </x-component>
-                    <x-component label="金额" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                    <x-component label="金额" :width="'15%'" :titleStyle="'#484848'" >
                         <div class="value">{{ items.markAmount }}</div>
                     </x-component>
-                    <x-component label="数量" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                    <x-component label="数量" :width="'15%'" :titleStyle="'#484848'" >
                         <div class="value">{{ items.markCount }}</div>
                     </x-component>
-                    <x-component label="合计" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                    <x-component label="合计" :width="'15%'" :titleStyle="'#484848'" >
                         <div class="value">{{ items.markTotal }}</div>
                     </x-component>
-                    <x-component label="备注" :width="'15%'" :titleStyle="'#484848'" :marginBottom="'16px'">
+                    <x-component label="备注" :width="'15%'" :titleStyle="'#484848'" >
                         <el-tooltip popper-class="tooltip-width" :content="items.markComment" placement="bottom"
                             effect="light">
                             <div class="value">{{ items.markComment }}</div>
@@ -275,6 +270,9 @@ const directions = (items) => {
         font-weight: 700;
     }
 }
+.audit-bottom{
+    margin-bottom: 0px;
+}
 
 .exception {
     width: 100%;
@@ -314,6 +312,7 @@ const directions = (items) => {
     justify-content: flex-start;
     flex-wrap: wrap;
     column-gap: 30px;
+    row-gap: 16px;
 
     .value,
     .value-number {
