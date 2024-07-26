@@ -110,7 +110,7 @@ const dialogVisible = ref(false)
 // 员工详细信息
 const memberDetails = ref({})
 const currentPage = ref(1);
-const pageSize = ref(16);
+const pageSize = ref(12);
 const totalPage = ref(0);
 // 查询参数
 const queryParams = ref({})

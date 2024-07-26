@@ -115,7 +115,7 @@ const createTime = ref(null); // 创建时间范围
 const startTime = ref(''); // 搜索开始时间
 const endTime = ref(''); // 搜索结束时间
 const currentPage = ref(1);
-const pageSize = ref(14);
+const pageSize = ref(12);
 const queryParams = ref({}) // 查询参数
 // 监听搜索表单数据的变化
 watch(searchForm, (newVal) => {

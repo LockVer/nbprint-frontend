@@ -73,7 +73,7 @@
                     <div class="dot"></div>
                     <span>{{ ["现金奖", "HOLD卡", "不中奖", "自定义玩法"][award.markType] }}{{ key + 1 }}</span>
                 </div>
-                <div class="generalInfo">
+                <div class="generalInfo prizemark" >
                     <x-component label="名称" :width="'15%'" :titleStyle="'#484848'" >
                         <div class="value">{{ items.markName }}</div>
                     </x-component>
@@ -209,7 +209,6 @@ const dataClear = (res) => {
         });
     });
 }
-// console.log(orderDetails.general)
 // 处理方向和盒码位置的显示
 const directions = (items) => {
     const directList = [
@@ -219,9 +218,9 @@ const directions = (items) => {
         { text: '右', value: 'R' }
     ]
     const boxCodePositionList = [
-        { text: '下左', value: 'bottomleft' },
-        { text: '下中', value: 'bottomcenter' },
-        { text: '下右', value: 'bottomright' },
+        { text: '下左', value: 'BL' },
+        { text: '下中', value: 'BC' },
+        { text: '下右', value: 'BR' },
     ]
     if (items.name == 'direction') {
         // 如果字段名称为 'direction'，则转换为对应的文本
@@ -306,7 +305,9 @@ const directions = (items) => {
         margin-bottom: 0;
     }
 }
-
+.prizemark{
+    margin-bottom: 16px;
+}
 .generalInfo {
     display: flex;
     justify-content: flex-start;
@@ -352,11 +353,6 @@ const directions = (items) => {
             padding-top: 16px;
             border-top: 1px solid #f0f0f0;
         }
-
-        &:not(:last-child) {
-            /* padding-bottom: 16px; */
-        }
-
         .item-title {
             display: flex;
             align-items: center;
