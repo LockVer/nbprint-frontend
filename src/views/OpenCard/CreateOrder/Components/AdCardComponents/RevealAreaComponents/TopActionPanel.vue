@@ -18,6 +18,8 @@ const mode = defineModel("mode");
 const selectedAreas = defineModel("selectedAreas");
 const revealAreas = defineModel("revealAreas");
 const gameAreas = defineModel("gameAreas");
+const selectedGameArea = defineModel("selectedGameArea");
+const activeArea = defineModel("activeArea");
 
 const drawCanvas = inject('drawCanvas');
 const modeList = [
@@ -52,6 +54,10 @@ const clearArea = () => {
     ElMessageBox.confirm('是否清空所有区域?')
         .then(() => {
             revealAreas.value = [];
+            gameAreas.value = [];
+            selectedAreas.value = [];
+            selectedGameArea.value = null;
+            activeArea.value = null;
             drawCanvas();
         })
         .catch(() => {

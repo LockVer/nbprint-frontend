@@ -1,6 +1,6 @@
 <template>
     <top-action-panel v-model:mode="mode" v-model:selectedAreas="selectedAreas" v-model:revealAreas="revealAreas"
-        v-model:gameAreas="gameAreas" />
+        v-model:gameAreas="gameAreas" v-mode:selectedGameArea="selectedGameArea" v-mode:activeArea="activeArea"/>
     <div class="reveal-area-editor" ref="editorRef" @contextmenu.prevent="handleContextMenu($event)">
         <canvas ref="canvasRef" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp"
             @mouseleave="handleMouseLeave"></canvas>
