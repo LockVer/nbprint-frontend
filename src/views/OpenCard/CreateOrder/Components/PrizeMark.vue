@@ -4,7 +4,7 @@
             :cardStyle="{ 'padding': '0', 'background': 'none', 'box-shadow': 'none' }">
             <div class="award-id">
                 <div class="addtype">
-                    <el-button @click="addPrizeMark(item)" color="#4d65b8" :key="item.value"
+                    <el-button color="#4d65b8" @click="batchUpload(item)" :key="item.value"
                         v-for="item in awardIDList">+{{ item.text }}</el-button>
                 </div>
                 <div class="actions">
@@ -73,16 +73,19 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted,inject } from 'vue';
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XInputUpload from '@/components/functional/XInputUpload.vue';
 import { ElMessageBox } from 'element-plus';
 import { v4 as uuidv4 } from 'uuid';
 
-const initData = defineModel("initData");
 
-console.log("奖符",initData.value);
+
+const initData = defineModel("initData");
+// 注入 commonClass 实例
+const commonClass = inject('commonClass');
+console.log("奖符", initData.value);
 
 const fileInputRefs = ref({});
 const prizeDialogVisible = ref(false);
@@ -135,14 +138,14 @@ const handleFileChange = (item, event) => {
     }
 };
 
-const addPrizeMark = (item) => {
+const addPrizeMark = (item, image) => {
     const prizeMarkItem = {
         id: uuidv4(),
         type: item.value,
         name: '',
         imageSelected: false,
         imageName: '',
-        image: '',
+        image: image || '',
         amount: '',
         count: '',
         total: '',
@@ -213,6 +216,29 @@ const showAddBatchDialog = () => {
         item.qty = 0;
     });
 };
+
+const batchUpload = async (awardType) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true; // 允许选择多个文件
+    input.onchange = async (event) => {
+        const files = Array.from(event.target.files);
+        files.sort((a, b) => a.name.localeCompare(b.name)); // 根据文件名排序
+
+        for (const file of files) {
+            try {
+                // 使用你提供的上传方法
+                const res = await commonClass.uploadImages(file);
+                // 上传成功后添加数据到awardIDList
+                addPrizeMark(awardType, res.data);
+            } catch (err) {
+                console.error(err);
+                ElMessage.error(err);
+            }
+        }
+    };
+    input.click(); // 触发文件选择
+};
 onMounted(() => {
     initData.value.forEach((item) => {
         if (!item.id) item.id = uuidv4();
@@ -276,7 +302,8 @@ onMounted(() => {
                     top: 50%;
                     transform: translateY(-50%);
                 }
-                .icon-ashbin{
+
+                .icon-ashbin {
                     font-size: 16px;
                     color: white;
                     background: #e47470;
@@ -286,9 +313,10 @@ onMounted(() => {
                     align-items: center;
                     justify-content: center;
                     width: 24px;
-                    height:24px;
+                    height: 24px;
                     border-radius: 50%;
-                    &:hover{
+
+                    &:hover {
                         background: #ff937d;
                     }
                 }

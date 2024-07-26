@@ -1,21 +1,31 @@
 <template>
     <div class="x-input-upload">
-        <el-button class="xbutton" type="primary" v-if="!image" @click="selectImage">
+        <el-button class="xbutton" :disabled="disabled" type="primary" v-if="!image" @click="selectImage">
             上传图片
         </el-button>
         <el-input placeholder="请选择图片" v-model="image" readonly v-if="image">
             <template #append>
-                <el-button type="primary" link @click="selectImage">修改</el-button>
+                <el-button :disabled="disabled" type="primary" link @click="selectImage">修改</el-button>
             </template>
         </el-input>
-        <input type="file" ref="inputRef" @change="(event) => handleFileChange(event)" style="display: none" />
+        <input :disabled="disabled" type="file" ref="inputRef" @change="(event) => handleFileChange(event)" style="display: none" />
     </div>
 </template>
 <script setup>
-import { ref, watch, inject, reactive} from 'vue';
+import { ref, watch, inject, reactive,defineProps} from 'vue';
 
 import { ElMessage } from 'element-plus';
 
+const props = defineProps({
+    disabled: {
+        type: Boolean,
+        default: false
+    }
+});
+console.log(props.disabled);
+watch(() => props.disabled, (val) => {
+    console.log(val);
+});
 const emit = defineEmits(['changeImage']);
 const image = defineModel("image");
 const imageSize = defineModel("size");

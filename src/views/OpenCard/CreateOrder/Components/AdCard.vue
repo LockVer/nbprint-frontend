@@ -26,8 +26,8 @@
                     </x-component>
 
                     <x-component label="背景图" width="220px">
-                        <x-input-upload v-model:size="item.imageSize" v-model:image="item.imageName"
-                            @changeImage="changeImage(item)"></x-input-upload>
+                        <x-input-upload :disabled="getRevealAreaCount(index) > 0" v-model:size="item.imageSize"
+                            v-model:image="item.imageName" @changeImage="changeImage(item)"></x-input-upload>
                     </x-component>
                     <x-component label="宣传卡尺寸(mm)" width="220px">
                         <el-input :value="item.adCardSize" disabled></el-input>
@@ -117,6 +117,7 @@ const revealDialogVisible = ref(false);
 const prizeDialogVisible = ref(false);
 const currentEditingIndex = ref(-1);
 
+
 const isOpenable = [
     { text: '有', value: 'openable' },
     { text: '无', value: 'non-openable' }
@@ -135,6 +136,7 @@ const openDirectionList = [
 ];
 
 const componentData = ref([]);
+
 const populateComponentData = () => {
     if (!initData.value) {
         return;

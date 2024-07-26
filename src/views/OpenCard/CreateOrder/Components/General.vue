@@ -40,6 +40,8 @@ watch(
     () => store.state.userInfo,
     (newUserInfo) => {
         // 将新数据赋值给 initData
+        initData.value.sales.employeeName = newUserInfo.userName;
+        initData.value.sales.employeeId = newUserInfo.id;
         console.log(newUserInfo);
     }
 );

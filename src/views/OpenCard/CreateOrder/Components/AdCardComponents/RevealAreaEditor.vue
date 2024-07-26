@@ -275,6 +275,23 @@ const getAreas = () => {
             return [];
         }
     }
+    // const returnAreas = cloneDeep(gameAreas.value);
+    // // 将游戏区域的坐标转换为毫米
+    // returnAreas.forEach((gameArea) => {
+    //     gameArea.areas.forEach((area) => {
+    //         area.x = pxToMm(area.x);
+    //         area.y = pxToMm(area.y);
+    //         area.width = pxToMm(area.width);
+    //         area.height = pxToMm(area.height);
+    //         area.mark.forEach((mark) => {
+    //             mark.x = pxToMm(mark.x);
+    //             mark.y = pxToMm(mark.y);
+    //             mark.width = pxToMm(mark.width);
+    //             mark.height = pxToMm(mark.height);
+    //         });
+    //     });
+    // });
+    // console.log(returnAreas);
     // 返回当前的揭开区域数组，并根据区域的x,y进行排序后返回副本,先按y排序，再按x排序
     return cloneDeep(gameAreas.value);
 };

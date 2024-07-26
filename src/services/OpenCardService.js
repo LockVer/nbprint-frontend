@@ -21,6 +21,9 @@ class OpenCardService {
     getDetails(id) {
         return this.apiService.get(`/uncardOrder/getInfo?id=${id}`, {}, true);
     }
+    getOrderById(id) {
+        return this.apiService.get(`/uncardOrder/edit?id=${id}`, {}, true);
+    }
 }
 
 export default OpenCardService;

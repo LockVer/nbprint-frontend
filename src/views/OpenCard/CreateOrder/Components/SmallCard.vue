@@ -1,7 +1,7 @@
 <template>
     <x-card title="小卡信息">
         <x-component label="尺寸(mm)" padding="0 0 10px 0">
-            <x-check-box v-model="initData.size" :DataList="cardSizeList" type="radio"></x-check-box>
+            <x-check-box :disabled="hasOpenRegion" disabledText="宣传卡揭开区已创建，禁止修改，如需修改，请先清空揭开区。" v-model="initData.size" :DataList="cardSizeList" type="radio"></x-check-box>
         </x-component>
         <x-component label="揭开口数量" padding="0 0 10px 0">
             <x-check-box v-model="initData.openQuantity" :DataList="cardOpenList" type="radio"></x-check-box>
@@ -23,14 +23,14 @@
             <el-input-number v-model="initData.boxCount" :min="1" />
         </x-component>
         <x-component label="每盒数量" padding="0 0 18px 0">
-            <el-input-number v-model="initData.quantityPerBox" :min="1" />
+            <el-input-number :disabled="hasOpenRegion" v-model="initData.quantityPerBox" :min="1" />
         </x-component>
         <div class="calcBox">
             <x-component label="列数" padding="0 0 18px 0" width="220px">
-                <el-input-number :step="1" v-model="initData.columnCount" :min="1" />
+                <el-input-number :step="1" :disabled="hasOpenRegion" v-model="initData.columnCount" :min="1" />
             </x-component>
             <x-component label="每列数量" padding="0 0 18px 0" width="220px">
-                <el-input-number v-model="initData.columnQuantity" :min="1" />
+                <el-input-number :disabled="hasOpenRegion" v-model="initData.columnQuantity" :min="1" />
             </x-component>
         </div>
         <div class="bg-img">
@@ -48,16 +48,22 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, defineProps } from 'vue';
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
 import XImageUpload from '@/components/functional/XImageUpload.vue';
 
 
+const props = defineProps({
+    hasOpenRegion: Boolean,
+});
+
+
 const initData = defineModel("initData");
 initData.smallBoxCodePosition = initData.smallBoxCodePosition || 'BL';
 const boxCanvas = ref(null);
+
 
 const cardSizeList = [
     { text: '48*76', value: { width: 48, height: 76 } },

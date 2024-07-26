@@ -19,7 +19,7 @@
             <x-component label="数量">
                 <div class="number-range-container">
                     <div class="number-range">
-                        <el-input-number placeholder="最小值" v-model="searchForm.minTotal" :controls="false"  />
+                        <el-input-number placeholder="最小值" v-model="searchForm.minTotal" :controls="false" />
                         <div class="to">
                             <span>-</span>
                         </div>
@@ -35,7 +35,7 @@
         </div>
         <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
             <el-table-column prop="productName" label="产品名称" :show-overflow-tooltip="true">
-                <template #default="scope" >
+                <template #default="scope">
                     {{ scope.row.productName }}（{{ scope.row.chineseName }}）
                 </template>
             </el-table-column>
@@ -218,8 +218,7 @@ onMounted(() => {
 // 编辑订单处理函数
 const editOrder = (row) => {
     console.log(row);
-    localStorage.setItem('editOrder', JSON.stringify(row));
-    router.push('/opencard/createorder');
+    router.push({ path: '/opencard/createorder', query: { id: row.id } });
 };
 // 删除订单处理函数
 const deleteOrder = (row) => {
