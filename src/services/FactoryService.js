@@ -5,7 +5,7 @@ class FactoryService {
         this.userDatas = JSON.parse(localStorage.getItem('userInfo'));
         this.wechatUserId = { wechatUserId: this.userDatas.wechatUserId };
     }
-    // 获取工厂审核列表
+
     getFactoryList(data) {
         return this.apiService.post('/check/getList', data, true);
     }

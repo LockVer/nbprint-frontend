@@ -6,10 +6,11 @@
                 <el-input v-model="searchForm.productName" placeholder="请输入产品名称" />
             </x-component>
             <x-component label="客户">
-                <el-select v-model="searchForm.customerName" placeholder="请选择客户" clearable>
+                <el-input v-model="searchForm.customerName" placeholder="请输入客户名称" />
+                <!-- <el-select v-model="searchForm.customerName" placeholder="请选择客户" clearable>
                     <el-option v-for="(item, index) in options.customerNames" :key="index" :label="item"
                         :value="item" />
-                </el-select>
+                </el-select> -->
             </x-component>
             <x-component label="尺寸">
                 <el-select v-model="searchForm.smallCardSize" placeholder="请选择尺寸" clearable>
@@ -64,15 +65,14 @@
                         :class="{ 'btn-disable': scope.row.status == 0 }" :disabled="scope.row.status == 0">
                         编辑
                     </el-button>
-                    <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)"
-                        :class="{ 'btn-disable': scope.row.status == 0 }">
-                        删除
-                    </el-button>
                     <el-link type="primary" :href="scope.row.pdfOss" @click.stop
                         :class="{ 'btn-disable': scope.row.status == 0 || scope.row.status == 4 }"
                         :disabled="scope.row.status == 0 || scope.row.status == 4">
                         下载
                     </el-link>
+                    <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)">
+                        删除
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -115,7 +115,7 @@ const createTime = ref(null); // 创建时间范围
 const startTime = ref(''); // 搜索开始时间
 const endTime = ref(''); // 搜索结束时间
 const currentPage = ref(1);
-const pageSize = ref(20);
+const pageSize = ref(14);
 const queryParams = ref({}) // 查询参数
 // 监听搜索表单数据的变化
 watch(searchForm, (newVal) => {
@@ -254,7 +254,7 @@ const deleteOrder = (row) => {
     margin-top: 20px;
 }
 
-.el-button+.el-button {
+.el-button+.el-link {
     margin-left: 12px;
     margin-right: 12px;
 }
@@ -262,6 +262,7 @@ const deleteOrder = (row) => {
 .btn-disable {
     color: #CCC !important;
 }
+
 
 a {
     color: #029;
