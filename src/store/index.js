@@ -1,7 +1,7 @@
 // store.js
 import { createStore } from 'vuex';
 import UserService from '@/services/UserService';
-const userService=new UserService();
+const userService = new UserService();
 export default createStore({
   state() {
     return {
@@ -18,6 +18,12 @@ export default createStore({
     }
   },
   actions: {
+    setUserInfo({ commit }, userInfo) {
+      commit('SET_USER_INFO', userInfo);
+    },
+    setPermissions({ commit }, permissions) {
+      commit('SET_PERMISSIONS', permissions);
+    },
     async getUserInfo({ commit }) {
       try {
         const response = await userService.getUserInfo();

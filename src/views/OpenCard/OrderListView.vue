@@ -94,9 +94,11 @@ import moment from 'moment';
 import OpenCardService from '@/services/OpenCardService';
 import searchService from '@/services/SearchService';
 import XComponent from '@/components/container/XComponent.vue';
+import { useStore } from 'vuex';
 
 
 const router = useRouter();
+const store = useStore();
 const tableData = ref([]);
 const totalPage = ref(0);
 const errorMessage = ref('');
@@ -180,7 +182,7 @@ const rowClick = (row) => {
 };
 
 // 加载数据处理
-const loadData = () => {
+const loadData = async () => {
     let params = {
         "pageSize": pageSize.value,
         "pageNum": currentPage.value
@@ -188,6 +190,11 @@ const loadData = () => {
     if (queryParams.value) {
         params = Object.assign(params, queryParams.value);
     }
+
+    if (!store.state.userInfo.id) {
+        await store.dispatch("getUserInfo");
+    }
+    params.nbUserId = store.state.userInfo.id;
     serviceClass.getList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;

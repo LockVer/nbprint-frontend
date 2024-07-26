@@ -20,6 +20,7 @@ import LayoutFooter from '@/components/common/LayoutFooter.vue';
 import OpenCardService from '@/services/OpenCardService';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter, useRoute } from 'vue-router';
+import { useStore } from 'vuex';
 import { v4 as uuidv4 } from 'uuid';
 import CommonService from '@/services/CommonService';
 
@@ -29,6 +30,7 @@ const orderId = ref("");   //唯一的orderId，用于后续的提交订单，�
 
 const router = useRouter();
 const route = useRoute();
+const store = useStore();
 const serviceClass = new OpenCardService();
 const commonClass = new CommonService(orderId.value);
 //提供统一的commonClass给子组件
@@ -122,8 +124,8 @@ const handleSubmit = () => {
         ElMessage.error('请填写客户名');
         return;
     }
-    if (general.value.sales.employeeName == '') {
-        ElMessage.error('请填写业务员');
+    if (general.value.sales.nbUserId == '') {
+        ElMessage.error('业务员不能为空');
         return;
     }
     if (smallCard.value.price == '') {

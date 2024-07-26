@@ -1,16 +1,16 @@
 import ApiService from '../utils/ApiService';
+
+
 class OpenCardService {
     constructor() {
         this.apiService = new ApiService();
-        this.userDatas = JSON.parse(localStorage.getItem('userInfo'));
-        this.employeeId = { employeeId: this.userDatas.id };
     }
 
     createOrder(data) {
-        return this.apiService.post('/pdf/render', { ...data, ...this.employeeId}, true);
+        return this.apiService.post('/pdf/render', data, true);
     }
     getList(data) {
-        return this.apiService.post('/uncardOrder/getList', { ...data, ...this.employeeId}, true);
+        return this.apiService.post('/uncardOrder/getList', data, true);
     }
     deleteOrder(orderId) {
         return this.apiService.post('/uncardOrder/delete?id=' + orderId, true);
