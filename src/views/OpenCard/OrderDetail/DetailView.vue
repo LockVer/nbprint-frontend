@@ -179,6 +179,7 @@ const dataClear = (res) => {
     if (res.checkDetail) {
         status.value = res.checkDetail.checkStatus
         // 如果状态不是 '0'，则显示异常详情
+        // jnbjbjh
         if (status.value !== '0') {
             isShow.value = true
         }
