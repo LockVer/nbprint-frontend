@@ -195,6 +195,7 @@ const loadData = async () => {
         await store.dispatch("getUserInfo");
     }
     params.nbUserId = store.state.userInfo.id;
+    
     serviceClass.getList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
