@@ -19,7 +19,7 @@
             <x-component label="数量">
                 <div class="number-range-container">
                     <div class="number-range">
-                        <el-input-number placeholder="最小值" v-model="searchForm.minTotal" :controls="false"  />
+                        <el-input-number placeholder="最小值" v-model="searchForm.minTotal" :controls="false" />
                         <div class="to">
                             <span>-</span>
                         </div>
@@ -35,7 +35,7 @@
         </div>
         <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
             <el-table-column prop="productName" label="产品名称" :show-overflow-tooltip="true">
-                <template #default="scope" >
+                <template #default="scope">
                     {{ scope.row.productName }}（{{ scope.row.chineseName }}）
                 </template>
             </el-table-column>
@@ -64,15 +64,14 @@
                         :class="{ 'btn-disable': scope.row.status == 0 }" :disabled="scope.row.status == 0">
                         编辑
                     </el-button>
-                    <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)"
-                        :class="{ 'btn-disable': scope.row.status == 0 }">
-                        删除
-                    </el-button>
                     <el-link type="primary" :href="scope.row.pdfOss" @click.stop
                         :class="{ 'btn-disable': scope.row.status == 0 || scope.row.status == 4 }"
                         :disabled="scope.row.status == 0 || scope.row.status == 4">
                         下载
                     </el-link>
+                    <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)">
+                        删除
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -115,7 +114,7 @@ const createTime = ref(null); // 创建时间范围
 const startTime = ref(''); // 搜索开始时间
 const endTime = ref(''); // 搜索结束时间
 const currentPage = ref(1);
-const pageSize = ref(20);
+const pageSize = ref(14);
 const queryParams = ref({}) // 查询参数
 // 监听搜索表单数据的变化
 watch(searchForm, (newVal) => {
@@ -255,7 +254,7 @@ const deleteOrder = (row) => {
     margin-top: 20px;
 }
 
-.el-button+.el-button {
+.el-button+.el-link {
     margin-left: 12px;
     margin-right: 12px;
 }
@@ -263,6 +262,7 @@ const deleteOrder = (row) => {
 .btn-disable {
     color: #CCC !important;
 }
+
 
 a {
     color: #029;

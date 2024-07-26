@@ -109,7 +109,7 @@ const startTime = ref('');
 const endTime = ref('');
 // 分页参数
 const currentPage = ref(1);
-const pageSize = ref(12);
+const pageSize = ref(14);
 
 watch(searchForm, (newVal) => {
     if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {

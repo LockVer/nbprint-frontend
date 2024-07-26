@@ -137,7 +137,7 @@ onMounted(() => {
 })
 // 获取订单详情数据
 const servicesHandle = (id) => {
-    serviceClass.GetDetails(id).then(res => {
+    serviceClass.getDetails(id).then(res => {
         delete res.data.id;
         // 处理宣传卡信息
         if (res.data.adCardInfo) {
