@@ -17,12 +17,14 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import UserService from '../../services/UserService';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import { ElMessage } from 'element-plus'
 const userService = new UserService();
 const username = ref('');
 const password = ref('');
 const errorMsg = ref('');
 const router = useRouter();
+const store = useStore();
 onMounted(() => {
     window.addEventListener('keyup', handleKeyup);
 })
@@ -39,13 +41,14 @@ const login = () => {
         ElMessage.error('用户名或密码不能为空');
         return;
     }
-    userService.login({  
+    userService.login({
         username: username.value,
         password: password.value
     }).then((res) => {
         console.log(res);
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('userInfo', JSON.stringify(res.data.userInfo));
+        store.dispatch('setUserInfo', res.data.userInfo);
         router.push('/opencard');
     }).catch((err) => {
         console.log(err);
@@ -59,6 +62,7 @@ const login = () => {
     display: flex;
     height: 100vh;
     width: 100vw;
+
     .cover {
         flex: 1;
         background: url('../../assets/login-bg.png') no-repeat center center;
