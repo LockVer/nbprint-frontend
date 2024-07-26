@@ -11,7 +11,7 @@
                 <el-input v-model="initData.client.clientName" placeholder="请输入客户名字" />
             </x-component>
             <x-component label="业务员" width="220px">
-                <el-input v-model="initData.sales.employeeName" disabled placeholder="请输入业务员" />
+                <el-input v-model="initData.sales.nbUserName" disabled placeholder="请输入业务员" />
             </x-component>
             <x-component label="货币符号" width="220px">
                 <el-select v-model="initData.currency" placeholder="请选择货币符号">
@@ -33,15 +33,15 @@ import { useStore } from 'vuex';
 const initData = defineModel("initData");
 const store = useStore();
 
-initData.value.sales.employeeName = store.state.userInfo.userName;
-initData.value.sales.employeeId = store.state.userInfo.id;
+initData.value.sales.nbUserName = store.state.userInfo.userName;
+initData.value.sales.nbUserId = store.state.userInfo.id;
 console.log(store.state.userInfo);
 watch(
     () => store.state.userInfo,
     (newUserInfo) => {
         // 将新数据赋值给 initData
-        initData.value.sales.employeeName = newUserInfo.userName;
-        initData.value.sales.employeeId = newUserInfo.id;
+        initData.value.sales.nbUserName = newUserInfo.userName;
+        initData.value.sales.nbUserId = newUserInfo.id;
         console.log(newUserInfo);
     }
 );
