@@ -269,9 +269,9 @@ const getAreas = () => {
     for (const gameArea of gameAreas.value) {
         const areas = gameArea.areas;
         if (areas.some((area1, index1) =>
-            areas.some((area2, index2) => index1 !== index2 && isOverlapping(area1, area2, mmToPx(6)))
+            areas.some((area2, index2) => index1 !== index2 && isOverlapping(area1, area2, mmToPx(5)))
         )) {
-            ElMessage.error('游戏区中的揭开区域间隔需要大于等于6mm！');
+            ElMessage.error('游戏区中的揭开区域间隔需要大于等于5mm！');
             return [];
         }
     }

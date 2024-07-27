@@ -175,14 +175,14 @@ const handleSubmit = () => {
             return true;
         }
         if (mark.type === 'noPrize') return false;  //不中奖不需要填写金额和数量
-        if (!mark.amount) {
-            ElMessage.error('请填写奖符金额');
-            return true;
-        }
-        if (!mark.count) {
-            ElMessage.error('请填写奖符数量');
-            return true;
-        }
+        // if (!mark.amount) {
+        //     ElMessage.error('请填写奖符金额');
+        //     return true;
+        // }
+        // if (!mark.count) {
+        //     ElMessage.error('请填写奖符数量');
+        //     return true;
+        // }
         return false;
     });
 
