@@ -15,7 +15,7 @@ export default [
             },
             {
                 label: '业务员',
-                name: 'businessPeople'
+                name: 'userName'
             },
             {
                 label: '创建时间',

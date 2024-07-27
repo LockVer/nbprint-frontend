@@ -3,7 +3,8 @@ class FactoryService {
     constructor() {
         this.apiService = new ApiService();
         this.userDatas = JSON.parse(localStorage.getItem('userInfo'));
-        this.wechatUserId = { wechatUserId: this.userDatas.wechatUserId };
+        this.nbUserId = { nbUserId: this.userDatas.id };
+
     }
 
     getFactoryList(data) {
@@ -11,7 +12,8 @@ class FactoryService {
     }
     // 审核锁单
     checkLock(data) {
-        return this.apiService.post(`/check/lock`, { "id": data, ...this.wechatUserId }, true);
+        console.log(data)
+        return this.apiService.post(`/check/lock`, { "checkId":data, ...this.nbUserId }, true);
     }
     // 审核解单
     checkUnlock(data) {
@@ -19,7 +21,7 @@ class FactoryService {
     }
     // 提交工厂审核
     submitFactoryCheck(data) {
-        return this.apiService.post('/check/submit', { ...data, ...this.wechatUserId }, true);
+        return this.apiService.post('/check/submit', { ...data, ...this.nbUserId }, true);
     }
 }
 

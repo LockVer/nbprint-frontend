@@ -48,7 +48,7 @@
             </el-table-column>
             <el-table-column prop="total" label="数量" />
             <el-table-column prop="smallCardSize" label="尺寸" />
-            <el-table-column prop="businessPeople" label="业务员" />
+            <el-table-column prop="userName" label="业务员" />
             <el-table-column prop="createTime" label="创建时间">
                 <template #default="scope">
                     <div style="display: flex; align-items: center">
@@ -164,9 +164,11 @@ const searchHandler = (value) => {
 }
 // 审核订单处理函数
 const checkOrder = (row) => {
-    factoryServiceClass.checkLock(row.id).then(res => {
+    // console.log(row)
+    factoryServiceClass.checkLock(row.checkId).then(res => {
+    console.log(res)
         localStorage.setItem('orderDetails', JSON.stringify(res.data));
-        router.push(`/factoryaudit/detail/${row.id}`);
+        router.push(`/factoryaudit/detail/${row.checkId}`);
     }).catch(err => {
         ElMessage.error(err);
     })

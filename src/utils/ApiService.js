@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ElLoading } from 'element-plus';
 import { useRouter } from 'vue-router';
 class ApiService {
-  constructor(baseURL) {
+  constructor(baseURL) { 
     this.api = axios.create({
       //baseURL: baseURL || 'https://nbprint-release-pffkcbubxj.cn-shenzhen.fcapp.run', // 你的API基础URL
       baseURL: baseURL || 'http://192.168.1.224:8084', // 你的API基础URL

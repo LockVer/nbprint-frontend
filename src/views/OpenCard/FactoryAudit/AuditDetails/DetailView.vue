@@ -60,6 +60,7 @@ import XCheckBox from '@/components/functional/XCheckBox.vue';
 import LayoutFooter from '@/components/common/LayoutFooter.vue';
 import audit from '@/config/audit';
 import auditCord from '@/config/auditCord';
+import store from '@/store/index';
 import { reactive, ref, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
@@ -106,7 +107,7 @@ onMounted(() => {
 
 // 处理异常变化
 const handleExceptionChange = (adItem) => {
-    console.log(exceptionLabels.value)
+    // console.log(exceptionLabels.value)
     // 检查 adItem 的 selectedValue 是否为 "0" (表示异常)
     if (adItem.selectedValue === "0") {
         // 如果异常标签数组中不存在当前 adItem 的标签，则将其添加到异常标签数组中
@@ -178,16 +179,18 @@ const postDatas = () => {
         });
     });
     data = {
-        id: Number(route.params.id),
+        checkId: Number(route.params.id),
+        nbUserId: store.state.userInfo.id,
         ...data,
         exceptionItem: exceptionLabels.value.map(item => item.label).join(','),
         remark: textarea1.value
     };
+    console.log(data)
     serviceClass.submitFactoryCheck(data).then((res) => {
         ElMessage({
             type: 'success',
             message: '提交成功',
-            duration: 1000,
+            duration: 2000,
             onClose: () => {
                 clearData();
                 router.go(-1);

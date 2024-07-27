@@ -140,7 +140,7 @@ const servicesHandle = (id) => {
             // 遍历每张宣传卡，处理其中的每个字段
             adCardInfo.value.adCard.forEach((item) => {
                 for (const key in item) {
-                    if (item[key] === null) {
+                    if (item[key] === null || item[key] === '') {
                         item[key] = '无';
                     }
                 }

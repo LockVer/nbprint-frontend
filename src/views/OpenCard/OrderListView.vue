@@ -65,7 +65,7 @@
                         :class="{ 'btn-disable': scope.row.status == 0 }" :disabled="scope.row.status == 0">
                         编辑
                     </el-button>
-                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop
+                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop style="padding: 2px;"
                         :class="{ 'btn-disable': scope.row.status == 0 || scope.row.status == 4 }"
                         :disabled="scope.row.status == 0 || scope.row.status == 4">
                         下载
@@ -195,7 +195,7 @@ const loadData = async () => {
         await store.dispatch("getUserInfo");
     }
     params.nbUserId = store.state.userInfo.id;
-    
+
     serviceClass.getList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
@@ -205,7 +205,6 @@ const loadData = async () => {
     });
 };
 // 处理每页大小变化
-//123
 const handleSizeChange = (newSize) => {
     pageSize.value = newSize;
     loadData();
