@@ -26,7 +26,7 @@
                         </div>
                         <div class="item-input">
                             <x-component label="名称" width="220px">
-                                <el-input placeholder="请输入名称" v-model="item.name" />
+                                <el-input placeholder="请输入名称" v-model="item.name" :value="awardItem.text+(eindex+1)"/>
                             </x-component>
                             <x-component label="背景图" width="220px">
                                 <x-input-upload v-model:image="item.image"></x-input-upload>
@@ -96,10 +96,21 @@ const awardIDList = reactive([
     { text: '自定义玩法', value: 'custom', qty: 0 }
 ]);
 
+watch(() => initData.value, (newData) => {
+    console.log(newData);
+}, { deep: true });
+
 const filterPrizeMark = (type) => {
-    console.log(initData.value.filter(item => item.type === type))
-    return initData.value.filter(item => item.type === type);
+    const filteredData = initData.value.filter((item, index) => {
+        if (item.type === type) {
+            item.name = `${item.text}${index}`;
+            return true;
+        }
+        return false;
+    });
+    return filteredData;
 };
+
 
 const removePrize = (item) => {
     ElMessageBox.confirm('确定删除该奖符信息？', '提示', {
