@@ -190,7 +190,7 @@ const postDatas = () => {
         ElMessage({
             type: 'success',
             message: '提交成功',
-            duration: 2000,
+            duration: 1000,
             onClose: () => {
                 clearData();
                 router.go(-1);

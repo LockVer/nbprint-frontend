@@ -11,6 +11,7 @@
 <script setup>
 import { inject } from 'vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
+import { ElMessageBox } from 'element-plus';
 
 import { v4 as uuidv4 } from 'uuid'; // 导入uuid库
 

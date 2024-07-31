@@ -1,6 +1,6 @@
 <template>
     <div class="x-input-upload">
-        <el-button class="xbutton" :disabled="disabled" type="primary" v-if="!image" @click="selectImage">
+        <el-button class="xbutton" color="#4d65b8" :disabled="disabled" type="primary" v-if="!image" @click="selectImage">
             上传图片
         </el-button>
         <el-input placeholder="请选择图片" v-model="image" readonly v-if="image">

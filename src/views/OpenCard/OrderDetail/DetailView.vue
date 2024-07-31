@@ -44,15 +44,16 @@
         </div>
         <div class="generalInfo" v-for="(items, key) in adCardInfo.adCard" :key="key">
             <x-component :label="'宣传卡' + (key + 1) + ' 有无揭开口'" :width="'15%'" :titleStyle="'#484848'">
-                <div class="value">{{ items.adUncover }}</div>
+                <!-- <div class="value">{{ items.adUncover }}</div> -->
+                <div class="value">{{ items.adUncover == 1 ? '有' : '无' }}</div>
             </x-component>
             <x-component :label="'宣传卡' + (key + 1) + ' 背景图'" :width="'15%'" :titleStyle="'#484848'">
                 <el-tooltip popper-class="tooltip-width" :content="items.adImage" placement="bottom" effect="light">
                     <div class="value">{{ items.adImage }}</div>
                 </el-tooltip>
             </x-component>
-            <x-component :label="'宣传卡' + (key + 1) + ' 是否有揭开区'" :width="'15%'" :titleStyle="'#484848'">
-                <div class="value">{{ items.adOpenRegion }}</div>
+            <x-component :label="'宣传卡' + (key + 1) + ' 有无揭开区'" :width="'15%'" :titleStyle="'#484848'">
+                <div class="value">{{ items.adOpenRegion == 1 ? '有' : '无' }}</div>
             </x-component>
             <x-component :label="'宣传卡' + (key + 1) + ' 揭开区数量'" :width="'15%'" :titleStyle="'#484848'">
                 <div class="value">{{ items.adOpenRegionNumber }}</div>
@@ -157,7 +158,7 @@ const servicesHandle = (id) => {
                     item.markType = 1;
                 } else if (item.markType === 'noPrize') {
                     item.markType = 2;
-                } else if (item.markType === 'userDefined') {
+                } else if (item.markType === 'custom') {
                     item.markType = 3;
                 }
                 item.prizeMark.forEach((item) => {

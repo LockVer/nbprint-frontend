@@ -12,10 +12,10 @@
         <x-component label="刀模开口方向" padding="0 0 10px 0">
             <x-check-box v-model="initData.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
         </x-component>
-        <x-component label="盒号" padding="0 0 18px 0" width="220px">
-            <el-input v-model="initData.smallBoxCode" />
+        <x-component label="小卡盒号" padding="0 0 18px 0" width="220px">
+            <el-input v-model="initData.smallBoxCode" placeholder="请输入小卡盒号" />
         </x-component>
-        <x-component label="盒号位置" padding="0 0 10px 0">
+        <x-component label="小卡盒号位置" padding="0 0 10px 0">
             <x-check-box v-model="initData.smallBoxCodePosition" :DataList="boxCodePositionList"
                 type="radio"></x-check-box>
         </x-component>
@@ -116,6 +116,7 @@ const calcRowCount = () => {
         const thickness = 0.67;                      //小卡厚度
         const quantityPerBox = initData.value.quantityPerBox;  //每盒数量
         columnCount = columnCount;  //列数
+        console.log('level', level, 'columnCount', columnCount, 'quantityPerBox', quantityPerBox);
         //在最高条件等级时，判断每列数量是否大于500，如果大于500不计算
         if (level == 0) {
             if (quantityPerBox / columnCount > 500) return;  //每列数量大于500不计算
@@ -128,7 +129,6 @@ const calcRowCount = () => {
 
         //计算长宽比
         const newRatio = calcBox.width / calcBox.thickness;
-        // console.log('newRatio', newRatio, calcBox.width, calcBox.thickness, columnCount, quantityPerBox / columnCount);
         //如果长宽比在ratio和maxRatio之间，并且尺寸在最大尺寸之内
         if (newRatio >= ratio && newRatio <= maxRatio) {
             // console.log('box', calcBox);
@@ -165,6 +165,7 @@ const calcBoxSize = (columnCount, columnQuantity) => {
     const width = initData.value.size.width;    //小卡宽度
     const height = initData.value.size.height;  //小卡高度
     const thickness = 0.67;                      //小卡厚度
+    
     if (!columnQuantity) {
         columnQuantity = initData.value.quantityPerBox / columnCount;
     }
@@ -305,6 +306,6 @@ watch(() => initData.value.columnQuantity, (newVal) => {
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 999;
+    z-index: 30;
 }
 </style>

@@ -26,7 +26,7 @@
                         </div>
                         <div class="item-input">
                             <x-component label="名称" width="220px">
-                                <el-input placeholder="请输入名称" v-model="item.name" :value="awardItem.text+(eindex+1)"/>
+                                <el-input placeholder="请输入名称" v-model="item.name" @focus="onNameFocus" @blur="onNameBlur" />
                             </x-component>
                             <x-component label="背景图" width="220px">
                                 <x-input-upload v-model:image="item.image"></x-input-upload>
@@ -73,19 +73,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted,inject } from 'vue';
+import { ref, reactive, watch, onMounted, inject } from 'vue';
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XInputUpload from '@/components/functional/XInputUpload.vue';
-import { ElMessageBox } from 'element-plus';
+import { ElMessageBox, ElMessage  } from 'element-plus';
 import { v4 as uuidv4 } from 'uuid';
-
-
 
 const initData = defineModel("initData");
 // 注入 commonClass 实例
 const commonClass = inject('commonClass');
-console.log("奖符", initData.value);
 
 const fileInputRefs = ref({});
 const prizeDialogVisible = ref(false);
@@ -97,13 +94,28 @@ const awardIDList = reactive([
 ]);
 
 watch(() => initData.value, (newData) => {
-    console.log(newData);
 }, { deep: true });
 
+const isFocus = ref(false);
+const onNameFocus = ()=>{
+    isFocus.value = true;
+}
+
+const onNameBlur = ()=>{
+    isFocus.value = false;
+}
+
 const filterPrizeMark = (type) => {
-    const filteredData = initData.value.filter((item, index) => {
+    let index = 1; // 初始化索引为1
+    const filteredData = initData.value.filter((item) => {
         if (item.type === type) {
-            item.name = `${item.text}${index}`;
+            if (!item.name && !isFocus.value) {
+                const awardItem = awardIDList.find(award => award.value === type);
+                if (awardItem) {
+                    item.name = `${awardItem.text}${index}`;
+                }
+            }
+            index++; // 每找到一个匹配项，索引加1
             return true;
         }
         return false;
@@ -124,36 +136,12 @@ const removePrize = (item) => {
     });
 };
 
-const setFileInputRef = (el, item) => {
-    fileInputRefs.value[item.id] = el;
-};
-
-
-const selectImage = (item) => {
-    const key = item.id;
-    const fileInput = fileInputRefs.value[key];
-    if (fileInput) {
-        fileInput.click();
-    }
-};
-
-const handleFileChange = (item, event) => {
-    const file = (event.target).files?.[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            item.image = file.name;
-            item.imageFile = file;
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
 const addPrizeMark = (item, image) => {
     const prizeMarkItem = {
         id: uuidv4(),
         type: item.value,
-        name: '',
+        // text: item.text,
+        name: "", // 设置初始名称
         imageSelected: false,
         imageName: '',
         image: image || '',
@@ -167,16 +155,6 @@ const addPrizeMark = (item, image) => {
         initData.value = [];
     }
     initData.value.push(prizeMarkItem);
-};
-
-const getTypeName = (type) => {
-    const typeNames = {
-        cash: '现金奖',
-        noPrize: '不中奖',
-        holdCard: 'HOLD卡',
-        custom: '自定义玩法'
-    };
-    return typeNames[type] || type;
 };
 
 const onAmountInput = (item) => {
@@ -200,9 +178,6 @@ const calculateTotal = (item) => {
 };
 
 const clearData = () => {
-    // for (const key in prizeMarkGroup) {
-    //     prizeMarkGroup[key] = [];
-    // }
     initData.value = [];
     fileInputRefs.value = {};
 };
@@ -255,7 +230,6 @@ onMounted(() => {
         if (!item.id) item.id = uuidv4();
         calculateTotal(item);
     });
-    console.log(initData.value);
 });
 </script>
 

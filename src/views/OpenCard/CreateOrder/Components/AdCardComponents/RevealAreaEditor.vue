@@ -1,20 +1,22 @@
 <template>
     <top-action-panel v-model:mode="mode" v-model:selectedAreas="selectedAreas" v-model:revealAreas="revealAreas"
-        v-model:gameAreas="gameAreas" v-mode:selectedGameArea="selectedGameArea" v-mode:activeArea="activeArea"/>
+        v-model:gameAreas="gameAreas" v-mode:selectedGameArea="selectedGameArea" v-mode:activeArea="activeArea" />
     <div class="reveal-area-editor" ref="editorRef" @contextmenu.prevent="handleContextMenu($event)">
         <canvas ref="canvasRef" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp"
             @mouseleave="handleMouseLeave"></canvas>
-        <game-area-panel :mode="mode" v-model:gameAreas="gameAreas" v-model:selectedGameArea="selectedGameArea" v-model:revealAreas="revealAreas"/>
-        <mark-area-panel v-model:selectedGameArea="selectedGameArea"/>
+        <game-area-panel :mode="mode" v-model:gameAreas="gameAreas" v-model:selectedGameArea="selectedGameArea"
+            v-model:revealAreas="revealAreas" />
+        <mark-area-panel v-model:selectedGameArea="selectedGameArea" />
         <context-menu :mode="mode" v-model:showContextMenu="showContextMenu" :contextMenuPosition="contextMenuPosition"
-            :rightClickedArea="rightClickedArea" v-model:revealAreas="revealAreas" v-model:activeArea="activeArea" v-model:setQtyDialogVisible="setQtyDialogVisible"
-            v-model:selectedGameArea="selectedGameArea"/>
-        <set-mark-qty-panel v-model:setQtyDialogVisible="setQtyDialogVisible" v-model:selectedGameArea="selectedGameArea" v-model:activeArea="activeArea"/>
+            :rightClickedArea="rightClickedArea" v-model:revealAreas="revealAreas" v-model:activeArea="activeArea"
+            v-model:setQtyDialogVisible="setQtyDialogVisible" v-model:selectedGameArea="selectedGameArea" />
+        <set-mark-qty-panel v-model:setQtyDialogVisible="setQtyDialogVisible"
+            v-model:selectedGameArea="selectedGameArea" v-model:activeArea="activeArea" />
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineProps, defineExpose,provide } from 'vue';
+import { ref, onMounted, watch, defineProps, defineExpose, provide } from 'vue';
 import { cloneDeep } from 'lodash';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
@@ -28,7 +30,7 @@ resizeArea = (x, y, resizeDirection, activeArea, revealAreas, alignLine, canvasR
 updateCursor = (x, y, revealAreas, canvasRef)
 determineResizeDirection = (x, y, area)
 */
-import { resizeArea, updateCursor,determineResizeDirection } from './RevealAreaUtils/ResizeUtil';
+import { resizeArea, updateCursor, determineResizeDirection } from './RevealAreaUtils/ResizeUtil';
 
 import UnitConvertUtil from './RevealAreaUtils/UnitConvertUtil';
 import DistanceDrawer from './RevealAreaUtils/DistanceDrawer';
@@ -65,7 +67,7 @@ const setQtyDialogVisible = ref(false);
 const rightClickedArea = ref(null);
 const scale = ref(1); // 缩放比例
 
-const distanceDrawer = new DistanceDrawer(pxToMm,revealAreas);
+const distanceDrawer = new DistanceDrawer(pxToMm, revealAreas);
 
 const canvasRendererOptions = {
     canvasRef: canvasRef,
@@ -97,7 +99,7 @@ watch(mode, (newMode) => {
         drawCanvas();
     }
 });
-watch(()=>selectedGameArea.value, (newVal) => {
+watch(() => selectedGameArea.value, (newVal) => {
     console.log(newVal)
 });
 watch(() => props.backgroundImageUrl, (newVal) => {
@@ -255,48 +257,49 @@ const getAreas = () => {
         ElMessage.error('还有区域未绑定游戏区！');
         return [];
     }
+
     const isOverlapping = (area1, area2, minSpacing) => {
         const { x: x1, y: y1, width: w1, height: h1 } = area1;
         const { x: x2, y: y2, width: w2, height: h2 } = area2;
 
-        // Check if the distance between the right edge of area1 and left edge of area2 is greater than minSpacing
-        const xOverlap = Math.abs(x1 + w1 - (x2)) < minSpacing;
-        // Check if the distance between the bottom edge of area1 and top edge of area2 is greater than minSpacing
-        const yOverlap = Math.abs(y1 + h1 - (y2)) < minSpacing;
+        const overlapX = x1 < x2 + w2 + minSpacing && x1 + w1 + minSpacing > x2;
+        const overlapY = y1 < y2 + h2 + minSpacing && y1 + h1 + minSpacing > y2;
 
-        return xOverlap || yOverlap;
+        return overlapX && overlapY;
     };
+
+    // 检查每个游戏区内部的揭开区域是否重叠
     for (const gameArea of gameAreas.value) {
         const areas = gameArea.areas;
         if (areas.some((area1, index1) =>
             areas.some((area2, index2) => index1 !== index2 && isOverlapping(area1, area2, mmToPx(5)))
         )) {
-            ElMessage.error('游戏区中的揭开区域间隔需要大于等于5mm！');
+            ElMessage.error('游戏区中的揭开区域间隔需要大于等于 5mm！');
             return [];
         }
     }
-    // const returnAreas = cloneDeep(gameAreas.value);
-    // // 将游戏区域的坐标转换为毫米
-    // returnAreas.forEach((gameArea) => {
-    //     gameArea.areas.forEach((area) => {
-    //         area.x = pxToMm(area.x);
-    //         area.y = pxToMm(area.y);
-    //         area.width = pxToMm(area.width);
-    //         area.height = pxToMm(area.height);
-    //         area.mark.forEach((mark) => {
-    //             mark.x = pxToMm(mark.x);
-    //             mark.y = pxToMm(mark.y);
-    //             mark.width = pxToMm(mark.width);
-    //             mark.height = pxToMm(mark.height);
-    //         });
-    //     });
-    // });
-    // console.log(returnAreas);
-    // 返回当前的揭开区域数组，并根据区域的x,y进行排序后返回副本,先按y排序，再按x排序
+
+    // 检查不同游戏区的揭开区域之间是否重叠
+    for (let i = 0; i < gameAreas.value.length; i++) {
+        console.log(revealAreas.value)
+        for (let j = i + 1; j < gameAreas.value.length; j++) {
+            const areas1 = gameAreas.value[i].areas;
+            const areas2 = gameAreas.value[j].areas;
+            if (areas1.some(area1 =>
+                areas2.some(area2 => isOverlapping(area1, area2, mmToPx(5)))
+            )) {
+                ElMessage.error('不同游戏区的揭开区域间隔需要大于等于 5mm！');
+                console.log(`Removing game area at index ${j} due to overlap.`)
+                // 只清空当前正在绘制的游戏区
+                
+                revealAreas.value = [];
+                return [];
+            }
+        }
+    }
+
     return cloneDeep(gameAreas.value);
 };
-
-
 
 defineExpose({
     drawCanvas,

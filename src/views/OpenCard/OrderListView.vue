@@ -30,7 +30,7 @@
                 </div>
             </x-component>
             <x-component label="创建时间">
-                <el-date-picker v-model="createTime" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
+                <el-date-picker v-model="createTime" type="daterange" style="width: 100%;" start-placeholder="开始日期" end-placeholder="结束日期"
                     :default-value="[new Date(), new Date()]" @change="changeHandler" />
             </x-component>
         </div>
@@ -50,7 +50,7 @@
             </el-table-column>
             <el-table-column prop="total" label="数量" />
             <el-table-column prop="smallCardSize" label="尺寸" />
-            <el-table-column prop="businessPeople" label="业务员" />
+            <el-table-column prop="userName" label="业务员" />
             <el-table-column prop="createTime" label="创建时间">
                 <template #default="scope">
                     <div style="display: flex; align-items: center">
@@ -302,7 +302,7 @@ a {
 
 /* 数量 */
 .number-range-container {
-    width: 300px;
+    /* width: 300px; */
     display: flex;
     flex-direction: column;
     height: 100%;

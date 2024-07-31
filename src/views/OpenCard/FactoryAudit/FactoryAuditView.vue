@@ -29,7 +29,7 @@
                 </div>
             </x-component>
             <x-component label="创建时间">
-                <el-date-picker v-model="createTime" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
+                <el-date-picker v-model="createTime" type="daterange" style="width: 100%;" start-placeholder="开始日期" end-placeholder="结束日期"
                     :append-to-body="true" :default-value="[new Date(), new Date()]" @change="changeHandler" />
             </x-component>
         </div>
@@ -287,7 +287,7 @@ a {
 
 /* 数量 */
 .number-range-container {
-    width: 300px;
+    /* width: 300px; */
     display: flex;
     flex-direction: column;
     height: 100%;

@@ -32,6 +32,7 @@ const router = useRouter();
 const route = useRoute();
 const store = useStore();
 const serviceClass = new OpenCardService();
+// const commonClass = ref();
 const commonClass = new CommonService(orderId.value);
 //提供统一的commonClass给子组件
 provide('commonClass', commonClass);
@@ -89,12 +90,9 @@ const hasOpenRegion = computed(() => {
     return adCard.value.some(card => card.openRegions.length > 0);
 })
 
-
-
 onMounted(() => {
     if (route.query.id) {
         serviceClass.getOrderById(route.query.id).then(res => {
-            console.log(res);
             let data = res.data.json;
             general.value = data.general;
             smallCard.value = data.smallCard;
@@ -105,9 +103,10 @@ onMounted(() => {
             orderId.value = data.orderId;
 
         })
-    }else{
+    } else {
         orderId.value = uuidv4();
     }
+    commonClass.value = new CommonService(orderId.value);
 })
 
 const handleSubmit = () => {
@@ -132,6 +131,10 @@ const handleSubmit = () => {
         ElMessage.error('请填写小卡价格');
         return;
     }
+    if (smallCard.value.smallBoxCode == '') {
+        ElMessage.error('请填写小卡盒号');
+        return;
+    }
     if (smallCard.value.frontImage == '') {
         ElMessage.error('请上传小卡正面图片');
         return;
@@ -147,6 +150,10 @@ const handleSubmit = () => {
     //判断宣传卡信息是否完整，如果有openable类型的宣传卡，需要检查openRegion是否填写完整
     const incompleteCard = adCard.value.find(card => {
         if (card.type === 'openable') {
+            if (card.adBoxCode == '' || card.adBoxCode == undefined) {
+                ElMessage.error('请填写宣传卡盒号');
+                return;
+            }
             if (!card.image) {
                 ElMessage.error('请上传宣传卡图片');
                 return true;
@@ -202,10 +209,9 @@ const handleSubmit = () => {
         // 新增状态
         status: editMode.value ? '1' : '0'  //0:新增 1:编辑
     }
-    //localStorage.setItem('submitData', JSON.stringify(submitData));
-    console.log(submitData);
+    localStorage.setItem('submitData', JSON.stringify(submitData));
     serviceClass.createOrder(submitData).then(res => {
-        console.log(res);
+        // console.log(res);
         ElMessageBox.alert(res.msg, '提交结果', {
             // if you want to disable its autofocus
             // autofocus: false,

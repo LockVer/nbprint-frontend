@@ -7,22 +7,20 @@
 
         </div>
         <div class="ad-card-list" v-for="(item, index) in componentData" :key="index">
-
             <x-component :label="'宣传卡' + (index + 1) + '有无揭开口'" padding="0 0 10px 0">
                 <x-check-box :DataList="isOpenable" v-model="item.type" type="radio"></x-check-box>
-            </x-component>
-            <x-component label="卡号位置">
-                <x-check-box :DataList="adCardNoPostionList" v-model="item.adBoxCodePosition"
-                    type="radio"></x-check-box>
             </x-component>
             <x-component label="揭开口方向" padding="0 0 10px 0">
                 <x-check-box v-model="item.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
             </x-component>
-
+            <x-component label="盒号位置">
+                <x-check-box :DataList="adCardNoPostionList" v-model="item.adBoxCodePosition"
+                    type="radio"></x-check-box>
+            </x-component>
             <div class="ad-card-info">
                 <div class="row">
-                    <x-component label="宣传卡卡号" width="220px">
-                        <el-input v-model="item.adBoxCode" placeholder="请输入名称" />
+                    <x-component label="宣传卡盒号" width="220px">
+                        <el-input v-model="item.adBoxCode" placeholder="请输入宣传卡盒号" />
                     </x-component>
 
                     <x-component label="背景图" width="220px">
@@ -33,7 +31,7 @@
                         <el-input :value="item.adCardSize" disabled></el-input>
                     </x-component>
                     <x-component label="揭开区" width="220px" :hide="item.type != 'openable'">
-                        <el-button class="xbutton" type="primary" :disabled="!(item.imageName)"
+                        <el-button class="xbutton"  type="primary" :disabled="!(item.imageName)"
                             @click="addRevealArea(index)" v-if="getRevealAreaCount(index) == 0">
                             添加揭开区
                         </el-button>
@@ -105,7 +103,7 @@ import _, { max } from 'lodash';
 const initData = defineModel("initData");
 const smallCard = defineModel("smallCard");
 
-console.log("adcard", initData.value)
+// console.log("adcard", initData.value)
 
 const RAEditor = ref(null);
 const PAEditor = ref(null);
@@ -156,7 +154,7 @@ const populateComponentData = () => {
             openDirection: item.openDirection || "T"
         };
     });
-    console.log('componentData', componentData.value)
+    // console.log('componentData', componentData.value)
 };
 
 const changeImage = (item) => {
@@ -176,7 +174,7 @@ const findMaxRectBWithRatio = (rectA, image) => {
      * 返回:
      * Array: 矩形B的最大可能尺寸，格式为[width, height]。
      */
-    console.log('findMaxRectBWithRatio', rectA, image)
+    // console.log('findMaxRectBWithRatio', rectA, image)
     if (!image || !rectA)
         return false;
     if (!image.width || !image.height) {
@@ -225,7 +223,7 @@ const findMaxRectBWithRatio = (rectA, image) => {
     }
     //尺寸向下取整
     maxRectB = maxRectB.map((size) => Math.floor(size));
-    console.log('maxRectB', maxRectB)
+    // console.log('maxRectB', maxRectB)
     return maxRectB;
 }
 
@@ -273,7 +271,7 @@ watch(adCardQty, (newVal, oldVal) => {
 
 watch(componentData, async (newVal, oldVal) => {
     //将数据还原成initData的格式
-    console.log('componentData', newVal)
+    // console.log('componentData', newVal)
     let pageInitData = newVal.map((item) => {
         return {
             type: item.type,
@@ -298,6 +296,7 @@ const getRevealAreaCount = (index) => {
     if (!componentData.value[index] || !componentData.value[index].revealAreas) {
         return 0;
     }
+    console.log(componentData.value[index].revealAreas)
     return componentData.value[index].revealAreas.length;
 };
 
@@ -315,37 +314,39 @@ const addRevealArea = (index) => {
     backgroundImageUrl.value = componentData.value[index].imageName;
     backgroundImageSize.value = componentData.value[index].imageSize;
     adCardSize.value = componentData.value[index].adCardSize;
-    console.log("addRevealArea", backgroundImageSize, adCardSize)
+    // console.log("addRevealArea", backgroundImageSize, adCardSize)
 }
 
 const confirmRevealArea = async () => {
-    console.log("confirmRevealArea")
+    // console.log("confirmRevealArea")
     let raAreas = RAEditor.value.getAreas();
-    if (raAreas.length == 0) {
-        return;
-    }
-    console.log(raAreas)
+    console.log('raAreas',raAreas)
+    // if (raAreas.length == 0) {
+    //     revealDialogVisible.value = false;
+    //     return;
+    // }
+    // console.log(raAreas)
     componentData.value[currentEditingIndex.value].revealAreas = raAreas;
     revealDialogVisible.value = false;
     // 这里可以添加更多逻辑来处理揭开区的内容
 }
 const closeRevealArea = () => {
-    console.log(componentData.value[currentEditingIndex.value])
+    // console.log(componentData.value[currentEditingIndex.value])
     revealDialogVisible.value = false;
 }
 
 const addPrizeArea = (index) => {
     currentEditingIndex.value = index;
 
-    console.log(componentData.value[index])
+    // console.log(componentData.value[index])
     prizeDialogVisible.value = true;
     backgroundImageUrl.value = componentData.value[index].imageName;
 
 }
 
 const confirmPrizeArea = () => {
-    console.log(PAEditor.value)
     let paAreas = PAEditor.value.getAreas();
+    console.log(paAreas)
     if (!paAreas) {
         return;
     }

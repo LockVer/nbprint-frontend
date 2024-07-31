@@ -9,6 +9,7 @@
             </x-component>
             <x-component label="性别" :width="'15%'">
                 <el-select v-model="searchForm.gender" placeholder="请选择性别" clearable>
+                    <el-option label="不选" value="" />
                     <el-option label="男" value="1" />
                     <el-option label="女" value="2" />
                 </el-select>

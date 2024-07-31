@@ -1,0 +1,357 @@
+<template>
+    <top-action-panel v-model:mode="mode" v-model:selectedAreas="selectedAreas" v-model:revealAreas="revealAreas"
+        v-model:gameAreas="gameAreas" v-mode:selectedGameArea="selectedGameArea" v-mode:activeArea="activeArea"/>
+    <div class="reveal-area-editor" ref="editorRef" @contextmenu.prevent="handleContextMenu($event)">
+        <canvas ref="canvasRef" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp"
+            @mouseleave="handleMouseLeave"></canvas>
+        <game-area-panel :mode="mode" v-model:gameAreas="gameAreas" v-model:selectedGameArea="selectedGameArea" v-model:revealAreas="revealAreas"/>
+        <mark-area-panel v-model:selectedGameArea="selectedGameArea"/>
+        <context-menu :mode="mode" v-model:showContextMenu="showContextMenu" :contextMenuPosition="contextMenuPosition"
+            :rightClickedArea="rightClickedArea" v-model:revealAreas="revealAreas" v-model:activeArea="activeArea" v-model:setQtyDialogVisible="setQtyDialogVisible"
+            v-model:selectedGameArea="selectedGameArea"/>
+        <set-mark-qty-panel v-model:setQtyDialogVisible="setQtyDialogVisible" v-model:selectedGameArea="selectedGameArea" v-model:activeArea="activeArea"/>
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted, watch, defineProps, defineExpose, provide } from 'vue';
+import { cloneDeep } from 'lodash'; 
+import { ElMessage, ElMessageBox } from 'element-plus';
+
+import GameAreaPanel from './RevealAreaComponents/GameAreaPanel.vue'; // 引入游戏区域面板组件
+import MarkAreaPanel from './RevealAreaComponents/MarkAreaPanel.vue'; // 引入标记区域面板组件
+import TopActionPanel from './RevealAreaComponents/TopActionPanel.vue'; // 引入顶部操作面板组件
+import ContextMenu from './RevealAreaComponents/ContextMenu.vue'; // 引入右键菜单组件
+import SetMarkQtyPanel from './RevealAreaComponents/SetMarkQtyPanel.vue'; // 引入设置标记数量面板组件
+
+// 引入调整区域大小、更新光标、确定调整方向的工具函数
+import { resizeArea, updateCursor, determineResizeDirection } from './RevealAreaUtils/ResizeUtil';
+
+import UnitConvertUtil from './RevealAreaUtils/UnitConvertUtil'; // 引入单位转换工具类
+import DistanceDrawer from './RevealAreaUtils/DistanceDrawer'; // 引入距离绘制器类
+import CanvasRenderer from './RevealAreaUtils/CanvasRenderer'; // 引入画布渲染器类
+
+const props = defineProps({
+    backgroundImageUrl: String, 
+    preAreas: Array, // 预定义区域数组
+    adCardSize: Array, // 广告卡尺寸数组
+    imageSize: Object // 图片尺寸对象
+});
+
+// 创建单位转换工具实例
+const unitConvertUtil = new UnitConvertUtil(props.adCardSize, props.imageSize);
+const mmToPx = unitConvertUtil.mmToPx.bind(unitConvertUtil); // 毫米转像素方法
+const pxToMm = unitConvertUtil.pxToMm.bind(unitConvertUtil); // 像素转毫米方法
+
+const canvasRef = ref(null); // 画布的引用
+const editorRef = ref(null); // 编辑器区域的引用
+const revealAreas = ref([]); // 揭开区域数组
+const gameAreas = ref(cloneDeep(props.preAreas || [])); // 游戏区域数组，克隆自预定义区域
+const selectedGameArea = ref(null); // 当前选中的游戏区域
+const mode = ref('create'); // 当前模式：'select' 或 'create'
+const selectedAreas = ref([]); // 被选中的区域数组
+const activeArea = ref(null); // 当前激活的区域
+const dragging = ref(false); // 是否正在拖动
+const resizing = ref(false); // 是否正在调整大小
+const resizeDirection = ref(''); // 调整方向
+const offsetX = ref(0); // X 轴偏移量
+const offsetY = ref(0); // Y 轴偏移量
+const alignLine = ref([]); // 对齐线数组
+const showContextMenu = ref(false); // 是否显示右键菜单
+const contextMenuPosition = ref({ x: 0, y: 0 }); // 右键菜单位置
+const setQtyDialogVisible = ref(false); // 是否显示设置数量对话框
+const rightClickedArea = ref(null); // 右键点击的区域
+const scale = ref(1); // 缩放比例
+
+// 创建距离绘制器实例
+const distanceDrawer = new DistanceDrawer(pxToMm, revealAreas);
+
+// 画布渲染器选项
+const canvasRendererOptions = {
+    canvasRef: canvasRef, // 画布引用
+    editorRef: editorRef, // 编辑器区域引用
+    scale: scale, // 缩放比例
+    alignLine: alignLine, // 对齐线数组
+    selectedGameArea: selectedGameArea, // 当前选中的游戏区域
+    activeArea: activeArea, // 当前激活的区域
+    selectedAreas: selectedAreas, // 被选中的区域数组
+    revealAreas: revealAreas, // 揭开区域数组
+    mode: mode, // 当前模式
+    backgroundImageUrl: props.backgroundImageUrl, // 背景图片 URL
+    mmToPx: mmToPx, // 毫米转像素方法
+    pxToMm: pxToMm, // 像素转毫米方法
+    drawDistanceLines: distanceDrawer.drawDistanceLines.bind(distanceDrawer) // 绘制距离线的方法
+};
+
+// 创建画布渲染器实例
+const canvasRenderer = new CanvasRenderer(canvasRendererOptions);
+const drawCanvas = canvasRenderer.drawCanvas.bind(canvasRenderer); // 绑定绘制画布方法
+const checkAlignLine = canvasRenderer.checkAlignLine.bind(canvasRenderer); // 绑定检查对齐线方法
+
+// 提供绘制画布的方法
+provide('drawCanvas', drawCanvas);
+
+// 监听模式变化
+watch(mode, (newMode) => {
+    if (newMode === 'create') {
+        selectedGameArea.value = null; // 清空选中的游戏区域
+        selectedAreas.value = []; // 清空选中的区域数组
+        drawCanvas(); // 重新绘制画布
+    }
+});
+
+// 监听选中的游戏区域变化
+watch(() => selectedGameArea.value, (newVal) => {
+    // 当选中的游戏区域变化时触发
+    // console.log(newVal)
+});
+
+// 监听背景图片 URL 变化
+watch(() => props.backgroundImageUrl, (newVal) => {
+    if (canvasRef.value && editorRef.value) {
+        drawCanvas(); // 如果画布和编辑器区域存在，重新绘制画布
+    }
+}, { immediate: true });
+
+// 组件挂载时执行
+onMounted(() => {
+    drawCanvas(); // 绘制画布
+});
+
+// 处理右键菜单事件
+const handleContextMenu = (event) => {
+    const rect = canvasRef.value.getBoundingClientRect(); // 获取画布的边界矩形
+    const x = (event.clientX - rect.left) / scale.value; // 计算点击位置的 X 坐标
+    const y = (event.clientY - rect.top) / scale.value; // 计算点击位置的 Y 坐标
+
+    if (mode.value === 'select') {
+        // 如果是选择模式
+        rightClickedArea.value = selectedGameArea.value.areas.find(area =>
+            x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height
+        );
+    } else {
+        // 如果是创建模式
+        rightClickedArea.value = revealAreas.value.find(area =>
+            x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height
+        );
+    }
+
+    if (rightClickedArea.value) {
+        event.preventDefault(); // 阻止默认的上下文菜单
+        showContextMenu.value = true; // 显示右键菜单
+
+        // 计算菜单的位置
+        const editorRect = editorRef.value.getBoundingClientRect();
+        contextMenuPosition.value = {
+            x: event.clientX - editorRect.left + window.scrollX,
+            y: event.clientY - editorRect.top   // 因为是在弹窗中加载，所以不需要 + window.scrollY
+        };
+        activeArea.value = rightClickedArea.value; // 设置当前激活的揭开区域
+    } else {
+        showContextMenu.value = false; // 隐藏右键菜单
+    }
+};
+
+// 处理鼠标按下事件
+const handleMouseDown = (event) => {
+    if (mode.value === 'create') {
+        // 如果是创建模式
+        const rect = canvasRef.value.getBoundingClientRect(); // 获取画布的边界矩形
+        const x = (event.clientX - rect.left) / scale.value; // 计算点击位置的 X 坐标
+        const y = (event.clientY - rect.top) / scale.value; // 计算点击位置的 Y 坐标
+
+        dragging.value = false; // 重置拖动状态
+        resizing.value = false; // 重置调整大小状态
+        activeArea.value = null; // 清空激活的区域
+        revealAreas.value.forEach(area => {
+            if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
+                offsetX.value = x - area.x; // 计算 X 轴偏移量
+                offsetY.value = y - area.y; // 计算 Y 轴偏移量
+                activeArea.value = area; // 设置激活的区域
+                if (x > area.x + area.width - 10 || x < area.x + 10 || y > area.y + area.height - 10 || y < area.y + 10) {
+                    resizing.value = true; // 设置调整大小状态
+                    resizeDirection.value = determineResizeDirection(x, y, area); // 确定调整方向
+                } else {
+                    dragging.value = true; // 设置拖动状态
+                }
+            }
+        });
+
+        if (!activeArea.value) {
+            // 如果没有激活的区域，创建一个新的区域
+            const newArea = { x, y, width: 0, height: 0 };
+            revealAreas.value.push(newArea); // 添加到揭开区域数组
+            activeArea.value = newArea; // 设置激活的区域
+            resizing.value = true; // 设置调整大小状态
+            resizeDirection.value = 'bottom-right'; // 设置调整方向为右下角
+        }
+    } else if (mode.value === 'select') {
+        // 如果是选择模式
+        const rect = canvasRef.value.getBoundingClientRect(); // 获取画布的边界矩形
+        const x = (event.clientX - rect.left) / scale.value; // 计算点击位置的 X 坐标
+        const y = (event.clientY - rect.top) / scale.value; // 计算点击位置的 Y 坐标
+        let areaAlreadySelected = false; // 标记区域是否已被选中
+
+        // 检查点击的区域是否已经被选中
+        selectedAreas.value.forEach((selectedArea) => {
+            if (x >= selectedArea.x && x <= selectedArea.x + selectedArea.width && y >= selectedArea.y && y <= selectedArea.y + selectedArea.height) {
+                areaAlreadySelected = true; // 设置区域已被选中
+            }
+        });
+
+        // 如果点击的区域未被选中，则添加到 selectedAreas 数组
+        if (!areaAlreadySelected) {
+            revealAreas.value.forEach((area) => {
+                if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
+                    selectedAreas.value.push(area); // 添加到选中的区域数组
+                }
+            });
+        } else {
+            // 如果点击的区域已被选中，则取消选中
+            selectedAreas.value = selectedAreas.value.filter((area) => {
+                return !(x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height);
+            });
+        }
+        drawCanvas(); // 重新绘制画布
+    }
+};
+
+// 处理鼠标移动事件
+const handleMouseMove = (event) => {
+    const rect = canvasRef.value.getBoundingClientRect(); // 获取画布的边界矩形
+    const x = (event.clientX - rect.left) / scale.value; // 计算移动位置的 X 坐标
+    const y = (event.clientY - rect.top) / scale.value; // 计算移动位置的 Y 坐标
+
+    if (dragging.value) {
+        // 如果正在拖动
+        activeArea.value.x = Math.max(0, Math.min(canvasRef.value.width / scale.value - activeArea.value.width, x - offsetX.value)); // 更新 X 坐标
+        activeArea.value.y = Math.max(0, Math.min(canvasRef.value.height / scale.value - activeArea.value.height, y - offsetY.value)); // 更新 Y 坐标
+        checkAlignLine(); // 检查对齐线
+        drawCanvas(); // 重新绘制画布
+    } else if (resizing.value) {
+        // 如果正在调整大小
+        resizeArea(x, y, resizeDirection, activeArea, revealAreas, alignLine, canvasRef); // 调整区域大小
+        drawCanvas(); // 重新绘制画布
+    } else {
+        updateCursor(x, y, revealAreas, canvasRef); // 更新光标样式
+    }
+};
+
+// 处理鼠标抬起事件
+const handleMouseUp = () => {
+    // 过滤掉过小的区域，例如小于 15x15 像素的区域
+    revealAreas.value = revealAreas.value.filter(area => area.width > 15 && area.height > 15);
+
+    dragging.value = false; // 重置拖动状态
+    resizing.value = false; // 重置调整大小状态
+    activeArea.value = null; // 清空激活的区域
+    canvasRef.value.style.cursor = 'default'; // 重置光标样式
+    alignLine.value = null; // 清空对齐线
+    drawCanvas(); // 重新绘制画布
+};
+
+// 处理鼠标离开事件
+const handleMouseLeave = () => {
+    // 同样在鼠标离开时进行过滤
+    revealAreas.value = revealAreas.value.filter(area => area.width > 15 && area.height > 15);
+    dragging.value = false; // 重置拖动状态
+    resizing.value = false; // 重置调整大小状态
+    //activeArea.value = null; // 注释掉，避免清空激活的区域
+    canvasRef.value.style.cursor = 'default'; // 重置光标样式
+    drawCanvas(); // 重新绘制画布以更新显示
+};
+
+// 获取区域的方法
+const getAreas = () => {
+    if (revealAreas.value.length > 0) {
+        ElMessage.error('还有区域未绑定游戏区！'); 
+        return [];
+    }
+    const isOverlapping = (area1, area2, minSpacing) => {
+        const { x: x1, y: y1, width: w1, height: h1 } = area1;
+        const { x: x2, y: y2, width: w2, height: h2 } = area2;
+        // 检查 area1 右边缘和 area2 左边缘之间的距离是否大于 minSpacing
+        const xOverlap = Math.abs(x1 + w1 - (x2)) < minSpacing;
+        // 检查 area1 的下边缘和 area2 的上边缘之间的距离是否大于 minSpacing
+        const yOverlap = Math.abs(y1 + h1 - (y2)) < minSpacing;
+
+        return xOverlap || yOverlap; // 返回是否重叠
+    };
+    for (const gameArea of gameAreas.value) {
+        const areas = gameArea.areas;
+
+        if (areas.some((area1, index1) =>
+            areas.some((area2, index2) => index1 !== index2 && isOverlapping(area1, area2, mmToPx(5)))
+        )) {
+            ElMessage.error('游戏区中的揭开区域间隔需要大于等于 5mm！'); // 如果重叠，显示错误消息
+            return [];
+        }
+    }
+    // 返回当前的揭开区域数组，并根据区域的 x, y 进行排序后返回副本，先按 y 排序，再按 x 排序
+    return cloneDeep(gameAreas.value);
+};
+
+// 公开方法
+defineExpose({
+    drawCanvas, // 绘制画布方法
+    getAreas // 获取区域方法
+});
+</script>
+<style lang="scss" scoped>
+.reveal-area-editor {
+    background: black;
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    border-radius: 4px;
+    cursor: not-allowed;
+    height: calc(100vh - 60px - 40px - 16px - 16px - 48px);
+}
+
+.reveal-area-editor canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+
+
+@keyframes appear-tv {
+    0% {
+        opacity: 0;
+        transform: scaleY(0) scaleX(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(1);
+    }
+}
+
+@keyframes disappear-tv {
+    0% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scaleY(0) scaleX(1);
+
+    }
+}
+</style>
