@@ -240,12 +240,8 @@ const loadData = () => {
 }
 
 .image-slot {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    background: var(--el-fill-color-light);
+    width: 36px;
+    height: 36px;
     color: var(--el-text-color-secondary);
     font-size: 11px;
 }

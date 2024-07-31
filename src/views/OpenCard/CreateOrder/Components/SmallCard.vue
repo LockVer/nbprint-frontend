@@ -1,7 +1,8 @@
 <template>
     <x-card title="小卡信息">
         <x-component label="尺寸(mm)" padding="0 0 10px 0">
-            <x-check-box :disabled="hasOpenRegion" disabledText="宣传卡揭开区已创建，禁止修改，如需修改，请先清空揭开区。" v-model="initData.size" :DataList="cardSizeList" type="radio"></x-check-box>
+            <x-check-box :disabled="hasOpenRegion" disabledText="宣传卡揭开区已创建，禁止修改，如需修改，请先清空揭开区。" v-model="initData.size"
+                :DataList="cardSizeList" type="radio"></x-check-box>
         </x-component>
         <x-component label="揭开口数量" padding="0 0 10px 0">
             <x-check-box v-model="initData.openQuantity" :DataList="cardOpenList" type="radio"></x-check-box>
@@ -48,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps } from 'vue';
+import { ref, watch } from 'vue';
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
@@ -101,11 +102,11 @@ const calcRowCount = () => {
         height: 0,
         thickness: 0
     }
-    //长：宽得倍数
-    const ratio = 1;
-    //最大倍数
+    // 长：宽得倍数
+    const ratio = 0.6;
+    // 最大倍数
     const maxRatio = 2;
-    //最大size，刀模最大尺寸480x310，纸张最大尺寸470mmx325mm，渲染器最大尺寸456mmx320mm，所以最大尺寸为456x310
+    // 最大size，刀模最大尺寸480x310，纸张最大尺寸470mmx325mm，渲染器最大尺寸456mmx320mm，所以最大尺寸为456x310
     const maxSize = { width: 456, thickness: 310 };
     //找出每盒数量的所有因数
     const divisors = findDivisors(initData.value.quantityPerBox);
@@ -116,7 +117,6 @@ const calcRowCount = () => {
         const thickness = 0.67;                      //小卡厚度
         const quantityPerBox = initData.value.quantityPerBox;  //每盒数量
         columnCount = columnCount;  //列数
-        console.log('level', level, 'columnCount', columnCount, 'quantityPerBox', quantityPerBox);
         //在最高条件等级时，判断每列数量是否大于500，如果大于500不计算
         if (level == 0) {
             if (quantityPerBox / columnCount > 500) return;  //每列数量大于500不计算
@@ -128,7 +128,9 @@ const calcRowCount = () => {
         }
 
         //计算长宽比
+        console.log('calcBox', calcBox);
         const newRatio = calcBox.width / calcBox.thickness;
+        console.log('newRatio', newRatio);
         //如果长宽比在ratio和maxRatio之间，并且尺寸在最大尺寸之内
         if (newRatio >= ratio && newRatio <= maxRatio) {
             // console.log('box', calcBox);
@@ -152,6 +154,7 @@ const calcRowCount = () => {
         if (box.width === 0) {
             //首先计算出在多少列的情况下，长宽比最接近1，假如最小为1列，最大为1000列
             for (let columnCount = 1; columnCount <= 1000; columnCount++) {
+                console.log('columnCount', columnCount, '------', 'level', level);
                 findBox(columnCount, level);
                 if (box.width !== 0) break;
             }
@@ -165,7 +168,6 @@ const calcBoxSize = (columnCount, columnQuantity) => {
     const width = initData.value.size.width;    //小卡宽度
     const height = initData.value.size.height;  //小卡高度
     const thickness = 0.67;                      //小卡厚度
-    
     if (!columnQuantity) {
         columnQuantity = initData.value.quantityPerBox / columnCount;
     }

@@ -221,7 +221,9 @@ const handleSubmit = () => {
                     router.push('/opencard');
                 }
             },
-        })
+        }).catch((err) => {
+            ElMessage.error(err);
+        });
     })
 }
 </script>

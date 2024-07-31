@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineProps, defineExpose, provide } from 'vue';
+import { ref, onMounted, watch, defineExpose, provide } from 'vue';
 import { cloneDeep } from 'lodash';
 import { ElMessage, ElMessageBox } from 'element-plus';
 

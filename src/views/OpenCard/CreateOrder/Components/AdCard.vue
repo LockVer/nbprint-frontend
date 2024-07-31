@@ -158,6 +158,9 @@ const populateComponentData = () => {
 };
 
 const changeImage = (item) => {
+    console.log('changeImage', item)
+    // smallCard.value.box 盒子大小
+    // item.imageSize 图片原始尺寸
     item.adCardSize = findMaxRectBWithRatio(smallCard.value.box, item.imageSize);
 }
 
@@ -233,7 +236,7 @@ onMounted(() => {
 });
 
 watch(initData, (newVal, oldVal) => {
-    console.log('initData', newVal, oldVal)
+    // console.log('initData', newVal, oldVal)
     if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
         populateComponentData();
     }
@@ -296,7 +299,7 @@ const getRevealAreaCount = (index) => {
     if (!componentData.value[index] || !componentData.value[index].revealAreas) {
         return 0;
     }
-    console.log(componentData.value[index].revealAreas)
+    // console.log(componentData.value[index].revealAreas)
     return componentData.value[index].revealAreas.length;
 };
 
