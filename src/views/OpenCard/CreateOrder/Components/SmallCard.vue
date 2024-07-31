@@ -103,7 +103,7 @@ const calcRowCount = () => {
         thickness: 0
     }
     // 长：宽得倍数
-    const ratio = 0.6;
+    const ratio = 1;
     // 最大倍数
     const maxRatio = 2;
     // 最大size，刀模最大尺寸480x310，纸张最大尺寸470mmx325mm，渲染器最大尺寸456mmx320mm，所以最大尺寸为456x310

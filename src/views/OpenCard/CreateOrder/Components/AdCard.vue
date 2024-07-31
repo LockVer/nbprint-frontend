@@ -31,7 +31,7 @@
                         <el-input :value="item.adCardSize" disabled></el-input>
                     </x-component>
                     <x-component label="揭开区" width="220px" :hide="item.type != 'openable'">
-                        <el-button class="xbutton"  type="primary" :disabled="!(item.imageName)"
+                        <el-button class="xbutton" type="primary" :disabled="!(item.imageName)"
                             @click="addRevealArea(index)" v-if="getRevealAreaCount(index) == 0">
                             添加揭开区
                         </el-button>
@@ -215,16 +215,29 @@ const findMaxRectBWithRatio = (rectA, image) => {
     let maxRectB = [...sizeLimits].sort((a, b) => a - b);
 
     // 调整尺寸以保持原始比例
+    // [456, 310];
     maxRectB[0] = Math.min(maxRectB[0], maxRectB[1] * originalRatio);
     maxRectB[1] = Math.min(maxRectB[1], maxRectB[0] / originalRatio);
-
     // 检查在保持比例的情况下，尺寸是否仍然适合矩形A
+    console.log('maxRect', maxRectB)
+    console.log('rectA', rectA)
     if (maxRectB[0] > rectA[0] || maxRectB[1] > rectA[1]) {
-        // 如果不适合，根据矩形A的尺寸重新调整尺寸
-        maxRectB[0] = Math.min(rectA[0], maxRectB[1] * originalRatio);
-        maxRectB[1] = Math.min(rectA[1], maxRectB[0] / originalRatio);
+
+
+        var tempWidth = rectA[1] * originalRatio
+        if (tempWidth >= rectA[0]) {
+            //长边true、以长边缩放
+            var tempLength = rectA[0] / originalRatio
+            maxRectB[0] = rectA[0];
+            maxRectB[1] = tempLength;
+        } else {
+            //宽边true、以宽边缩放
+            maxRectB[0] = tempWidth;
+            maxRectB[1] = rectA[1];
+        }
     }
-    //尺寸向下取整
+    // console.log('maxRectB', maxRectB)
+    // 宣传卡尺寸向下取整
     maxRectB = maxRectB.map((size) => Math.floor(size));
     // console.log('maxRectB', maxRectB)
     return maxRectB;
@@ -323,7 +336,7 @@ const addRevealArea = (index) => {
 const confirmRevealArea = async () => {
     // console.log("confirmRevealArea")
     let raAreas = RAEditor.value.getAreas();
-    console.log('raAreas',raAreas)
+    console.log('raAreas', raAreas)
     // if (raAreas.length == 0) {
     //     revealDialogVisible.value = false;
     //     return;
