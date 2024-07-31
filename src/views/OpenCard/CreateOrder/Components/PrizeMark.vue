@@ -214,7 +214,7 @@ const batchUpload = async (awardType) => {
         for (const file of files) {
             try {
                 // 使用你提供的上传方法
-                const res = await commonClass.uploadImages(file);
+                const res = await commonClass.uploadImages(file, localStorage.getItem('orderId'));
                 // 上传成功后添加数据到awardIDList
                 addPrizeMark(awardType, res.data);
             } catch (err) {

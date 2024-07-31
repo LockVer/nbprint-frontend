@@ -25,7 +25,7 @@ import { ElMessage } from 'element-plus';
 
 // 注入 CommonService 实例
 const commonClass = inject('commonClass');
-// console.log(commonClass.value);
+console.log(commonClass.value);
 const internalValue = defineModel();
 
 const showModal = ref(false);
@@ -38,11 +38,10 @@ const handleDrop = (event) => {
         handleFiles(files);
     }
 };
-
 const handleFiles = (files) => {
     if (files.length > 0) {
         const file = files[0];
-        commonClass.uploadImages(file,commonClass.value.orderId).then((res) => {
+        commonClass.uploadImages(file,localStorage.getItem('orderId')).then((res) => {
             internalValue.value = res.data;
         }).catch((err) => {
             console.log(err);

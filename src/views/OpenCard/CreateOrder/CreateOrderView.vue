@@ -107,6 +107,7 @@ onMounted(() => {
         orderId.value = uuidv4();
     }
     commonClass.value = new CommonService(orderId.value);
+    localStorage.setItem('orderId', orderId.value);
 })
 
 const handleSubmit = () => {
