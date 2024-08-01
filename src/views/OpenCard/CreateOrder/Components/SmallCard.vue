@@ -54,6 +54,7 @@ import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
 import XImageUpload from '@/components/functional/XImageUpload.vue';
+import { ElMessageBox,ElMessage } from 'element-plus';
 
 
 const props = defineProps({
@@ -106,6 +107,10 @@ const calcRowCount = () => {
     const ratio = 1;
     // 最大倍数
     const maxRatio = 2;
+    // 最小每列数量
+    const minColumnCount = 250;
+    // 最大每列数量
+    const maxColumnCount = 700;
     // 最大size，刀模最大尺寸480x310，纸张最大尺寸470mmx325mm，渲染器最大尺寸456mmx320mm，所以最大尺寸为456x310
     const maxSize = { width: 456, thickness: 310 };
     //找出每盒数量的所有因数
@@ -121,6 +126,12 @@ const calcRowCount = () => {
         if (level == 0) {
             if (quantityPerBox / columnCount > 500) return;  //每列数量大于500不计算
         }
+        //限制每列数量的最小值和最大值
+        console.log('quantityPerBox / columnCount', quantityPerBox / columnCount);
+        if (quantityPerBox / columnCount < minColumnCount) return;
+        if (quantityPerBox / columnCount > maxColumnCount) return;
+
+
         const calcBox = {
             width: width * columnCount,
             height: height,
@@ -160,6 +171,13 @@ const calcRowCount = () => {
             }
         }
         level++;
+    }
+
+    //如果没有找到合适的尺寸，就取能找到的最大尺寸
+    if (box.width === 0) {
+        ElMessage.error('根据当前的限制条件，无法找到合适的尺寸，请手动更改列数选择一个尺寸。');
+    }else{
+        ElMessage.success('已找到合适的尺寸：' + box.width + 'x' + box.height + 'x' + box.thickness + 'mm');
     }
 }
 

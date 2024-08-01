@@ -67,7 +67,7 @@ class CanvasRenderer {
         });
     }
     selectModeRenderAreas(ctx) {
-        
+
 
         if (this.selectedGameArea.value) {
             this.selectedGameArea.value.areas.forEach(area => {
@@ -87,7 +87,10 @@ class CanvasRenderer {
                 ctx.strokeRect(area.x * this.scale.value, area.y * this.scale.value, area.width * this.scale.value, area.height * this.scale.value);
             });
         }
-
+        //如果有选中的游戏区，则不可选中其他区域
+        if (this.selectedGameArea.value) {
+            this.selectedAreas.value = [];
+        }
         if (this.selectedAreas.value) {
             ctx.strokeStyle = 'red';
             this.selectedAreas.value.forEach((area) => {

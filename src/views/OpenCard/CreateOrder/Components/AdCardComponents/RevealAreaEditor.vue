@@ -189,8 +189,8 @@ const handleMouseDown = (event) => {
             }
         });
 
-        // 如果点击的区域未被选中，则添加到 selectedAreas 数组
-        if (!areaAlreadySelected) {
+        // 如果点击的区域未被选中，并且没有选中游戏区时，则添加到 selectedAreas 数组
+        if (!areaAlreadySelected&&!selectedGameArea.value) {
             revealAreas.value.forEach((area) => {
                 if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
                     selectedAreas.value.push(area);
@@ -223,7 +223,9 @@ const handleMouseMove = (event) => {
         resizeArea(x, y, resizeDirection, activeArea, revealAreas, alignLine, canvasRef);
         drawCanvas();
     } else {
-        updateCursor(x, y, revealAreas, canvasRef);
+        //如果没有选中游戏区，则更新鼠标样式
+        if(!selectedGameArea.value)
+            updateCursor(x, y, revealAreas, canvasRef);
     }
 };
 
