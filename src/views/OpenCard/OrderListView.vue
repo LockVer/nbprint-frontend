@@ -50,7 +50,7 @@
             </el-table-column>
             <el-table-column prop="total" label="数量" />
             <el-table-column prop="smallCardSize" label="尺寸" />
-            <el-table-column prop="businessPeople" label="业务员" />
+            <el-table-column prop="userName" label="业务员" />
             <el-table-column prop="createTime" label="创建时间">
                 <template #default="scope">
                     <div style="display: flex; align-items: center">
