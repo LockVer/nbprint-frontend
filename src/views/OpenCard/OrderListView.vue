@@ -30,8 +30,8 @@
                 </div>
             </x-component>
             <x-component label="创建时间">
-                <el-date-picker v-model="createTime" type="daterange" style="width: 100%;" start-placeholder="开始日期" end-placeholder="结束日期"
-                    :default-value="[new Date(), new Date()]" @change="changeHandler" />
+                <el-date-picker v-model="createTime" type="daterange" style="width: 100%;" start-placeholder="开始日期"
+                    end-placeholder="结束日期" :default-value="[new Date(), new Date()]" @change="changeHandler" />
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
@@ -59,17 +59,21 @@
                     </div>
                 </template>
             </el-table-column>
+            <el-table-column fixed="right" label="印前文件">
+                <template #default="scope">
+                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop style="padding: 2px;"
+                        :class="{ 'btn-disable': scope.row.status == 0 || scope.row.status == 4 }"
+                        :disabled="scope.row.status == 0 || scope.row.status == 4">
+                        下载
+                    </el-link>
+                </template>
+            </el-table-column>
             <el-table-column fixed="right" label="操作">
                 <template #default="scope">
                     <el-button link type="primary" size="small" @click.stop="editOrder(scope.row)"
                         :class="{ 'btn-disable': scope.row.status == 0 }" :disabled="scope.row.status == 0">
                         编辑
                     </el-button>
-                    <el-link type="primary" :href="scope.row.pdfOss" @click.stop style="padding: 2px;"
-                        :class="{ 'btn-disable': scope.row.status == 0 || scope.row.status == 4 }"
-                        :disabled="scope.row.status == 0 || scope.row.status == 4">
-                        下载
-                    </el-link>
                     <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)">
                         删除
                     </el-button>

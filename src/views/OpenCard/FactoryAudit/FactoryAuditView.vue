@@ -57,12 +57,12 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column fixed="right" label="操作" width="80">
+            <el-table-column fixed="right" label="印前文件" width="80">
                 <template #default="scope">
                     <el-link type="primary" :href="scope.row.pdfOss" @click.stop>下载</el-link>
                 </template>
             </el-table-column>
-            <el-table-column fixed="right" label="审核" width="100">
+            <el-table-column fixed="right" label="操作" width="100">
                 <template #default="scope">
                     <button class="btn" :disabled="scope.row.checkStatus == 2 || scope.row.checkStatus == 3"
                         :class="{ 'btn-disabled': scope.row.checkStatus == 2 || scope.row.checkStatus == 3 }"
