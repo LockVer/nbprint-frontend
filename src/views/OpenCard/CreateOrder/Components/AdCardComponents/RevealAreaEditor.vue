@@ -274,9 +274,9 @@ const getAreas = () => {
     for (const gameArea of gameAreas.value) {
         const areas = gameArea.areas;
         if (areas.some((area1, index1) =>
-            areas.some((area2, index2) => index1 !== index2 && isOverlapping(area1, area2, mmToPx(5)))
+            areas.some((area2, index2) => index1 !== index2 && isOverlapping(area1, area2, mmToPx(6)))
         )) {
-            ElMessage.error('游戏区中的揭开区域间隔需要大于等于 5mm！');
+            ElMessage.error('游戏区中的揭开区域间隔需要大于等于 6mm！');
             return [];
         }
     }
@@ -290,7 +290,7 @@ const getAreas = () => {
             if (areas1.some(area1 =>
                 areas2.some(area2 => isOverlapping(area1, area2, mmToPx(5)))
             )) {
-                ElMessage.error('不同游戏区的揭开区域间隔需要大于等于 5mm！');
+                ElMessage.error('不同游戏区的揭开区域间隔需要大于等于 6mm！');
                 console.log(`Removing game area at index ${j} due to overlap.`)
                 // 只清空当前正在绘制的游戏区
                 

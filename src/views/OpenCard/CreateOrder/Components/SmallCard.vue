@@ -175,7 +175,7 @@ const calcRowCount = () => {
 
     //如果没有找到合适的尺寸，就取能找到的最大尺寸
     if (box.width === 0) {
-        ElMessage.error('根据当前的限制条件，无法找到合适的尺寸，请手动更改列数选择一个尺寸。');
+        //ElMessage.error('根据当前的限制条件，无法找到合适的尺寸，请手动更改列数选择一个尺寸。');
     }else{
         ElMessage.success('已找到合适的尺寸：' + box.width + 'x' + box.height + 'x' + box.thickness + 'mm');
     }
