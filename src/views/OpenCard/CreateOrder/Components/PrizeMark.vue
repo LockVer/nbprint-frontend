@@ -90,6 +90,7 @@ const awardIDList = reactive([
     { text: '现金奖', value: 'cash', qty: 0 },
     { text: '不中奖', value: 'noPrize', qty: 0 },
     { text: 'HOLD卡', value: 'holdCard', qty: 0 },
+    { text: 'WINDOW奖', value: 'window', qty: 0 },
     { text: '自定义玩法', value: 'custom', qty: 0 }
 ]);
 
