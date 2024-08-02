@@ -4,11 +4,12 @@
         <li v-if="mode == 'create'" @click="copyArea">复制</li>
         <li v-if="mode == 'create'" @click="deleteArea">删除</li>
         <li v-if="mode == 'select'" @click="setPrizeQty">设置奖符数量</li>
+        <li v-if="mode == 'select'" @click="setRewardToken">设置1个奖符</li>
         <li v-if="mode == 'select'" @click="removePrizeQty">移出所有奖符</li>
     </ul>
 </template>
 <script setup>
-import { ref, defineProps, defineEmits, onMounted,onUnmounted,inject } from 'vue';
+import { ref, defineProps, defineEmits, onMounted, onUnmounted, inject } from 'vue';
 
 const revealAreas = defineModel("revealAreas");
 const showContextMenu = defineModel("showContextMenu");
@@ -74,6 +75,41 @@ const removePrizeQty = () => {
     showContextMenu.value = false;
 };
 
+const setRewardToken = () => {
+    if (Array.isArray(activeArea.value.drawData)) {
+        // 将当前区域的drawData还给selectedGameArea.value.range
+        selectedGameArea.value.range.push(...activeArea.value.drawData);
+    }
+
+    // 从合并后的数组中随机取出N个元素
+    const selectedRangeData = selectedGameArea.value.range
+        .sort(() => 0.5 - Math.random()) // 打乱数组
+        .slice(0, 1); // 取前N个元素
+
+    if (selectedRangeData.length < 1) {
+        ElMessage.error('奖符数据不足！');
+        return;
+    }
+    // 更新drawData
+    activeArea.value.drawData = selectedRangeData;
+
+    // 创建一个计数器对象来记录selectedRangeData中每个元素的数量
+    const countMap = selectedRangeData.reduce((acc, val) => {
+        acc[val] = (acc[val] || 0) + 1;
+        return acc;
+    }, {});
+
+    // 从range中去除已选元素，确保只去除正确数量的重复元素
+    selectedGameArea.value.range = selectedGameArea.value.range.filter(item => {
+        if (countMap[item]) {
+            countMap[item] -= 1;
+            return false;
+        }
+        return true;
+    });
+    showContextMenu.value = false;
+    drawCanvas();
+};
 </script>
 <style lang="scss" scoped>
 .context-menu {

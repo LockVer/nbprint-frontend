@@ -67,7 +67,7 @@ const setQtyDialogVisible = ref(false);
 const rightClickedArea = ref(null);
 const scale = ref(1); // 缩放比例
 
-const distanceDrawer = new DistanceDrawer(pxToMm, revealAreas);
+const distanceDrawer = new DistanceDrawer(pxToMm, revealAreas, selectedGameArea);
 
 const canvasRendererOptions = {
     canvasRef: canvasRef,
@@ -190,7 +190,7 @@ const handleMouseDown = (event) => {
         });
 
         // 如果点击的区域未被选中，并且没有选中游戏区时，则添加到 selectedAreas 数组
-        if (!areaAlreadySelected&&!selectedGameArea.value) {
+        if (!areaAlreadySelected && !selectedGameArea.value) {
             revealAreas.value.forEach((area) => {
                 if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
                     selectedAreas.value.push(area);
@@ -224,7 +224,7 @@ const handleMouseMove = (event) => {
         drawCanvas();
     } else {
         //如果没有选中游戏区，则更新鼠标样式
-        if(!selectedGameArea.value)
+        if (!selectedGameArea.value)
             updateCursor(x, y, revealAreas, canvasRef);
     }
 };
@@ -293,7 +293,7 @@ const getAreas = () => {
                 ElMessage.error('不同游戏区的揭开区域间隔需要大于等于 6mm！');
                 console.log(`Removing game area at index ${j} due to overlap.`)
                 // 只清空当前正在绘制的游戏区
-                
+
                 revealAreas.value = [];
                 return [];
             }

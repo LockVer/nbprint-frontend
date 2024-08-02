@@ -1,7 +1,8 @@
 class DistanceDrawer {
-    constructor(pxToMmFunc, revealAreas) {
+    constructor(pxToMmFunc, revealAreas, selectedGameArea) {
         this.pxToMm = pxToMmFunc;
         this.revealAreas = revealAreas;
+        this.selectedGameArea = selectedGameArea;
     }
 
     drawDistanceLines(canvasRef, scale, area) {
@@ -25,7 +26,10 @@ class DistanceDrawer {
             let closestDistance = Infinity;
             let closestOtherArea = null;
 
-            this.revealAreas.value.forEach(otherArea => {
+            let areas = this.selectedGameArea.value ? this.selectedGameArea.value.areas : this.revealAreas.value;
+
+            console.log('areas', areas);
+            areas.forEach(otherArea => {
                 if (otherArea !== area) {
                     const intersections = this.getIntersections(edge, otherArea, scale);
                     intersections.forEach(intersection => {
@@ -38,6 +42,7 @@ class DistanceDrawer {
                     });
                 }
             });
+
 
             ctx.beginPath();
             ctx.moveTo(edge.x1, edge.y1);
