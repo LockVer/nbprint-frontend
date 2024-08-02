@@ -67,7 +67,8 @@ const removeRange = (index) => {
     top: 10px;
     right: 10px;
     border-radius: 4px;
-
+    overflow: auto;
+    max-height: calc(100% - 20px);
     p {
         text-align: left;
     }
