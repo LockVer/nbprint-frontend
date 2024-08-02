@@ -202,6 +202,17 @@ const handleMouseDown = (event) => {
                 return !(x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height);
             });
         }
+        //在选择模式时，如果选中了游戏区，则鼠标点击时判断是否选中了揭开区域，选中则设置为activeArea
+        //此举是为了能在鼠标点击时显示当前选择的揭开区域的距离指示器
+        if (selectedGameArea.value) {
+            selectedGameArea.value.areas.forEach(area => {
+                if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
+                    activeArea.value = area;
+                }
+            });
+        }
+
+        console.log(activeArea.value)
         drawCanvas();
     }
 
