@@ -98,8 +98,14 @@ onMounted(() => {
     audits.forEach((item) => {
         item.items.forEach((value) => {
             // 检查 resdata 中是否存在与当前 item 的 name 属性匹配的数据
-            if (resdata[value.name]) {
-                value.datas = resdata[value.name]
+            if (resdata) {
+                if (resdata[value.name]) {
+                    value.datas = resdata[value.name]
+                } else {
+                    value.datas = ''
+                }
+            } else {
+                value.datas = ''
             }
         })
     })
@@ -137,7 +143,6 @@ const handleSubmit = () => {
     auditCordData.forEach((card) => {
         card.items.forEach((item) => {
             item.adItem.forEach((adItem) => {
-                // 检查 adItem 是否有选中的值
                 if (!adItem.selectedValue) {
                     // 如果没有选中值，设置错误信息并标记为未完成
                     adItem.errorMessage = `${adItem.label} 为必填项`;

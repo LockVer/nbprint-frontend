@@ -74,7 +74,6 @@
             </x-component>
         </div>
     </x-card>
-
     <x-card title="奖符" :cardStyle="{ 'height': 'auto' }" :headerStyle="{ 'marginBottom': '0' }"
         :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }" v-if="prizeMarkInfo.length > 0" ref="prizeMarkRef">
         <div class="prize-card" v-for="(award, key) in prizeMarkInfo" :key="key">
@@ -208,9 +207,13 @@ const servicesHandle = (id) => {
 const dataClear = (res) => {
     // 处理审核详情数据
     if (res.checkDetail) {
+        console.log(res.checkDetail)
         status.value = res.checkDetail.checkStatus
         // 如果状态不是 '0'，则显示异常详情
         if (status.value !== '0') {
+            if(status.value == '1'){
+                isShow.value = false
+            }
             isShow.value = true
         }
     }

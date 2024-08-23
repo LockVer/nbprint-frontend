@@ -6,10 +6,6 @@
             </x-component>
             <x-component label="客户">
                 <el-input v-model="searchForm.customerName" placeholder="请输入客户名称" />
-                <!-- <el-select v-model="searchForm.customerName" placeholder="请选择客户" clearable>
-                    <el-option v-for="(item, index) in options.customerNames" :key="index" :label="item"
-                        :value="item" />
-                </el-select> -->
             </x-component>
             <x-component label="尺寸">
                 <el-select v-model="searchForm.smallCardSize" placeholder="请选择尺寸" clearable>
@@ -167,9 +163,7 @@ const searchHandler = (value) => {
 }
 // 审核订单处理函数
 const checkOrder = (row) => {
-    // console.log(row)
     factoryServiceClass.checkLock(row.checkId).then(res => {
-        console.log(res)
         localStorage.setItem('orderDetails', JSON.stringify(res.data));
         router.push(`/factoryaudit/detail/${row.checkId}`);
     }).catch(err => {

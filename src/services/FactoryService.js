@@ -4,7 +4,7 @@ class FactoryService {
         this.apiService = new ApiService();
         this.userDatas = JSON.parse(localStorage.getItem('userInfo'));
         this.nbUserId = { nbUserId: this.userDatas.id };
-
+        this.outUserType = { outUserType: this.userDatas.outUserType };
     }
 
     getFactoryList(data) {
@@ -21,7 +21,7 @@ class FactoryService {
     }
     // 提交工厂审核
     submitFactoryCheck(data) {
-        return this.apiService.post('/check/submit', { ...data, ...this.nbUserId }, true);
+        return this.apiService.post('/check/submit', { ...data, ...this.nbUserId, ...this.outUserType }, true);
     }
 }
 
