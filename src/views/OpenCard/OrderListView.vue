@@ -373,3 +373,11 @@ a {
     }
 }
 </style>
+<style lang="scss">
+.number-range-container {
+
+    .el-input-number {
+        width: 100%;
+    }
+}
+</style>

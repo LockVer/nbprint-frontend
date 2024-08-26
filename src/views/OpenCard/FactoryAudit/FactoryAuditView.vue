@@ -230,7 +230,6 @@ onMounted(() => {
 }
 
 .el-button+.el-button {
-    margin-left: 12px;
     margin-right: 12px;
     color: #4D64B8;
 }

@@ -10,7 +10,7 @@
             <x-component :label="'宣传卡' + (index + 1) + '有无揭开口'" padding="0 0 10px 0">
                 <x-check-box :DataList="isOpenable" v-model="item.type" type="radio"></x-check-box>
             </x-component>
-            <x-component label="揭开口方向" padding="0 0 10px 0">
+            <x-component v-if="item.type == 'openable'" label="揭开口方向" padding="0 0 10px 0">
                 <x-check-box v-model="item.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
             </x-component>
             <x-component label="盒号位置">

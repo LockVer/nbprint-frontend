@@ -9,7 +9,7 @@
     </ul>
 </template>
 <script setup>
-import { ref, defineProps,  onMounted, onUnmounted, inject } from 'vue';
+import { ref,onMounted, onUnmounted, inject } from 'vue';
 
 const revealAreas = defineModel("revealAreas");
 const showContextMenu = defineModel("showContextMenu");

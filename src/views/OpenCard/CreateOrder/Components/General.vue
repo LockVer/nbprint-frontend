@@ -116,7 +116,7 @@ watch(
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
-    column-gap: 110px;
+    column-gap: 100px;
     row-gap: 12px;
 
     .color-picker {

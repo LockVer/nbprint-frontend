@@ -145,32 +145,8 @@ const filterPrizeMark = (type) => {
         if (item.type === type) {
             const awardItem = awardIDList.value.find(award => award.value === type);
             if (awardItem) {
-                // if (!item.name && !isFocus.value) {
-                //     item.name = `${awardItem.text}${index}`;
-                //     // item.name = `${awardItem.text}`;
-                // }
-                if ((!item.name || item.name.startsWith(awardItem.text)) && !isFocus.value) {
-                    const str = item.name;
-                    // 动态部分
-                    const dynamicPart = awardItem.text + index;
-                    if (!str || str == (`${awardItem.text}${index >= 1 ? index + 1 : index}`)) {
-                        // 构建正则表达式
-                        const regex = new RegExp(dynamicPart + "(.*)");
-                        // 使用正则表达式匹配
-                        console.log('str', str)
-                        console.log('dynamicPart', dynamicPart)
-                        const match = str.match(regex);
-                        console.log('match', match)
-                        if (match) {
-                            // 提取并输出匹配到的内容
-                            const result = match ? match[1] : match;
-                            console.log('result', result); // 输出 "485465"
-
-                        } else {
-                            console.log("未找到匹配内容");
-                            item.name = `${awardItem.text}${index}`;
-                        }
-                    }
+                if (!item.name && !isFocus.value) {
+                    item.name = `${awardItem.text}${index}`;
                 }
             }
             index++; // 每找到一个匹配项，索引加1
@@ -300,6 +276,19 @@ onMounted(() => {
     justify-content: space-between;
 }
 
+.award-id {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 12px;
+
+    .addtype,
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: 12px;
+    }
+}
+
 .award-list {
     display: flex;
     flex-direction: column;
@@ -345,6 +334,7 @@ onMounted(() => {
             display: flex;
             flex-direction: column;
             margin-bottom: 18px;
+
             &:last-child {
                 margin-bottom: 0;
             }

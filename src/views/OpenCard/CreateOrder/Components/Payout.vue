@@ -3,27 +3,27 @@
         <div class="basicInfo">
             <div class="title">模板配置</div>
             <div class="generalInfo">
-                <x-component label="数量连接符" :titleStyle="'#484848'" :width="'12%'">
+                <x-component label="数量连接符" :titleStyle="'#484848'" :width="'220px'">
                     <el-select v-model="initData.templateConfiguration.quantitativeConnector" placeholder="请选择数量连接符"
                         clearable>
                         <el-option v-for="item in quantitativeConnectorList" :key="item.value" :label="item.label"
                             :value="item.value" />
                     </el-select>
                 </x-component>
-                <x-component label="结果连接符" :titleStyle="'#484848'" :width="'12%'">
+                <x-component label="结果连接符" :titleStyle="'#484848'" :width="'220px'">
                     <el-select v-model="initData.templateConfiguration.resultConnector" placeholder="请选择结果连接符"
                         clearable>
                         <el-option v-for="item in resultConnectorList" :key="item.value" :label="item.label"
                             :value="item.value" />
                     </el-select>
                 </x-component>
-                <x-component label="字体" :titleStyle="'#484848'" :width="'12%'">
+                <x-component label="字体" :titleStyle="'#484848'" :width="'220px'">
                     <el-select v-model="initData.templateConfiguration.typeface" placeholder="请选择字体" clearable>
                         <el-option v-for="item in typefaceList" :key="item.value" :label="item.label"
                             :value="item.value" />
                     </el-select>
                 </x-component>
-                <x-component label="边框样式" :titleStyle="'#484848'" :width="'12%'">
+                <x-component label="边框样式" :titleStyle="'#484848'" :width="'220px'">
                     <el-select v-model="initData.templateConfiguration.borderStyle" placeholder="请选择边框样式" clearable>
                         <el-option v-for="item in borderStyleList" :key="item.value" :label="item.label"
                             :value="item.value" />
@@ -34,7 +34,7 @@
         <div class="basicInfo">
             <div class="title">基础信息</div>
             <div class="generalInfo">
-                <x-component label="添加标题形式" :titleStyle="'#484848'" :width="'15%'" :titleBottom="'12px'">
+                <x-component label="添加标题形式" :titleStyle="'#484848'" :width="'200px'" :titleBottom="'12px'">
                     <div class="title-modality">
                         <div @click="selectTitleModality(0)"
                             :class="{ 'title-active': initData.basicInfo?.payoutStatus === 0 }">手动输入</div>
@@ -43,25 +43,25 @@
                     </div>
                 </x-component>
                 <x-component v-if="initData.basicInfo.payoutStatus == 0" label="手动输入标题" :titleStyle="'#484848'"
-                    :width="'12%'" :titleBottom="'12px'">
+                    :width="'200px'" :titleBottom="'12px'">
                     <el-input v-model="initData.basicInfo.payoutTitle" placeholder="请输入标题" />
                 </x-component>
                 <x-component v-if="initData.basicInfo.payoutStatus == 1" label="上传标题图片（上传png格式）" :titleStyle="'#484848'"
-                    :width="'12%'" :titleBottom="'12px'">
+                    :width="'200px'" :titleBottom="'12px'">
                     <x-input-upload v-model:image="initData.basicInfo.payoutImage"
                         @changeImage="handleImageChange"></x-input-upload>
                 </x-component>
             </div>
             <div class="generalInfo">
-                <x-component label="数量" :titleStyle="'#484848'" :width="'12%'">
+                <x-component label="数量" :titleStyle="'#484848'" :width="'200px'">
                     <el-input disabled v-model="initData.basicInfo.payoutNumber"
                         @input="onNumberInput(initData.basicInfo, 'payoutNumber')" placeholder="小卡数量" />
                 </x-component>
-                <x-component label="单价" :titleStyle="'#484848'" :width="'12%'">
+                <x-component label="单价" :titleStyle="'#484848'" :width="'200px'">
                     <el-input disabled v-model="initData.basicInfo.payoutAmount"
                         @input="onAmountInput(initData.basicInfo, 'payoutAmount')" placeholder="小卡单价" />
                 </x-component>
-                <x-component label="合计" :titleStyle="'#484848'" :width="'12%'">
+                <x-component label="合计" :titleStyle="'#484848'" :width="'200px'">
                     <el-input disabled v-model="initData.basicInfo.payoutTotal" />
                 </x-component>
             </div>
@@ -70,13 +70,13 @@
             <div class="title">玩法信息</div>
             <div class="award-id">
                 <div class="addtype">
-                    <el-button color="#4d65b8" :key="item.value" v-for="item in payoutIDList"
+                    <el-button id="Btn" color="#4d65b8" :key="item.value" v-for="item in payoutIDList"
                         @click="showAddBatchDialog(item)">+{{ item.text
                         }}</el-button>
                 </div>
                 <div class="actions">
-                    <el-button color="#4d65b8" @click="onCustomName">添加自定义玩法</el-button>
-                    <el-button type="danger" @click="clearData">清空</el-button>
+                    <el-button id="Btn" color="#4d65b8" @click="onCustomName">添加自定义玩法</el-button>
+                    <el-button id="Btn" type="danger" @click="clearData">清空</el-button>
                 </div>
             </div>
             <div class="award-list">
@@ -87,23 +87,23 @@
                     </div>
 
                     <div class="item-content" v-for="(item, eindex) in filterPrizeMark(awardItem.value)" :key="item.id">
-                        <div class="item-input payout-item">
+                        <div class="item-input">
                             <x-component v-if="awardItem.text != 'Last Sale'" :label="eindex === 0 ? '序号' : ''"
                                 width="5%">
                                 <div style="height: 32px; line-height: 32px; font-size: 12px;">{{ eindex + 1 }}</div>
                             </x-component>
                             <div class="items-content">
                                 <x-component v-if="awardItem.text != 'Last Sale'" :label="eindex === 0 ? '数量' : ''"
-                                    width="220px">
+                                    width="15%">
                                     <el-input placeholder="请输入数量" v-model="item.gameNumber"
                                         @input="onNumberInput(item, 'gameNumber')" />
                                 </x-component>
-                                <x-component :label="eindex === 0 ? '金额' : ''" width="220px">
+                                <x-component :label="eindex === 0 ? '金额' : ''" width="15%">
                                     <el-input placeholder="请输入金额" v-model="item.gameAmount"
                                         @input="onAmountInput(item, 'gameAmount')" />
                                 </x-component>
                                 <x-component v-if="awardItem.text != 'Last Sale'" :label="eindex === 0 ? '合计' : ''"
-                                    width="220px">
+                                    width="15%">
                                     <el-input placeholder="" v-model="item.gameTotal" :disabled="true" />
                                 </x-component>
                                 <x-component v-if="awardItem.text != 'Last Sale'" width="100px">
@@ -435,7 +435,9 @@ const calculateTotal = (item) => {
     }
 
 }
-.playingMethod{
+
+.playingMethod {
+    align-items: flex-start;
     padding-bottom: 0;
     border-bottom: 0px;
     margin-bottom: 0px;
@@ -443,7 +445,10 @@ const calculateTotal = (item) => {
 
 .generalInfo {
     display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     column-gap: 37px;
+    row-gap: 12px;
     margin-bottom: 18px;
 
     &:last-child {
@@ -490,10 +495,30 @@ const calculateTotal = (item) => {
     }
 }
 
+.award-id {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 12px;
+
+    .addtype,
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: 12px;
+    }
+}
+
+
+/* .item-input,
 .payout-item {
+    display: flex;
+     justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
     justify-content: flex-start !important;
     column-gap: 50px;
-}
+    row-gap: 12px;
+} */
 
 .dialog-content {
     display: flex;
