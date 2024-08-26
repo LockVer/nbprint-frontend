@@ -91,7 +91,7 @@
 import { onMounted, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import XCard from '@/components/container/XCard.vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import moment from 'moment';
 import OpenCardService from '@/services/OpenCardService';
 import searchService from '@/services/SearchService';
@@ -228,18 +228,35 @@ onMounted(() => {
 
 // 编辑订单处理函数
 const editOrder = (row) => {
-    console.log(row);
     router.push({ path: '/opencard/createorder', query: { id: row.id } });
 };
 // 删除订单处理函数
 const deleteOrder = (row) => {
-    openCardServiceClass.deleteOrder(row.id).then((res) => {
-        ElMessage.success('删除成功');
-        loadData();
-    }).catch((err) => {
-        console.log(err);
-        ElMessage.error(err);
-    });
+    ElMessageBox.confirm(
+        '你确定要删除该订单信息吗?',
+        '提示',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    )
+        .then(() => {
+            openCardServiceClass.deleteOrder(row.id).then((res) => {
+                ElMessage({
+                    type: 'success',
+                    message: '删除成功',
+                })
+                loadData();
+            }).catch((err) => {
+                console.log(err);
+                ElMessage.error(err);
+            });
+        })
+        .catch(() => {
+            console.log('取消删除');
+        })
+
 };
 
 </script>

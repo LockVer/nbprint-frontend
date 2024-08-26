@@ -62,7 +62,7 @@ import audit from '@/config/audit';
 import auditCord from '@/config/auditCord';
 import store from '@/store/index';
 import { reactive, ref, watch, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import factoryService from '@/services/FactoryService';
 
@@ -235,12 +235,27 @@ const clearData = () => {
 // 返回处理
 const backHandler = () => {
     factoryServiceClass.auditUnlock(route.params.id).then((res) => {
-        // 打印解锁结果
         router.go(-1)
+        // 打印解锁结果
     }).catch((err) => {
         console.log(err)
     })
 }
+
+// 在离开页面时进行解单功能
+onBeforeRouteLeave((to, from, next) => {
+    console.log(from.name)
+    if (from.name == "auditdetails") {
+        if (from.params.id) {
+            factoryServiceClass.auditUnlock(from.params.id).then((res) => {
+                console.log(res)
+            }).catch((err) => {
+                console.log(err)
+            })
+        }
+    }
+    next();
+})
 
 </script>
 
