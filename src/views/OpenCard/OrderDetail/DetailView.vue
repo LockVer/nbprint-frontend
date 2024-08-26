@@ -118,10 +118,10 @@ import XComponent from '../../../components/container/XComponent.vue';
 import PayoutInfo from './Components/PayoutInfo.vue';
 import FloatingButton from './Components/FloatingButton.vue';
 import { onMounted, ref, reactive, watch } from 'vue';
-import OpenCardService from '../../../services/OpenCardService';
+import openCardService from '../../../services/OpenCardService';
 import { checkDetail, general, smallCard } from '@/config/orderCordDatas';
 
-const serviceClass = new OpenCardService();
+const openCardServiceClass = new openCardService();
 const status = ref('') // 订单状态
 const isShow = ref(false) // 是否显示异常信息
 
@@ -163,7 +163,7 @@ onMounted(() => {
 
 // 获取订单详情数据
 const servicesHandle = (id) => {
-    serviceClass.getDetails(id).then(res => {
+    openCardServiceClass.getDetails(id).then(res => {
         delete res.data.id;
         if (res.data.adCardInfo) {
             adCardInfo.value = res.data.adCardInfo;

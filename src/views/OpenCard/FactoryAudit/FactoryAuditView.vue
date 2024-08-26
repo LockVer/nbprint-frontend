@@ -84,7 +84,7 @@ import { ElMessage } from 'element-plus';
 import moment from 'moment';
 import XComponent from '@/components/container/XComponent.vue';
 import searchService from '@/services/SearchService';
-import FactoryService from '@/services/FactoryService';
+import factoryService from '@/services/FactoryService';
 
 
 const router = useRouter();
@@ -93,7 +93,7 @@ const totalPage = ref(0);
 const errorMessage = ref('');
 const options = ref('');
 const searchServiceClass = new searchService();
-const factoryServiceClass = new FactoryService();
+const factoryServiceClass = new factoryService();
 const searchForm = reactive({
     chineseName: '',
     customerName: '',
@@ -110,24 +110,28 @@ const currentPage = ref(1);
 const pageSize = ref(12);
 // 权限
 const isWatch = ref(true);
-
+// 监听 searchForm 的变化
 watch(searchForm, (newVal) => {
     if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {
         errorMessage.value = '最大值不能小于最小值';
         return
     }
+    // 清空错误信息
     errorMessage.value = '';
+    // 去除空值或 null 的键
     for (const key in newVal) {
         if (newVal[key] === '' || newVal[key] === null) {
             delete newVal[key];
         }
     }
+    // 调用搜索处理函数
     searchHandler({
         ...newVal,
         startTime: startTime.value,
         endTime: endTime.value
     });
 });
+// 日期变化处理函数
 const changeHandler = (value) => {
     if (value) {
         const formattedDates = value.map(date => {
@@ -161,9 +165,9 @@ const searchHandler = (value) => {
     }
     loadData(value)
 }
-// 审核订单处理函数
+// 审核订单函数
 const checkOrder = (row) => {
-    factoryServiceClass.checkLock(row.checkId).then(res => {
+    factoryServiceClass.auditLock(row.checkId).then(res => {
         localStorage.setItem('orderDetails', JSON.stringify(res.data));
         router.push(`/factoryaudit/detail/${row.checkId}`);
     }).catch(err => {
@@ -188,16 +192,17 @@ const loadData = (data) => {
         console.log(err);
     });
 };
-
+// 处理每页大小变化
 const handleSizeChange = (newSize) => {
     pageSize.value = newSize;
     loadData();
 };
+// 处理当前页码变化
 const handleCurrentChange = (newSize) => {
     currentPage.value = newSize;
     loadData();
 };
-
+// 组件挂载时加载初始数据
 onMounted(() => {
     searchServiceClass.getOptions().then((res) => {
         options.value = res.data;

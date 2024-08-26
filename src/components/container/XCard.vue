@@ -25,10 +25,6 @@ export default defineComponent({
                 return {}
             }
         },
-        isHrmBtn: {
-            type: Boolean,
-            default: false
-        }
     },
     setup(props, { emit }) {
         const createOrderHandler = () => {
@@ -55,9 +51,6 @@ export default defineComponent({
             <div class="card-title" :style="titleStyle">{{ title }}</div>
             <el-button color="#4d65b8" v-if="title == '订单管理'" style="border-color: #4d65b8;" @click="createOrderHandler">+
                 创建订单</el-button>
-            <!-- <el-button type="primary" v-if="title == '部门列表'" :text="true" @click="addDepartment">+ 新增</el-button>
-            <el-button color="#4d65b8" v-if="isHrmBtn" style="border-color: #4d65b8;" @click="addMember">+
-                添加成员</el-button> -->
         </div>
         <div class="card-content">
             <slot></slot>

@@ -139,9 +139,7 @@ const calcRowCount = () => {
         }
 
         //计算长宽比
-        console.log('calcBox', calcBox);
         const newRatio = calcBox.width / calcBox.thickness;
-        console.log('newRatio', newRatio);
         //如果长宽比在ratio和maxRatio之间，并且尺寸在最大尺寸之内
         if (newRatio >= ratio && newRatio <= maxRatio) {
             // console.log('box', calcBox);

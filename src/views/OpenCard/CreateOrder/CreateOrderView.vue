@@ -225,12 +225,6 @@ const handleSubmit = () => {
                 scrollToElement(adCardRef);
                 return true;
             }
-            // const incompleteRegion = card.openRegions.find(region => !region.mark.length);
-            // if (incompleteRegion) {
-            //     ElMessage.error('请添加奖符区域');
-            //     scrollToElement(adCardRef);
-            //     return true;
-            // }
         } else {
             if (card.adBoxCode == '' || card.adBoxCode == undefined) {
                 ElMessage.error('请填写宣传卡盒号');
@@ -258,16 +252,6 @@ const handleSubmit = () => {
             return true;
         }
         if (mark.type === 'noPrize') return false;  // 不中奖不需要填写金额和数量
-        // if (!mark.amount) {
-        //     ElMessage.error('请填写奖符金额');
-        //     scrollToElement(prizeMarkRef);
-        //     return true;
-        // }
-        // if (!mark.count) {
-        //     ElMessage.error('请填写奖符数量');
-        //     scrollToElement(prizeMarkRef);
-        //     return true;
-        // }
         return false;
     });
 
@@ -292,11 +276,6 @@ const handleSubmit = () => {
         scrollToElement(payoutRef);
         return;
     }
-    // if (payout.value.basicInfo.payoutTitle == '' || payout.value.basicInfo.payoutImage == '') {
-    //     ElMessage.error('请填写标题或者上传图片');
-    //     scrollToElement(payoutRef);
-    //     return;
-    // }
     if (payout.value.basicInfo.payoutNumber == '') {
         ElMessage.error('请输入小卡数量');
         scrollToElement(payoutRef);

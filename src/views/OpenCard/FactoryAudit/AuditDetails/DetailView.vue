@@ -64,7 +64,7 @@ import store from '@/store/index';
 import { reactive, ref, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import FactoryService from '@/services/FactoryService';
+import factoryService from '@/services/FactoryService';
 
 const router = useRouter()
 const route = useRoute()
@@ -82,7 +82,7 @@ const auditCordData = reactive([...auditCord]);
 const hasException = ref(false);
 const exceptionLabels = ref([]);
 const errorMessage = ref('');
-const serviceClass = new FactoryService();
+const factoryServiceClass = new factoryService();
 
 // 监听异常描述的变化
 watch(() => textarea1.value, (newVal) => {
@@ -113,7 +113,6 @@ onMounted(() => {
 
 // 处理异常变化
 const handleExceptionChange = (adItem) => {
-    // console.log(exceptionLabels.value)
     // 检查 adItem 的 selectedValue 是否为 "0" (表示异常)
     if (adItem.selectedValue === "0") {
         // 如果异常标签数组中不存在当前 adItem 的标签，则将其添加到异常标签数组中
@@ -191,7 +190,7 @@ const postDatas = () => {
         remark: textarea1.value
     };
     console.log(data)
-    serviceClass.submitFactoryCheck(data).then((res) => {
+    factoryServiceClass.submitFactoryAudit(data).then((res) => {
         ElMessage({
             type: 'success',
             message: '提交成功',
@@ -235,9 +234,8 @@ const clearData = () => {
 
 // 返回处理
 const backHandler = () => {
-    serviceClass.checkUnlock(route.params.id).then((res) => {
+    factoryServiceClass.auditUnlock(route.params.id).then((res) => {
         // 打印解锁结果
-        console.log(res)
         router.go(-1)
     }).catch((err) => {
         console.log(err)
@@ -290,9 +288,6 @@ const backHandler = () => {
     }
 
     .audit-content {
-        /* width: 100%; */
-        /* display: flex; */
-        /* gap: 18px; */
 
         .generalInfo {
             width: 100%;

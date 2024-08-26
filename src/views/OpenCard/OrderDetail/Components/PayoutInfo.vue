@@ -82,8 +82,6 @@ const props = defineProps({
     default: () => []
 })
 
-
-
 const payoutData = ref([]);
 const borderStyles = ref([
     { label: '无', value: '' },
@@ -104,9 +102,6 @@ const payoutDataClear = (data) => {
 </script>
 
 <style lang="scss" scoped>
-/* .basic-template {
-    margin-bottom: 18px;
-} */
 
 .basicInfo {
     font-family: "Helvetica Neue";

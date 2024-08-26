@@ -140,7 +140,7 @@
                 </template>
                 <div class="dialog-content">
                     <x-component label="玩法名称" width="45%">
-                        <el-input v-model="batchAddInfo.text" readonly />
+                        <span class="payout-name">{{ batchAddInfo.text }}</span>
                     </x-component>
                     <x-component label="数量" width="45%">
                         <el-input-number v-model="batchAddInfo.qty" :min="0"
@@ -162,10 +162,9 @@
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XInputUpload from '@/components/functional/XInputUpload.vue';
-import { ref, watch, reactive, onMounted } from 'vue';
+import { ref, watch, reactive} from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { ElMessageBox } from 'element-plus';
-import { add } from 'lodash';
 
 
 
@@ -225,7 +224,6 @@ watch(() => gameData.value, (newData) => {
             payoutIDList.push({ text: item.gameType, value: item.gameType, qty: 0 })
         }
     })
-    console.log('payoutIDList', payoutIDList)
 }, { deep: true });
 
 watch(smallCardData, (newVal, oldVal) => {
@@ -256,7 +254,6 @@ const handleImageChange = (value) => {
 // 单个添加
 const addPayoutMark = (item) => {
     addCustomPrize(item)
-    // addCustomPrize(item)
 }
 // 添加自定义玩法
 const onCustomName = () => {
@@ -285,7 +282,6 @@ const onTypeClick = (item) => {
 
 // 批量添加
 const showAddBatchDialog = (item) => {
-    console.log(item)
     batchAddInfo.value = item;
     payoutDialogVisible.value = true;
     // 重置每个玩法的数量为0
@@ -355,7 +351,6 @@ const addPrizeMark = (item) => {
         gameData.value = [];
     }
     gameData.value.push(prizeMarkItem);
-    console.log(gameData.value);
 };
 
 // 添加自定义玩法
@@ -507,19 +502,11 @@ const calculateTotal = (item) => {
         row-gap: 12px;
     }
 }
-
-
-/* .item-input,
-.payout-item {
-    display: flex;
-     justify-content: flex-start;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-start !important;
-    column-gap: 50px;
-    row-gap: 12px;
-} */
-
+.payout-name{
+    display: inline-block;
+    line-height: 32px;
+    height: 32px
+}
 .dialog-content {
     display: flex;
     justify-content: space-between;

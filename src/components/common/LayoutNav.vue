@@ -22,8 +22,8 @@
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import FactoryService from '@/services/FactoryService';
-const serviceClass = new FactoryService();
+import factoryService from '@/services/FactoryService';
+const factoryServiceClass = new factoryService();
 
 const navList = reactive({
     title: "工序",
@@ -69,7 +69,7 @@ onMounted(() => {
 const handleSelect = () => {
     if (route.name == "auditDetails") {
         if (route.params.id) {
-            serviceClass.checkUnlock(route.params.id).then((res) => {
+            factoryServiceClass.auditUnlock(route.params.id).then((res) => {
                 console.log(res)
             }).catch((err) => {
                 console.log(err)

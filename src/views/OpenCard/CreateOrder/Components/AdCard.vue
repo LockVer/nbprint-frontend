@@ -77,7 +77,6 @@
         <el-dialog v-model="prizeDialogVisible" width="1000px" :destroy-on-close="true" title="添加奖符区"
             :close-on-click-modal="false" :close-on-press-escape="false">
             <!-- 添加奖符区域的内容 -->
-
             <PrizeAreaEditor ref="PAEditor" :pre-areas="componentData[currentEditingIndex].prizeAreas"
                 :externalRevealAreas="componentData[currentEditingIndex].revealAreas"
                 :background-image-url="backgroundImageUrl" />
@@ -98,7 +97,6 @@ import XCheckBox from '@/components/functional/XCheckBox.vue';
 import RevealAreaEditor from './AdCardComponents/RevealAreaEditor.vue';
 import PrizeAreaEditor from './AdCardComponents/PrizeAreaEditor.vue';
 import XInputUpload from '@/components/functional/XInputUpload.vue';
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { useStore } from 'vuex';
 import _, { max } from 'lodash';
 
@@ -142,7 +140,6 @@ const populateComponentData = () => {
     if (!initData.value) {
         return;
     }
-    // console.log('populateComponentData', componentData.value)
     componentData.value = initData.value.map((item) => {
         return {
             type: item.type,
@@ -158,11 +155,9 @@ const populateComponentData = () => {
             openDirection: item.openDirection || "T"
         };
     });
-    // console.log('componentData', componentData.value)
 };
 
 const changeImage = (item) => {
-    // console.log('changeImage', item)
     // smallCard.value.box 盒子大小
     // item.imageSize 图片原始尺寸
     item.adCardSize = findMaxRectBWithRatio(smallCard.value.box, item.imageSize);
@@ -181,7 +176,6 @@ const findMaxRectBWithRatio = (rectA, image) => {
      * 返回:
      * Array: 矩形B的最大可能尺寸，格式为[width, height]。
      */
-    // console.log('findMaxRectBWithRatio', rectA, image)
     if (!image || !rectA)
         return false;
     if (!image.width || !image.height) {
@@ -223,8 +217,6 @@ const findMaxRectBWithRatio = (rectA, image) => {
     maxRectB[0] = Math.min(maxRectB[0], maxRectB[1] * originalRatio);
     maxRectB[1] = Math.min(maxRectB[1], maxRectB[0] / originalRatio);
     // 检查在保持比例的情况下，尺寸是否仍然适合矩形A
-    console.log('maxRect', maxRectB)
-    console.log('rectA', rectA)
     if (maxRectB[0] > rectA[0] || maxRectB[1] > rectA[1]) {
 
 
@@ -240,10 +232,8 @@ const findMaxRectBWithRatio = (rectA, image) => {
             maxRectB[1] = rectA[1];
         }
     }
-    // console.log('maxRectB', maxRectB)
     // 宣传卡尺寸向下取整
     maxRectB = maxRectB.map((size) => Math.floor(size));
-    // console.log('maxRectB', maxRectB)
     return maxRectB;
 }
 
@@ -253,7 +243,6 @@ onMounted(() => {
 });
 
 watch(initData, (newVal, oldVal) => {
-    // console.log('initData', newVal, oldVal)
     if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
         populateComponentData();
     }
@@ -291,7 +280,6 @@ watch(adCardQty, (newVal, oldVal) => {
 
 watch(componentData, async (newVal, oldVal) => {
     //将数据还原成initData的格式
-    // console.log('componentData', newVal)
     let pageInitData = newVal.map((item) => {
         return {
             type: item.type,
@@ -316,7 +304,6 @@ const getRevealAreaCount = (index) => {
     if (!componentData.value[index] || !componentData.value[index].revealAreas) {
         return 0;
     }
-    // console.log(componentData.value[index].revealAreas)
     return componentData.value[index].revealAreas.length;
 };
 
@@ -339,8 +326,6 @@ const addRevealArea = (index) => {
 
 const confirmRevealArea = async () => {
     let raAreas = RAEditor.value.getAreas();
-    console.log('raAreas', raAreas)
-    // console.log('store', store.state.isPrizeDialogShow)
     if (raAreas.length == 0) {
         // 判断是否是清空后点击的确定
         if(!store.state.isPrizeDialogShow){
@@ -358,14 +343,12 @@ const confirmRevealArea = async () => {
     // 这里可以添加更多逻辑来处理揭开区的内容
 }
 const closeRevealArea = () => {
-    // console.log(componentData.value[currentEditingIndex.value])
     revealDialogVisible.value = false;
 }
 
 const addPrizeArea = (index) => {
     currentEditingIndex.value = index;
 
-    // console.log(componentData.value[index])
     prizeDialogVisible.value = true;
     backgroundImageUrl.value = componentData.value[index].imageName;
 

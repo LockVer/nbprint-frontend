@@ -7,10 +7,6 @@
             </x-component>
             <x-component label="客户">
                 <el-input v-model="searchForm.customerName" placeholder="请输入客户名称" />
-                <!-- <el-select v-model="searchForm.customerName" placeholder="请选择客户" clearable>
-                    <el-option v-for="(item, index) in options.customerNames" :key="index" :label="item"
-                        :value="item" />
-                </el-select> -->
             </x-component>
             <x-component label="尺寸">
                 <el-select v-model="searchForm.smallCardSize" placeholder="请选择尺寸" clearable>
@@ -34,6 +30,7 @@
                     end-placeholder="结束日期" :default-value="[new Date(), new Date()]" @change="changeHandler" />
             </x-component>
         </div>
+        <!-- 列表数据 -->
         <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
             <el-table-column prop="productName" label="产品名称" :show-overflow-tooltip="true">
                 <template #default="scope">
@@ -80,8 +77,9 @@
                 </template>
             </el-table-column>
         </el-table>
+        <!-- 页码 -->
         <div class="pager" v-if="totalPage">
-            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            <el-pagination @size-change="pageSizeChangeHandler" @current-change="handleCurrentChange"
                 :current-page.sync="currentPage" :page-size="pageSize" layout="prev, pager, next" background
                 :page-count="totalPage" />
         </div>
@@ -103,11 +101,11 @@ import { useStore } from 'vuex';
 
 const router = useRouter();
 const store = useStore();
-const tableData = ref([]);
-const totalPage = ref(0);
-const errorMessage = ref('');
+const tableData = ref([]); // 表格数据
+const totalPage = ref(0); // 总页数
+const errorMessage = ref(''); // 错误信息
 const options = ref(''); // 选择框选项数据
-const serviceClass = new OpenCardService();
+const openCardServiceClass = new OpenCardService();
 const searchServiceClass = new searchService();
 // 搜索表单数据
 const searchForm = reactive({
@@ -200,7 +198,7 @@ const loadData = async () => {
     }
     params.nbUserId = store.state.userInfo.id;
 
-    serviceClass.getList(params).then((res) => {
+    openCardServiceClass.getList(params).then((res) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
@@ -209,7 +207,7 @@ const loadData = async () => {
     });
 };
 // 处理每页大小变化
-const handleSizeChange = (newSize) => {
+const pageSizeChangeHandler = (newSize) => {
     pageSize.value = newSize;
     loadData();
 };
@@ -228,7 +226,6 @@ onMounted(() => {
     loadData();
 });
 
-// const 
 // 编辑订单处理函数
 const editOrder = (row) => {
     console.log(row);
@@ -236,7 +233,7 @@ const editOrder = (row) => {
 };
 // 删除订单处理函数
 const deleteOrder = (row) => {
-    serviceClass.deleteOrder(row.id).then((res) => {
+    openCardServiceClass.deleteOrder(row.id).then((res) => {
         ElMessage.success('删除成功');
         loadData();
     }).catch((err) => {

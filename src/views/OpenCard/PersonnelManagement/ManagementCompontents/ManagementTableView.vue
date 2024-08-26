@@ -83,7 +83,7 @@
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import { Picture as IconPicture } from '@element-plus/icons-vue'
-import HrmService from '@/services/HrmService';
+import personnelManagementService from '@/services/PersonnelManagementService';
 import { ref, reactive, watch, onMounted } from 'vue';
 import { debounce } from 'lodash';
 
@@ -98,15 +98,14 @@ const props = defineProps({
     }
 })
 const tableData = ref([])
-const servicesClass = new HrmService()
+const personnelManagementServicesClass = new personnelManagementService()
 const searchForm = reactive({
     id: "",
     userName: "",
     gender: "",
     position: ""
 })
-// 当前选中的员工数据
-const presonData = ref({})
+// 详情卡片显示状态
 const dialogVisible = ref(false)
 // 员工详细信息
 const memberDetails = ref({})
@@ -115,13 +114,14 @@ const pageSize = ref(12);
 const totalPage = ref(0);
 // 查询参数
 const queryParams = ref({})
-
+// 监听 titleId 的变化，重置搜索表单并重新加载数据
 watch(() => props.titleId, () => {
     for (const key in searchForm) {
         searchForm[key] = ''
     }
     loadData()
 })
+// 监听搜索表单数据的变化，进行防抖处理
 watch(searchForm, (newVal) => {
     debouncedLoadData(newVal)
 })
@@ -135,16 +135,16 @@ const debouncedLoadData = debounce((newVal) => {
     }
     queryParams.value = filteredVal
     loadData()
-}, 1000)
+}, 600)
 
 onMounted(() => {
     loadData()
 })
 
+// 双击跳转到详情页面
 const rowClick = (row) => {
-    // presonData.value = row
     dialogVisible.value = true
-    servicesClass.getMembersDetail(row.userId).then(res => {
+    personnelManagementServicesClass.getMembersDetail(row.userId).then(res => {
         memberDetails.value = res.data
         for (const key in memberDetails.value) {
             if (memberDetails.value[key] == null || memberDetails.value[key] == '') {
@@ -154,17 +154,17 @@ const rowClick = (row) => {
         console.log(memberDetails.value.avatar)
     })
 }
-
+// 处理每页大小变化，重新加载数据
 const handleSizeChange = (newSize) => {
     pageSize.value = newSize;
     loadData();
 };
-
+// 处理当前页码变化，重新加载数据
 const handleCurrentChange = (newSize) => {
     currentPage.value = newSize;
     loadData();
 };
-
+// 加载数据函数，获取员工列表并处理空值
 const loadData = () => {
     let params = {
         "deptId": props.titleId,
@@ -174,7 +174,7 @@ const loadData = () => {
     if (queryParams.value) {
         params = Object.assign(params, queryParams.value);
     }
-    servicesClass.getMembersList(params).then((res) => {
+    personnelManagementServicesClass.getMembersList(params).then((res) => {
         tableData.value = res.data.userList
         totalPage.value = res.data.totalPage
         tableData.value.forEach(element => {

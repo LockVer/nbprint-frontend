@@ -127,7 +127,6 @@ const onTypeClick = (item) => {
     }).then(() => {
         initData.value = initData.value.filter(items => items.type !== item.value);
         let list = awardIDList.value.slice(3);
-        console.log(list)
         list.forEach(type => {
             console.log(type.value, item.value)
             if (type.value === item.value) {
@@ -254,7 +253,6 @@ const batchUpload = async (awardType) => {
                 // 上传成功后添加数据到awardIDList
                 addPrizeMark(awardType, res.data);
             } catch (err) {
-                console.error(err);
                 ElMessage.error(err);
             }
         }

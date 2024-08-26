@@ -52,7 +52,6 @@ const login = () => {
         username: username.value,
         password: password.value
     }).then((res) => {
-        console.log(res);
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('userInfo', JSON.stringify(res.data.userInfo));
         store.dispatch('setUserInfo', res.data.userInfo);

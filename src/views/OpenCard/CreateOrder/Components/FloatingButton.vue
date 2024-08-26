@@ -43,7 +43,6 @@ const isScrollingProgrammatically = ref(false);
 
 const scrollToElement = (refName, index) => {
   const element = refName?.$el || refName;
-  // const res = document.querySelector('.content-page');
   if (element) {
     element.scrollIntoView({ behavior: 'instant', block: 'start' });
     isScrollingProgrammatically.value = true;

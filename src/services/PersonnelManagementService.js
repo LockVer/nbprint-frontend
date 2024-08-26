@@ -9,7 +9,6 @@ class SearchService {
     }
     // 获取成员列表
     getMembersList(data) {
-        // console.log(data)
         return this.apiService.post(`/user/getList`, data, true);
     }
     // 获取成员详情
