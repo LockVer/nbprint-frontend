@@ -4,7 +4,7 @@ class DistanceDrawer {
         this.revealAreas = revealAreas;
         this.selectedGameArea = selectedGameArea;
     }
-
+    // 绘制距离线的方法
     drawDistanceLines(canvasRef, scale, area) {
         const ctx = canvasRef.value.getContext('2d');
         ctx.strokeStyle = 'blue';
@@ -12,25 +12,24 @@ class DistanceDrawer {
         ctx.font = '12px Arial';
         ctx.lineWidth = 1;
 
-        const paddingX = 5;
-        const paddingY = 3;
-
+        const paddingX = 5;  // 文本框的水平内边距
+        const paddingY = 3;  // 文本框的垂直内边距
         const edges = [
             { side: 'top', x1: area.x * scale + area.width * scale / 2, y1: area.y * scale, x2: area.x * scale + area.width * scale / 2, y2: 0 },
             { side: 'bottom', x1: area.x * scale + area.width * scale / 2, y1: (area.y + area.height) * scale, x2: area.x * scale + area.width * scale / 2, y2: canvasRef.value.height },
             { side: 'left', x1: area.x * scale, y1: area.y * scale + area.height * scale / 2, x2: 0, y2: area.y * scale + area.height * scale / 2 },
             { side: 'right', x1: (area.x + area.width) * scale, y1: area.y * scale + area.height * scale / 2, x2: canvasRef.value.width, y2: area.y * scale + area.height * scale / 2 }
         ];
+        // 遍历每条边，计算与其他区域的距离
         edges.forEach(edge => {
-            let closestIntersection = null;
-            let closestDistance = Infinity;
-            let closestOtherArea = null;
-
+            let closestIntersection = null;  // 最近的交点
+            let closestDistance = Infinity;  // 最近的距离
+            let closestOtherArea = null;  // 最近的其他区域
             let areas = this.selectedGameArea.value ? this.selectedGameArea.value.areas : this.revealAreas.value;
-
-            console.log('areas', areas);
             areas.forEach(otherArea => {
+                 // 排除当前处理的区域
                 if (otherArea !== area) {
+                    // 获取当前边与其他区域的交点
                     const intersections = this.getIntersections(edge, otherArea, scale);
                     intersections.forEach(intersection => {
                         const distance = this.getDistance(edge.x1, edge.y1, intersection.x, intersection.y);

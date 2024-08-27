@@ -80,7 +80,6 @@
             <PrizeAreaEditor ref="PAEditor" :pre-areas="componentData[currentEditingIndex].prizeAreas"
                 :externalRevealAreas="componentData[currentEditingIndex].revealAreas"
                 :background-image-url="backgroundImageUrl" />
-
             <template #footer>
                 <el-button @click="closePrizeArea">取消</el-button>
                 <el-button type="primary" @click="confirmPrizeArea">确定</el-button>
@@ -108,55 +107,64 @@ console.log("adcard", initData.value)
 
 const RAEditor = ref(null);
 const PAEditor = ref(null);
+// 默认宣传卡数量
 const adCardQty = ref(1);
+// 背景图片 URL 和尺寸
 const backgroundImageUrl = ref('');
 const backgroundImageSize = ref(null);
 const adCardSize = ref(null);
+// 对话框显示状态
 const revealDialogVisible = ref(false);
 const prizeDialogVisible = ref(false);
+// 当前编辑的索引
 const currentEditingIndex = ref(-1);
 
-
+// 选择是否有揭开口的选项
 const isOpenable = [
     { text: '有', value: 'openable' },
     { text: '无', value: 'non-openable' }
 ];
-
+// 盒号位置选项
 const adCardNoPostionList = [
     { text: '下左', value: 'BL' },
     { text: '下中', value: 'BC' },
     { text: '下右', value: 'BR' }
 ];
+// 方向选项
 const openDirectionList = [
     { text: '上', value: 'T' },
     { text: '下', value: 'B' },
     { text: '左', value: 'L' },
     { text: '右', value: 'R' }
 ];
-
+// 组件数据
 const componentData = ref([]);
-
+// 填充组件数据
 const populateComponentData = () => {
     if (!initData.value) {
         return;
     }
+    // 使用 initData.value 的数据来填充 componentData.value
     componentData.value = initData.value.map((item) => {
         return {
             type: item.type,
             imageSelected: item.image ? true : false,
+            // 初始化 imageFile 为一个空的 File 对象
             imageFile: new File([], ''),
             imageName: item.image,
             imageSize: item.imageSize,
+            // 揭开区信息
             revealAreas: item.openRegions,
             adCardSize: item.adCardSize,
             adBoxCode: item.adBoxCode,
             adBoxCodePosition: item.adBoxCodePosition || "BL",
+            // 备注信息
             comment: item.comment,
             openDirection: item.openDirection || "T"
         };
     });
 };
-
+// 更改图片时的处理函数
 const changeImage = (item) => {
     // smallCard.value.box 盒子大小
     // item.imageSize 图片原始尺寸
@@ -209,17 +217,15 @@ const findMaxRectBWithRatio = (rectA, image) => {
     // 确保rectA的宽度总是小于等于高度
     rectA.sort((a, b) => a - b);
 
-    // 初始化矩形B的最大可能尺寸为尺寸限制
+    // 初始化矩形B的最大可能尺寸为尺寸限制,定义最大矩形 B 并排序（从小到大）
     let maxRectB = [...sizeLimits].sort((a, b) => a - b);
 
-    // 调整尺寸以保持原始比例
+    // 调整最大矩形 B 的短边和长边，以保持原始比例
     // [456, 310];
     maxRectB[0] = Math.min(maxRectB[0], maxRectB[1] * originalRatio);
     maxRectB[1] = Math.min(maxRectB[1], maxRectB[0] / originalRatio);
-    // 检查在保持比例的情况下，尺寸是否仍然适合矩形A
+     // 如果调整后的最大矩形 B 超过了矩形 A 的尺寸，则进行进一步调整
     if (maxRectB[0] > rectA[0] || maxRectB[1] > rectA[1]) {
-
-
         var tempWidth = rectA[1] * originalRatio
         if (tempWidth >= rectA[0]) {
             //长边true、以长边缩放
@@ -299,14 +305,14 @@ watch(componentData, async (newVal, oldVal) => {
 
 }, { deep: true });
 
-
+// 获取揭开区数量
 const getRevealAreaCount = (index) => {
     if (!componentData.value[index] || !componentData.value[index].revealAreas) {
         return 0;
     }
     return componentData.value[index].revealAreas.length;
 };
-
+// 获取奖符区数量
 const getPrizeAreaCount = (index) => {
     if (!componentData.value[index] || !componentData.value[index].prizeAreas) {
         return 0;
@@ -314,7 +320,7 @@ const getPrizeAreaCount = (index) => {
     return componentData.value[index].prizeAreas.length;
 };
 
-
+// 添加揭开区
 const addRevealArea = (index) => {
     currentEditingIndex.value = index;
     revealDialogVisible.value = true;
@@ -324,8 +330,11 @@ const addRevealArea = (index) => {
 
 }
 
+// 添加揭开区确认事件
 const confirmRevealArea = async () => {
+    // 获取揭开区的区域信息
     let raAreas = RAEditor.value.getAreas();
+    // 如果没有揭开区
     if (raAreas.length == 0) {
         // 判断是否是清空后点击的确定
         if(!store.state.isPrizeDialogShow){
@@ -337,11 +346,14 @@ const confirmRevealArea = async () => {
         }
         return;
     }
+    // 更新当前编辑的宣传卡的揭开区域信息
     componentData.value[currentEditingIndex.value].revealAreas = raAreas;
+    // 关闭揭开区对话框
     revealDialogVisible.value = false;
 
     // 这里可以添加更多逻辑来处理揭开区的内容
 }
+// 关闭揭开区对话框
 const closeRevealArea = () => {
     revealDialogVisible.value = false;
 }
@@ -353,8 +365,9 @@ const addPrizeArea = (index) => {
     backgroundImageUrl.value = componentData.value[index].imageName;
 
 }
-
+// 确认添加奖符区
 const confirmPrizeArea = () => {
+    // 获取奖符区的区域信息
     let paAreas = PAEditor.value.getAreas();
     console.log(paAreas)
     if (!paAreas) {

@@ -9,7 +9,7 @@
     </ul>
 </template>
 <script setup>
-import { ref,onMounted, onUnmounted, inject } from 'vue';
+import { onMounted, onUnmounted, inject } from 'vue';
 
 const revealAreas = defineModel("revealAreas");
 const showContextMenu = defineModel("showContextMenu");
@@ -61,11 +61,13 @@ const deleteArea = () => {
     }
     showContextMenu.value = false;
 };
-
+// 设置奖符数量
 const setPrizeQty = () => {
+    // 显示设置奖符数量的对话框
     setQtyDialogVisible.value = true;
     showContextMenu.value = false;
 };
+// 移出所有奖符的函数
 const removePrizeQty = () => {
     if (activeArea.value.drawData) {
         selectedGameArea.value.range.push(...activeArea.value.drawData);
@@ -74,7 +76,7 @@ const removePrizeQty = () => {
     }
     showContextMenu.value = false;
 };
-
+// 设置1个奖符的函数
 const setRewardToken = () => {
     if (Array.isArray(activeArea.value.drawData)) {
         // 将当前区域的drawData还给selectedGameArea.value.range

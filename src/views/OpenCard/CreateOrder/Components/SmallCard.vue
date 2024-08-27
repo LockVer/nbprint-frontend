@@ -127,7 +127,6 @@ const calcRowCount = () => {
             if (quantityPerBox / columnCount > 500) return;  //每列数量大于500不计算
         }
         //限制每列数量的最小值和最大值
-        console.log('quantityPerBox / columnCount', quantityPerBox / columnCount);
         if (quantityPerBox / columnCount < minColumnCount) return;
         if (quantityPerBox / columnCount > maxColumnCount) return;
 
@@ -142,7 +141,6 @@ const calcRowCount = () => {
         const newRatio = calcBox.width / calcBox.thickness;
         //如果长宽比在ratio和maxRatio之间，并且尺寸在最大尺寸之内
         if (newRatio >= ratio && newRatio <= maxRatio) {
-            // console.log('box', calcBox);
             box.width = Math.ceil(calcBox.width);
             box.height = Math.ceil(calcBox.height);
             box.thickness = Math.ceil(calcBox.thickness);
@@ -163,7 +161,6 @@ const calcRowCount = () => {
         if (box.width === 0) {
             //首先计算出在多少列的情况下，长宽比最接近1，假如最小为1列，最大为1000列
             for (let columnCount = 1; columnCount <= 1000; columnCount++) {
-                console.log('columnCount', columnCount, '------', 'level', level);
                 findBox(columnCount, level);
                 if (box.width !== 0) break;
             }

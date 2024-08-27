@@ -1,9 +1,10 @@
 class CanvasRenderer {
     constructor(options) {
+        // 初始化类属性
         this.scale = options.scale;
         this.mode = options.mode;
         this.activeArea = options.activeArea;
-        this.revealAreas = options.revealAreas;
+        this.revealAreas = options.revealAreas; // 所有显示区域
         this.selectedAreas = options.selectedAreas;
         this.alignLine = options.alignLine;
         this.selectedGameArea = options.selectedGameArea;
@@ -15,15 +16,17 @@ class CanvasRenderer {
         this.drawDistanceLines = options.drawDistanceLines;
     }
 
+    // 加载图片
     loadImage(src) {
         return new Promise((resolve, reject) => {
             const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = reject;
+            img.onload = () => resolve(img); // 加载成功
+            img.onerror = reject; // 加载失败
             img.src = src;
         });
     }
 
+    // 绘制canvas
     async drawCanvas() {
         if (!this.canvasRef.value || !this.editorRef.value) {
             console.error('Canvas or editor not mounted yet');
@@ -37,6 +40,7 @@ class CanvasRenderer {
             this.scale.value = Math.min(editorWidth / img.width, editorHeight / img.height);
             this.canvasRef.value.width = img.width * this.scale.value;
             this.canvasRef.value.height = img.height * this.scale.value;
+            // 绘制背景图片
             ctx.drawImage(img, 0, 0, this.canvasRef.value.width, this.canvasRef.value.height);
         }
         // 绘制区域和文本
@@ -46,7 +50,7 @@ class CanvasRenderer {
             this.drawDistanceLines(this.canvasRef, this.scale.value, this.activeArea.value);
         }
     }
-
+    // 渲染区域
     renderAreas(ctx) {
         switch (this.mode.value) {
             case 'create':
@@ -71,12 +75,12 @@ class CanvasRenderer {
 
         if (this.selectedGameArea.value) {
             this.selectedGameArea.value.areas.forEach(area => {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                ctx.fillRect(area.x * this.scale.value, area.y * this.scale.value, area.width * this.scale.value, area.height * this.scale.value);
-                ctx.strokeStyle = area === this.activeArea.value ? 'red' : '#FFF';
-                ctx.strokeRect(area.x * this.scale.value, area.y * this.scale.value, area.width * this.scale.value, area.height * this.scale.value);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; // 设置填充颜色
+                ctx.fillRect(area.x * this.scale.value, area.y * this.scale.value, area.width * this.scale.value, area.height * this.scale.value); // 绘制矩形
+                ctx.strokeStyle = area === this.activeArea.value ? 'red' : '#FFF'; // 设置边框颜色
+                ctx.strokeRect(area.x * this.scale.value, area.y * this.scale.value, area.width * this.scale.value, area.height * this.scale.value); // 绘制边框矩形
                 if (area.drawData) {
-                    this.renderRangeText(area, area.drawData);
+                    this.renderRangeText(area, area.drawData); // 渲染文本
                 }
             });
         } else {
