@@ -1,5 +1,6 @@
 <template>
-    <x-card title="订单管理" @createOrder="createOrderHandler">
+    <x-card title="订单管理" @createOrder="createOrderHandler" @updateOrderStatus="updateOrderStatusHandler"
+        v-model:modelValue="isSpinning">
         <!-- 筛选条件 -->
         <div class="general-content">
             <x-component label="产品名称">
@@ -107,6 +108,8 @@ const errorMessage = ref(''); // 错误信息
 const options = ref(''); // 选择框选项数据
 const openCardServiceClass = new OpenCardService();
 const searchServiceClass = new searchService();
+const isSpinning = ref(false); // 控制刷新图标旋转
+const isUpdateClickable = ref(true); // 控制刷新按钮是否可点击
 // 搜索表单数据
 const searchForm = reactive({
     chineseName: '',
@@ -177,6 +180,34 @@ const searchHandler = (value) => {
 const createOrderHandler = () => {
     router.push(`/opencard/createorder`);
 }
+// 更新订单状态处理函数
+const updateOrderStatusHandler = async () => {
+    if (!isUpdateClickable.value) {
+        isSpinning.value = false; // 立即停止旋转
+        ElMessage.warning('请勿频繁点击, 5秒后再试！');
+        return;
+    }
+    isUpdateClickable.value = false; // 设置按钮不可点击
+    isSpinning.value = true; // 开始旋转
+    const startTime = Date.now(); // 记录开始时间
+
+    try {
+        await loadData();
+    } finally {
+        const elapsedTime = Date.now() - startTime; // 计算经过的时间
+        const remainingTime = 600 - elapsedTime; // 计算剩余时间
+        const delay = remainingTime > 0 ? remainingTime : 0; // 确保延迟时间为正数
+
+        // 使用 setTimeout 延迟停止旋转，确保旋转时间至少为 600 毫秒
+        setTimeout(() => {
+            isSpinning.value = false; // 停止旋转
+        }, delay);
+        // 设置按钮在 5 秒后可点击
+        setTimeout(() => {
+            isUpdateClickable.value = true; // 设置按钮可点击
+        }, 5000);
+    }
+};
 // 双击跳转到详情页面
 const rowClick = (row) => {
     localStorage.setItem('orderDetails', JSON.stringify(row));
@@ -225,6 +256,7 @@ onMounted(() => {
     })
     loadData();
 });
+
 
 // 编辑订单处理函数
 const editOrder = (row) => {

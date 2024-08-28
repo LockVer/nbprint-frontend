@@ -1,4 +1,5 @@
 import ApiService from '../utils/ApiService';
+import store from '../store';
 class FactoryService {
     constructor() {
         this.apiService = new ApiService();

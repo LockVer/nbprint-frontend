@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "@vueuse/motion": "^2.2.3",
     "axios": "^1.7.2",
     "color": "^4.2.3",

@@ -83,6 +83,7 @@ const hasException = ref(false);
 const exceptionLabels = ref([]);
 const errorMessage = ref('');
 const factoryServiceClass = new factoryService();
+const isSubmitting = ref(false); // 是否为提交状态
 
 // 监听异常描述的变化
 watch(() => textarea1.value, (newVal) => {
@@ -191,6 +192,7 @@ const postDatas = () => {
     };
     console.log(data)
     factoryServiceClass.submitFactoryAudit(data).then((res) => {
+        isSubmitting.value = true;
         ElMessage({
             type: 'success',
             message: '提交成功',
@@ -244,19 +246,28 @@ const backHandler = () => {
 
 // 在离开页面时进行解单功能
 onBeforeRouteLeave((to, from, next) => {
-    console.log(from.name)
-    if (from.name == "auditdetails") {
+    console.log(from.name);
+    if (isSubmitting.value) {
+        // 如果正在提交，则不执行解锁功能，直接放行
+        next();
+        return;
+    }
+    if (from.name === "auditdetails") {
         if (from.params.id) {
             factoryServiceClass.auditUnlock(from.params.id).then((res) => {
-                console.log(res)
+                console.log(res);
+                next(); // 只有在异步操作完成后才调用 next()
             }).catch((err) => {
-                console.log(err)
-            })
+                console.log(err);
+                next();
+            });
+        } else {
+            next();
         }
+    } else {
+        next();
     }
-    next();
-})
-
+});
 </script>
 
 

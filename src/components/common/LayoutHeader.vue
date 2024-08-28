@@ -16,7 +16,7 @@
             </span>
             <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item @click="console.log(111)" disabled>帮助文档</el-dropdown-item>
+                    <el-dropdown-item @click="helpDocumentHandler">帮助文档</el-dropdown-item>
                     <el-dropdown-item @click="console.log(222)" disabled>意见反馈</el-dropdown-item>
                     <el-dropdown-item disabled>个人设置</el-dropdown-item>
                     <!-- <el-dropdown-item @click="changePassword">修改密码</el-dropdown-item> -->
@@ -46,6 +46,7 @@
   </el-dialog> -->
 </template>
 <script setup>
+import pdfUrl from '@/assets/揭开卡系统操作手册.pdf';
 import { defineComponent, ref, reactive, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useStore } from 'vuex';
@@ -67,6 +68,10 @@ const handleClick = (index) => {
     headerData.actions.forEach((action, i) => {
         action.isActive = i === index;
     });
+}
+
+const helpDocumentHandler = () => {
+    window.open(pdfUrl, '_blank');
 }
 const changePassword = () => {
     dialogFormVisible.value = true
