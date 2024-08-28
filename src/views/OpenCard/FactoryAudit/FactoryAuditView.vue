@@ -241,7 +241,7 @@ onMounted(() => {
 
 a {
     color: #4D64B8;
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 12px;
 }
 

@@ -410,7 +410,7 @@ const calculateTotal = (item) => {
 
 <style lang="scss" scoped>
 .basicInfo {
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     padding-bottom: 18px;
     border-bottom: 1px solid #EEEE;
     margin-bottom: 18px;
@@ -454,7 +454,7 @@ const calculateTotal = (item) => {
         display: flex;
         column-gap: 8px;
         color: #181818;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 12px;
         cursor: pointer;
 

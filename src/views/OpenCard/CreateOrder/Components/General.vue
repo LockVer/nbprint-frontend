@@ -135,7 +135,7 @@ watch(
         }
 
         .btn {
-            font-family: "Helvetica Neue";
+            font-family:"Source Han Sans CN";
             margin-left: 90px;
             color: #029;
         }
@@ -161,7 +161,7 @@ watch(
 
     .no-icon {
         color: rgba(0, 0, 0, 0.8);
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 12px;
         line-height: 30px;
     }

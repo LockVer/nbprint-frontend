@@ -245,29 +245,29 @@ const backHandler = () => {
 }
 
 // 在离开页面时进行解单功能
-onBeforeRouteLeave((to, from, next) => {
-    console.log(from.name);
-    if (isSubmitting.value) {
-        // 如果正在提交，则不执行解锁功能，直接放行
-        next();
-        return;
-    }
-    if (from.name === "auditdetails") {
-        if (from.params.id) {
-            factoryServiceClass.auditUnlock(from.params.id).then((res) => {
-                console.log(res);
-                next(); // 只有在异步操作完成后才调用 next()
-            }).catch((err) => {
-                console.log(err);
-                next();
-            });
-        } else {
-            next();
-        }
-    } else {
-        next();
-    }
-});
+// onBeforeRouteLeave((to, from, next) => {
+//     if (isSubmitting.value) {
+//         // 如果正在提交，则不执行解锁功能，直接放行
+//         next();
+//         return;
+//     }
+//     if (from.name === "auditdetails") {
+//         console.log("dasdasdasdas")
+//         if (from.params.id) {
+//             factoryServiceClass.auditUnlock(from.params.id).then((res) => {
+//                 console.log(res);
+//                 next(); // 只有在异步操作完成后才调用 next()
+//             }).catch((err) => {
+//                 console.log(err);
+//                 next();
+//             });
+//         } else {
+//             next();
+//         }
+//     } else {
+//         next();
+//     }
+// });
 </script>
 
 
@@ -290,7 +290,7 @@ onBeforeRouteLeave((to, from, next) => {
 
     .value {
         color: rgba(0, 0, 0, 0.80);
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 12px;
     }
 }
@@ -307,7 +307,7 @@ onBeforeRouteLeave((to, from, next) => {
         box-sizing: border-box;
         background: rgba(0, 34, 153, 0.04);
         color: #029;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 14px;
         font-weight: 700;
         margin-bottom: 18px;
@@ -323,7 +323,7 @@ onBeforeRouteLeave((to, from, next) => {
 
             .value {
                 color: rgba(0, 0, 0, 0.80);
-                font-family: "Helvetica Neue";
+                font-family:"Source Han Sans CN";
                 font-size: 12px;
             }
         }
@@ -336,7 +336,7 @@ onBeforeRouteLeave((to, from, next) => {
         flex-direction: column;
         gap: 8px;
         margin-bottom: 18px;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 12px;
         color: var(--Grey-70, #484848);
 
@@ -346,7 +346,7 @@ onBeforeRouteLeave((to, from, next) => {
             gap: 8px;
 
             .el-tag__content {
-                font-family: "Helvetica Neue";
+                font-family:"Source Han Sans CN";
                 font-size: 12px;
             }
         }

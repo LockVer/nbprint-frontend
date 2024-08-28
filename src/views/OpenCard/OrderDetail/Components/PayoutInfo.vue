@@ -104,7 +104,7 @@ const payoutDataClear = (data) => {
 <style lang="scss" scoped>
 
 .basicInfo {
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     padding-bottom: 18px;
     border-bottom: 1px solid #EEEE;
     margin-bottom: 18px;
@@ -160,7 +160,7 @@ const payoutDataClear = (data) => {
         box-sizing: border-box;
         background: rgba(0, 34, 153, 0.04);
         color: #029;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 14px;
         font-weight: 700;
         margin-bottom: 16px;
@@ -191,7 +191,7 @@ const payoutDataClear = (data) => {
 
             span {
                 color: #666;
-                font-family: "Helvetica Neue";
+                font-family:"Source Han Sans CN";
                 font-size: 12px;
                 font-weight: 700;
             }

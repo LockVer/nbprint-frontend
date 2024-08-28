@@ -250,7 +250,7 @@ const loadData = () => {
 <style lang="scss">
 .new-dialog .el-dialog__header {
     color: rgba(0, 0, 0, 0.80);
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 24px;
     font-weight: 700;
     padding-bottom: 16px;

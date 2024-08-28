@@ -290,7 +290,7 @@ const directions = (items) => {
 .title {
     margin-bottom: 20px;
     color: rgba(0, 0, 0, 0.80);
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 24px;
     font-weight: 700;
 }
@@ -308,7 +308,7 @@ const directions = (items) => {
     .audit-title {
         color: rgba(0, 0, 0, 0.80);
         text-align: center;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 24px;
         font-weight: 700;
     }
@@ -323,7 +323,7 @@ const directions = (items) => {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 12px;
     font-weight: 700;
     color: var(--Grey-70, #484848);
@@ -335,7 +335,7 @@ const directions = (items) => {
         gap: 8px;
 
         .el-tag__content {
-            font-family: "Helvetica Neue";
+            font-family:"Source Han Sans CN";
             font-size: 12px;
         }
 
@@ -366,7 +366,7 @@ const directions = (items) => {
     .value,
     .value-number {
         color: rgba(0, 0, 0, 0.80);
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 12px;
         width: 126px;
         overflow: hidden; //超出的文本隐藏
@@ -392,7 +392,7 @@ const directions = (items) => {
         box-sizing: border-box;
         background: rgba(0, 34, 153, 0.04);
         color: #029;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 14px;
         font-weight: 700;
         margin-bottom: 18px;
@@ -423,7 +423,7 @@ const directions = (items) => {
 
             span {
                 color: #666;
-                font-family: "Helvetica Neue";
+                font-family:"Source Han Sans CN";
                 font-size: 12px;
                 font-weight: 700;
             }
@@ -445,7 +445,7 @@ const directions = (items) => {
     }
 
     .btn {
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         margin-left: 90px;
         color: #029;
     }

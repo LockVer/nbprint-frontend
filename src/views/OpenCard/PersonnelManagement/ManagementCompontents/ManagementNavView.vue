@@ -50,7 +50,7 @@ defineExpose({
 <style lang="scss" scoped>
 .label {
     color: var(--Grey-70, #484848);
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 12px;
     margin-bottom: 8px;
 }
