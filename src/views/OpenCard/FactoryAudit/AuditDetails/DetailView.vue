@@ -58,11 +58,11 @@ import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
 import LayoutFooter from '@/components/common/LayoutFooter.vue';
-import audit from '@/config/audit';
-import auditCord from '@/config/auditCord';
+import audit from './AuditDetailsUtils/audit';
+import auditCord from './AuditDetailsUtils/auditCord';
 import store from '@/store/index';
 import { reactive, ref, watch, onMounted } from 'vue';
-import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router';
+import { useRouter, useRoute} from 'vue-router';
 import { ElMessage } from 'element-plus';
 import factoryService from '@/services/FactoryService';
 

@@ -49,6 +49,7 @@ const scrollToElement = (refName, index) => {
   if (element) {
     element.scrollIntoView({ behavior: 'instant', block: 'start' });
     isScrollingProgrammatically.value = true; // 设置标志为 true
+    activeIndex.value = index; // 直接设置 activeIndex
     isScrollingProgrammatically.value = false; // 设置标志为 false
   }
 };
@@ -68,7 +69,7 @@ const handleScroll = () => {
     const element = section?.$el || section;
     if (element) {
       const rect = element.getBoundingClientRect();
-      if (rect.top <= 140) {
+      if (rect.top <= 120 ) {
         activeIndex.value = index;
       }
     }

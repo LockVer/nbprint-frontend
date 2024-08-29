@@ -119,7 +119,7 @@ import PayoutInfo from './Components/PayoutInfo.vue';
 import FloatingButton from './Components/FloatingButton.vue';
 import { onMounted, ref, reactive, watch } from 'vue';
 import openCardService from '../../../services/OpenCardService';
-import { checkDetail, general, smallCard } from '@/config/orderCordDatas';
+import { checkDetail, general, smallCard } from './OrderDetailUtils/orderCordDatas';
 
 const openCardServiceClass = new openCardService();
 const status = ref('') // 订单状态
