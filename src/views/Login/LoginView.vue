@@ -16,7 +16,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import UserService from '../../services/UserService';
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { ElMessage } from 'element-plus'
 const userService = new UserService();
@@ -24,8 +24,15 @@ const username = ref('');
 const password = ref('');
 const errorMsg = ref('');
 const router = useRouter();
+const route = useRoute()
 const store = useStore();
 onMounted(() => {
+    // if(route.query.token){
+    //     localStorage.setItem('token', route.query.token);
+    //     router.push('/opencard');
+    // } else {
+    //     router.push('/login');
+    // }
     window.addEventListener('keyup', handleKeyup);
 })
 onBeforeUnmount(() => {
@@ -45,7 +52,6 @@ const login = () => {
         username: username.value,
         password: password.value
     }).then((res) => {
-        console.log(res);
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('userInfo', JSON.stringify(res.data.userInfo));
         store.dispatch('setUserInfo', res.data.userInfo);

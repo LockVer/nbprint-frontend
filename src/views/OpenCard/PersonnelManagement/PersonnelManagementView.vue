@@ -1,23 +1,23 @@
 <template>
     <div class="container">
         <!-- 公司部门 -->
-        <hrm-nav v-model="departmentValue" @checkChange="handleCheckChange" ref="hrmNavRef" />
+        <management-nav v-model="departmentValue" @checkChange="handleCheckChange" ref="departmentNavRef" />
         <!-- 人员表格 -->
-        <hrm-tabel :title="title" :titleId="titleId" />
+        <management-table :title="title" :titleId="titleId" />
     </div>
 </template>
 
 <script setup>
-import hrmNav from './ManagementCompontents/ManagementNavView.vue';
-import hrmTabel from './ManagementCompontents/ManagementTableView.vue';
+import ManagementNav from './ManagementCompontents/ManagementNavView.vue';
+import ManagementTable from './ManagementCompontents/ManagementTableView.vue';
 import { ref, onMounted } from 'vue';
-import HrmService from '@/services/HrmService';
+import personnelManagementService from '@/services/PersonnelManagementService';
 
-const servicesClass = new HrmService()
+const personnelManagementServiceClass = new personnelManagementService()
 // 用于获取部门列表数据存储
 const departmentValue = ref([])
 // 获取部门实例
-const hrmNavRef = ref(null);
+const departmentNavRef = ref(null);
 // 用于表示选中的部门名称
 const title = ref('');
 const titleId = ref(1);
@@ -25,7 +25,7 @@ const titleId = ref(1);
 
 onMounted(() => {
     // 获取部门列表数据
-    servicesClass.getDepartmentsList().then(res => {
+    personnelManagementServiceClass.getDepartmentsList().then(res => {
         departmentValue.value = res.data
         handleCheckChange(departmentValue.value[0])
     }).catch(err => {

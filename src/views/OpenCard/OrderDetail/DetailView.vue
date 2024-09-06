@@ -1,6 +1,6 @@
 <template>
     <div class="title">订单详情</div>
-    <x-card :cardStyle="{ 'height': 'auto' }">
+    <x-card :cardStyle="{ 'height': 'auto' }" ref="auditRef">
         <div class="audit" :class="{ 'audit-bottom': !isShow }">
             <span class="audit-title">审核详情</span>
             <el-tag v-if="status" :type="['warning', 'warning', 'success', 'danger'][status]">{{ ["待审核", "待审核",
@@ -20,31 +20,40 @@
             </div>
         </div>
     </x-card>
-    <x-card title="通用信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
+    <x-card title="通用信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }"
+        ref="generalRef">
         <div class="generalInfo">
             <x-component v-for="items in orderDetails.general" :key="items.name" :label="items.label" :width="'15%'"
-                :titleStyle="'#484848'" >
-                <div class="value">{{ items.datas }}</div>
+                :titleStyle="'#484848'">
+                <div v-if="items.label === '背景颜色'" class="color-picker">
+                    <el-color-picker ref="colorPicker" :disabled="true" v-model="items.datas" />
+                    <div class="colorText">{{ items.datas }}</div>
+                </div>
+                <div v-else-if="items.label === '公司图标'" class="value">
+                    <img :src="items.datas" alt="">
+                </div>
+                <div v-else class="value" :title="items.datas">{{ items.datas }}</div>
             </x-component>
         </div>
     </x-card>
-    <x-card title="小卡信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
+    <x-card title="小卡信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }"
+        ref="smallCardRef">
         <div class="generalInfo">
             <x-component v-for="items in orderDetails.smallCard" :key="items.name" :label="items.label" :width="'15%'"
-                :titleStyle="'#484848'" >
+                :titleStyle="'#484848'">
                 <div class="value">{{ items.datas }}</div>
             </x-component>
         </div>
     </x-card>
-    <x-card title="宣传卡信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }">
+    <x-card title="宣传卡信息" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }"
+        ref="adCardRef">
         <div class="generalInfo">
-            <x-component label="宣传卡数量" :width="'100%'" :titleStyle="'#484848'" :marginBottom="'16px'" >
+            <x-component label="宣传卡数量" :width="'100%'" :titleStyle="'#484848'" :marginBottom="'16px'">
                 <div class="value-number">{{ adCardInfo.adNumber }}</div>
             </x-component>
         </div>
         <div class="generalInfo" v-for="(items, key) in adCardInfo.adCard" :key="key">
             <x-component :label="'宣传卡' + (key + 1) + ' 有无揭开口'" :width="'15%'" :titleStyle="'#484848'">
-                <!-- <div class="value">{{ items.adUncover }}</div> -->
                 <div class="value">{{ items.adUncover == 1 ? '有' : '无' }}</div>
             </x-component>
             <x-component :label="'宣传卡' + (key + 1) + ' 背景图'" :width="'15%'" :titleStyle="'#484848'">
@@ -65,80 +74,99 @@
             </x-component>
         </div>
     </x-card>
-    <x-card title="奖符" :cardStyle="{ 'height': 'auto' }" :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }"
-        v-if="prizeMarkInfo.length > 0">
+    <x-card title="奖符" :cardStyle="{ 'height': 'auto' }" :headerStyle="{ 'marginBottom': '0' }"
+        :titleStyle="{ 'color': 'rgba(0, 0, 0, 0.8)' }" v-if="prizeMarkInfo.length > 0" ref="prizeMarkRef">
         <div class="prize-card" v-for="(award, key) in prizeMarkInfo" :key="key">
-            <div class="prize-title">{{ ["现金奖", "HOLD卡", "不中奖", "自定义玩法"][award.markType] }}</div>
+            <div class="prize-title">{{ award.markType }}</div>
             <div class="item" v-for="(items, key) in award.prizeMark" :key="key">
-                <div class="item-title">
-                    <div class="dot"></div>
-                    <span>{{ ["现金奖", "HOLD卡", "不中奖", "自定义玩法"][award.markType] }}{{ key + 1 }}</span>
-                </div>
-                <div class="generalInfo prizemark" >
-                    <x-component label="名称" :width="'15%'" :titleStyle="'#484848'" >
-                        <div class="value">{{ items.markName }}</div>
-                    </x-component>
-                    <x-component label="文件" :width="'15%'" :titleStyle="'#484848'" >
-                        <el-tooltip popper-class="tooltip-width" :content="items.markImage" placement="bottom"
-                            effect="light">
-                            <div class="value">{{ items.markImage }}</div>
-                        </el-tooltip>
-                    </x-component>
-                    <x-component label="金额" :width="'15%'" :titleStyle="'#484848'" >
-                        <div class="value">{{ items.markAmount }}</div>
-                    </x-component>
-                    <x-component label="数量" :width="'15%'" :titleStyle="'#484848'" >
-                        <div class="value">{{ items.markCount }}</div>
-                    </x-component>
-                    <x-component label="合计" :width="'15%'" :titleStyle="'#484848'" >
-                        <div class="value">{{ items.markTotal }}</div>
-                    </x-component>
-                    <x-component label="备注" :width="'15%'" :titleStyle="'#484848'" >
-                        <el-tooltip popper-class="tooltip-width" :content="items.markComment" placement="bottom"
-                            effect="light">
-                            <div class="value">{{ items.markComment }}</div>
-                        </el-tooltip>
-                    </x-component>
+                <div class="item-content">
+                    <div class="generalInfo item-index">
+                        <x-component :label="key == 0 ? '序号' : ''" :titleStyle="'#484848'">
+                            <div class="value">{{ key + 1 }}</div>
+                        </x-component>
+                    </div>
+                    <div class="generalInfo prizemark">
+                        <x-component :label="key == 0 ? '名称' : ''" :width="'15%'" :titleStyle="'#484848'">
+                            <div class="value">{{ items.markName }}</div>
+                        </x-component>
+                        <x-component :label="key == 0 ? '文件' : ''" :width="'15%'" :titleStyle="'#484848'">
+                            <el-tooltip popper-class="tooltip-width" :content="items.markImage" placement="bottom"
+                                effect="light">
+                                <div class="value">{{ items.markImage }}</div>
+                            </el-tooltip>
+                        </x-component>
+                        <x-component :label="key == 0 ? '备注' : ''" :width="'15%'" :titleStyle="'#484848'">
+                            <el-tooltip popper-class="tooltip-width" :content="items.markComment" placement="bottom"
+                                effect="light">
+                                <div class="value">{{ items.markComment }}</div>
+                            </el-tooltip>
+                        </x-component>
+                    </div>
                 </div>
             </div>
         </div>
     </x-card>
+    <payout-info :payoutInfo="payoutInfo" ref="payoutRef" />
+    <!-- 悬浮定位 -->
+    <FloatingButton :auditRef="auditRef" :generalRef="generalRef" :smallCardRef="smallCardRef" :adCardRef="adCardRef"
+        :payoutRef="payoutRef" :prizeMarkRef="prizeMarkRef" />
 </template>
 
 <script setup>
 import XCard from '../../../components/container/XCard.vue';
 import XComponent from '../../../components/container/XComponent.vue';
-import { onMounted, ref, reactive } from 'vue';
-import OpenCardService from '../../../services/OpenCardService';
+import PayoutInfo from './Components/PayoutInfo.vue';
+import FloatingButton from './Components/FloatingButton.vue';
+import { onMounted, ref, reactive, watch } from 'vue';
+import openCardService from '../../../services/OpenCardService';
 import { checkDetail, general, smallCard } from '@/config/orderCordDatas';
 
-const serviceClass = new OpenCardService();
+const openCardServiceClass = new openCardService();
 const status = ref('') // 订单状态
 const isShow = ref(false) // 是否显示异常信息
+
+const auditRef = ref(null);
+const generalRef = ref(null);
+const smallCardRef = ref(null);
+const adCardRef = ref(null);
+const payoutRef = ref(null);
+const prizeMarkRef = ref(null);
 // 定义订单详情数据结构
 const orderDetails = reactive({
     checkDetail: reactive(checkDetail.map(item => ({ ...item, datas: null }))),
     general: reactive(general.map(item => ({ ...item, datas: null }))),
     smallCard: reactive(smallCard.map(item => ({ ...item, datas: null }))),
 })
-// 定义宣传卡和奖符相关信息
+
+const companyIconList = ref([
+    { label: '东莞市大朗聚印贸易行有限公司', value: 'Dongguan Dalang Juyin trading Co., Ltd', url: '/public/image/dalang.png' },
+    { label: '东莞汇合数据科技有限公司', value: 'Dongguan Huivo Data Technology Co., Ltd', url: '/public/image/huihe.png' },
+    { label: '东莞将为防伪科技有限公司', value: 'Dongguan Jiangwei anti-counterfeiting technology Co., Ltd', url: '/public/image/jiangwei.png' },
+    { label: '深圳市将维可变数据赋码技术有限公司', value: 'Shenzhen Jiangwei variable data coding technology Co., Ltd', url: '/public/image/jiangwei.png' },
+]);
+
+// 定义宣传卡和奖符和payout相关信息
 const adCardInfo = ref({})
 const prizeMarkInfo = ref([])
+const payoutInfo = ref([])
+
+
+watch(() => payoutInfo.value, (newVal) => {
+    payoutInfo.value = newVal
+})
 
 onMounted(() => {
     let id = JSON.parse(localStorage.getItem('orderDetails'));
     id = id.id
-    // 进行获取详情请求
     servicesHandle(id)
 })
+
 // 获取订单详情数据
 const servicesHandle = (id) => {
-    serviceClass.getDetails(id).then(res => {
+    openCardServiceClass.getDetails(id).then(res => {
         delete res.data.id;
-        // 处理宣传卡信息
         if (res.data.adCardInfo) {
             adCardInfo.value = res.data.adCardInfo;
-            // 遍历每张宣传卡，处理其中的每个字段
             adCardInfo.value.adCard.forEach((item) => {
                 for (const key in item) {
                     if (item[key] === null || item[key] === '') {
@@ -147,20 +175,20 @@ const servicesHandle = (id) => {
                 }
             });
         }
-        // 处理奖符信息
         if (res.data.prizeMarkInfo) {
             prizeMarkInfo.value = res.data.prizeMarkInfo;
             prizeMarkInfo.value.forEach((item) => {
                 // 根据 markType 字段值转换为相应的数字
                 if (item.markType === 'cash') {
-                    item.markType = 0;
+                    item.markType = 'Instant Winning';
                 } else if (item.markType === 'holdCard') {
-                    item.markType = 1;
+                    item.markType = 'HOLD';
                 } else if (item.markType === 'noPrize') {
-                    item.markType = 2;
-                } else if (item.markType === 'custom') {
-                    item.markType = 3;
+                    item.markType = 'Instant No Winning';
+                } else if (item.markType === 'window') {
+                    item.markType = 'WINDOW';
                 }
+
                 item.prizeMark.forEach((item) => {
                     for (const key in item) {
                         if (item[key] === null || item[key] === '') {
@@ -170,18 +198,22 @@ const servicesHandle = (id) => {
                 });
             });
         }
-        // 数据处理
         dataClear(res.data);
+        payoutInfo.value = res.data.payout;
+        console.log(payoutInfo.value)
     });
 };
 // 数据清洗
 const dataClear = (res) => {
     // 处理审核详情数据
     if (res.checkDetail) {
+        console.log(res.checkDetail)
         status.value = res.checkDetail.checkStatus
         // 如果状态不是 '0'，则显示异常详情
-        // jnbjbjh
         if (status.value !== '0') {
+            if(status.value == '1'){
+                isShow.value = false
+            }
             isShow.value = true
         }
     }
@@ -189,9 +221,14 @@ const dataClear = (res) => {
     Object.keys(orderDetails).forEach(key => {
         orderDetails[key].forEach(item => {
             // 如果返回数据中存在对应的字段，则更新 item 的数据
-            // console.log(item)
             if (res[key] && res[key][item.name]) {
-                item.datas = res[key][item.name];
+                if(item.name == 'companyIcon'){
+                    // console.log(res[key][item.name])
+                    item.datas = companyIconList.value.find(items => items.label === res[key][item.name]).url
+                } else {
+                    item.datas = res[key][item.name];
+                }
+                 
             }
             // 如果数据为 null 或空字符串，则替换为 '无'
             if (item.datas == null || item.datas == '') {
@@ -201,8 +238,12 @@ const dataClear = (res) => {
             } else if (item.datas == 'USD') {
                 item.datas = '$'
             } else {
-                // 如果数据包含逗号，则分割为数组
-                item.datas = String(item.datas).includes(',') ? item.datas.split(',') : item.datas;
+                if (item.name == 'exceptionItem') {
+                    // 如果数据包含逗号，则分割为数组
+                    item.datas = String(item.datas).includes(',') ? item.datas.split(',') : item.datas;
+                } else {
+                    item.datas = item.datas
+                }
             }
             // 处理方向和盒码位置的显示
             if (item.name == 'direction' || item.name == 'boxCodePosition') {
@@ -237,6 +278,7 @@ const directions = (items) => {
         }
     }
 }
+
 </script>
 
 <style lang="scss">
@@ -248,7 +290,7 @@ const directions = (items) => {
 .title {
     margin-bottom: 20px;
     color: rgba(0, 0, 0, 0.80);
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 24px;
     font-weight: 700;
 }
@@ -266,12 +308,13 @@ const directions = (items) => {
     .audit-title {
         color: rgba(0, 0, 0, 0.80);
         text-align: center;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 24px;
         font-weight: 700;
     }
 }
-.audit-bottom{
+
+.audit-bottom {
     margin-bottom: 0px;
 }
 
@@ -280,7 +323,7 @@ const directions = (items) => {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 12px;
     font-weight: 700;
     color: var(--Grey-70, #484848);
@@ -292,7 +335,7 @@ const directions = (items) => {
         gap: 8px;
 
         .el-tag__content {
-            font-family: "Helvetica Neue";
+            font-family:"Source Han Sans CN";
             font-size: 12px;
         }
 
@@ -307,9 +350,12 @@ const directions = (items) => {
         margin-bottom: 0;
     }
 }
-.prizemark{
-    margin-bottom: 16px;
+
+.prizemark {
+    margin-bottom: 18px;
+    width: 100%;
 }
+
 .generalInfo {
     display: flex;
     justify-content: flex-start;
@@ -320,13 +366,17 @@ const directions = (items) => {
     .value,
     .value-number {
         color: rgba(0, 0, 0, 0.80);
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 12px;
         width: 126px;
         overflow: hidden; //超出的文本隐藏
         text-overflow: ellipsis; //溢出用省略号显示
         white-space: nowrap; //溢出不换行
+        max-width: 126px;
         /* margin-bottom: 18px; */
+        img{
+            height: 32px;
+        }
     }
 
     .value-number {
@@ -342,19 +392,23 @@ const directions = (items) => {
         box-sizing: border-box;
         background: rgba(0, 34, 153, 0.04);
         color: #029;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 14px;
         font-weight: 700;
-        /* margin-bottom: 16px; */
+        margin-bottom: 18px;
+        margin-top: 18px;
     }
 
     .item {
+        .item-content {
+            display: flex;
 
-        /* background-color: red; */
-        &:not(:first-child) {
-            padding-top: 16px;
-            border-top: 1px solid #f0f0f0;
+            .item-index {
+                width: 50px;
+                margin-right: 20px;
+            }
         }
+
         .item-title {
             display: flex;
             align-items: center;
@@ -369,11 +423,39 @@ const directions = (items) => {
 
             span {
                 color: #666;
-                font-family: "Helvetica Neue";
+                font-family:"Source Han Sans CN";
                 font-size: 12px;
                 font-weight: 700;
             }
         }
     }
+}
+
+/* 背景颜色样式 */
+.color-picker {
+    height: 32px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 12px;
+
+    .colorText {
+        color: rgba(0, 0, 0, 0.80);
+        margin-left: 10px;
+    }
+
+    .btn {
+        font-family:"Source Han Sans CN";
+        margin-left: 90px;
+        color: #029;
+    }
+}
+
+::v-deep(.el-color-picker__trigger) {
+    border: 1px solid transparent;
+}
+
+::v-deep(.el-color-picker__icon) {
+    display: none;
 }
 </style>

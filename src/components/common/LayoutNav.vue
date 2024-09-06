@@ -22,8 +22,8 @@
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import FactoryService from '@/services/FactoryService';
-const serviceClass = new FactoryService();
+import factoryService from '@/services/FactoryService';
+const factoryServiceClass = new factoryService();
 
 const navList = reactive({
     title: "工序",
@@ -33,11 +33,6 @@ const navList = reactive({
             id: '1',
             url: "/opencard"
         },
-        // {
-        //     text: "创建订单",
-        //     id: '2',
-        //     url: "/opencard/createorder"
-        // },
         {
             text: "工厂审核",
             id: '2',
@@ -74,7 +69,7 @@ onMounted(() => {
 const handleSelect = () => {
     if (route.name == "auditDetails") {
         if (route.params.id) {
-            serviceClass.checkUnlock(route.params.id).then((res) => {
+            factoryServiceClass.auditUnlock(route.params.id).then((res) => {
                 console.log(res)
             }).catch((err) => {
                 console.log(err)

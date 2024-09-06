@@ -19,7 +19,7 @@ class UnitConvertUtil {
         } else {
             this.adCardWidth = Math.min(...(adCardSize));
             this.adCardHeight = Math.max(...(adCardSize));
-        }
+        }  
     }
     mmToPx(mm) {
         return mm * this.imageWidth / this.adCardWidth;

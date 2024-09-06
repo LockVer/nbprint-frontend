@@ -12,9 +12,11 @@
 import { inject } from 'vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
 import { ElMessageBox } from 'element-plus';
+import { useStore } from 'vuex';
 
 import { v4 as uuidv4 } from 'uuid'; // 导入uuid库
 
+const store = useStore();
 const mode = defineModel("mode");
 const selectedAreas = defineModel("selectedAreas");
 const revealAreas = defineModel("revealAreas");
@@ -60,6 +62,8 @@ const clearArea = () => {
             selectedGameArea.value = null;
             activeArea.value = null;
             drawCanvas();
+            // 设置画布状态
+            store.commit('SET_PRIZEdIALOGSHOW', false);
         })
         .catch(() => {
             // catch error

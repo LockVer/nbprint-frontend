@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { ElLoading } from 'element-plus';
 import { useRouter } from 'vue-router';
+
 class ApiService {
   constructor(baseURL) { 
     this.api = axios.create({
-      baseURL: baseURL || 'https://nbprint-release-pffkcbubxj.cn-shenzhen.fcapp.run', // 你的API基础URL
-      // baseURL: baseURL || 'http://192.168.1.225:8084', // 你的API基础URL
+      baseURL: baseURL || import.meta.env.VITE_API_BASE_URL, // 使用环境变量配置的API基础URL'
       timeout: 120000, // 请求超时时间
     });
     this.router = useRouter();
@@ -98,8 +98,8 @@ class ApiService {
               resolve(response.data);
               break;
             case -1:
-              this.router.push('/login');
-              reject("请重新登录");
+                this.router.push('/login');
+                reject("请重新登录");
               break;
             default:
               reject(response.data.msg);

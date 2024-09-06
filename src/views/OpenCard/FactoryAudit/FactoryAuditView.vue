@@ -6,10 +6,6 @@
             </x-component>
             <x-component label="客户">
                 <el-input v-model="searchForm.customerName" placeholder="请输入客户名称" />
-                <!-- <el-select v-model="searchForm.customerName" placeholder="请选择客户" clearable>
-                    <el-option v-for="(item, index) in options.customerNames" :key="index" :label="item"
-                        :value="item" />
-                </el-select> -->
             </x-component>
             <x-component label="尺寸">
                 <el-select v-model="searchForm.smallCardSize" placeholder="请选择尺寸" clearable>
@@ -29,8 +25,9 @@
                 </div>
             </x-component>
             <x-component label="创建时间">
-                <el-date-picker v-model="createTime" type="daterange" style="width: 100%;" start-placeholder="开始日期" end-placeholder="结束日期"
-                    :append-to-body="true" :default-value="[new Date(), new Date()]" @change="changeHandler" />
+                <el-date-picker v-model="createTime" type="daterange" style="width: 100%;" start-placeholder="开始日期"
+                    end-placeholder="结束日期" :append-to-body="true" :default-value="[new Date(), new Date()]"
+                    @change="changeHandler" />
             </x-component>
         </div>
         <el-table :data="tableData" style="width: 100%">
@@ -87,7 +84,7 @@ import { ElMessage } from 'element-plus';
 import moment from 'moment';
 import XComponent from '@/components/container/XComponent.vue';
 import searchService from '@/services/SearchService';
-import FactoryService from '@/services/FactoryService';
+import factoryService from '@/services/FactoryService';
 
 
 const router = useRouter();
@@ -96,7 +93,7 @@ const totalPage = ref(0);
 const errorMessage = ref('');
 const options = ref('');
 const searchServiceClass = new searchService();
-const factoryServiceClass = new FactoryService();
+const factoryServiceClass = new factoryService();
 const searchForm = reactive({
     chineseName: '',
     customerName: '',
@@ -111,24 +108,30 @@ const endTime = ref('');
 // 分页参数
 const currentPage = ref(1);
 const pageSize = ref(12);
-
+// 权限
+const isWatch = ref(true);
+// 监听 searchForm 的变化
 watch(searchForm, (newVal) => {
     if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {
         errorMessage.value = '最大值不能小于最小值';
         return
     }
+    // 清空错误信息
     errorMessage.value = '';
+    // 去除空值或 null 的键
     for (const key in newVal) {
         if (newVal[key] === '' || newVal[key] === null) {
             delete newVal[key];
         }
     }
+    // 调用搜索处理函数
     searchHandler({
         ...newVal,
         startTime: startTime.value,
         endTime: endTime.value
     });
 });
+// 日期变化处理函数
 const changeHandler = (value) => {
     if (value) {
         const formattedDates = value.map(date => {
@@ -162,11 +165,9 @@ const searchHandler = (value) => {
     }
     loadData(value)
 }
-// 审核订单处理函数
+// 审核订单函数
 const checkOrder = (row) => {
-    // console.log(row)
-    factoryServiceClass.checkLock(row.checkId).then(res => {
-    console.log(res)
+    factoryServiceClass.auditLock(row.checkId).then(res => {
         localStorage.setItem('orderDetails', JSON.stringify(res.data));
         router.push(`/factoryaudit/detail/${row.checkId}`);
     }).catch(err => {
@@ -186,23 +187,22 @@ const loadData = (data) => {
         tableData.value = res.data.orderList;
         totalPage.value = res.data.totalPage;
     }).catch((err) => {
-        // if(err === '没有访问权限'){
-        //     router.go(-1);
-        //     ElMessage.error(err);
-        // }
+        ElMessage.error(err);
+        isWatch.value = false;
         console.log(err);
     });
 };
-
+// 处理每页大小变化
 const handleSizeChange = (newSize) => {
     pageSize.value = newSize;
     loadData();
 };
+// 处理当前页码变化
 const handleCurrentChange = (newSize) => {
     currentPage.value = newSize;
     loadData();
 };
-
+// 组件挂载时加载初始数据
 onMounted(() => {
     searchServiceClass.getOptions().then((res) => {
         options.value = res.data;
@@ -235,14 +235,13 @@ onMounted(() => {
 }
 
 .el-button+.el-button {
-    margin-left: 12px;
     margin-right: 12px;
     color: #4D64B8;
 }
 
 a {
     color: #4D64B8;
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 12px;
 }
 

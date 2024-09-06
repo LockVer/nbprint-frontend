@@ -2,7 +2,7 @@
     <x-card title="部门列表" :cardStyle="{ 'width': '310px' }">
         <div class="label">部门</div>
         <el-input v-model="filterText" placeholder="请输入查询内容" style="margin-bottom: 22px;" />
-        <el-tree ref="treeRef" class="filter-tree" :data="value" :props="defaultProps" highlight-current
+        <el-tree ref="departmentTreeRef" class="filter-tree" :data="value" :props="defaultProps" highlight-current
             :filter-node-method="filterNode" @node-click="checkChangeHandler" node-key="id" />
     </x-card>
 </template>
@@ -14,7 +14,7 @@ import { ref, watch } from 'vue'
 const value = defineModel()
 // 搜索框数据
 const filterText = ref('')
-const treeRef = ref(null)
+const departmentTreeRef = ref(null)
 // 定义 emits，用于发出事件
 const emits = defineEmits(['checkChange'])
 
@@ -26,7 +26,7 @@ const defaultProps = {
 }
 // 监控 filterText 变量的变化，过滤树形节点
 watch(filterText, (val) => {
-    treeRef.value.filter(val)
+    departmentTreeRef.value.filter(val)
 })
 // 过滤节点的方法
 const filterNode = (value, data) => {
@@ -41,16 +41,16 @@ const checkChangeHandler = (data, checked) => {
     emits('checkChange', data, checked)
 
 }
-// 暴露 treeRef，用于外部访问树组件实例
+// 暴露 departmentTreeRef，用于外部访问树组件实例
 defineExpose({
-    treeRef
+    departmentTreeRef
 })
 </script>
 
 <style lang="scss" scoped>
 .label {
     color: var(--Grey-70, #484848);
-    font-family: "Helvetica Neue";
+    font-family:"Source Han Sans CN";
     font-size: 12px;
     margin-bottom: 8px;
 }

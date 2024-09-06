@@ -163,6 +163,7 @@ const resizeFromRight = (x, activeArea, revealAreas, alignLine, canvasRef) => {
 const updateCursor = (x, y, revealAreas, canvasRef) => {
     let cursor = 'default';
     revealAreas.value.forEach(area => {
+        // 检查鼠标是否在当前区域内
         if (x >= area.x && x <= area.x + area.width && y >= area.y && y <= area.y + area.height) {
             const nearLeft = Math.abs(x - area.x) < 10;
             const nearRight = Math.abs(x - (area.x + area.width)) < 10;
@@ -170,26 +171,27 @@ const updateCursor = (x, y, revealAreas, canvasRef) => {
             const nearBottom = Math.abs(y - (area.y + area.height)) < 10;
 
             if (nearTop && nearLeft) {
-                cursor = 'nw-resize'; // Top left corner
+                cursor = 'nw-resize'; // 左上角
             } else if (nearTop && nearRight) {
-                cursor = 'ne-resize'; // Top right corner
+                cursor = 'ne-resize'; // 右上角
             } else if (nearBottom && nearLeft) {
-                cursor = 'sw-resize'; // Bottom left corner
+                cursor = 'sw-resize'; // 左下角
             } else if (nearBottom && nearRight) {
-                cursor = 'se-resize'; // Bottom right corner
+                cursor = 'se-resize'; // 右下角
             } else if (nearTop) {
-                cursor = 'n-resize'; // Top edge
+                cursor = 'n-resize'; // 上边缘
             } else if (nearBottom) {
-                cursor = 's-resize'; // Bottom edge
+                cursor = 's-resize'; // 下边缘
             } else if (nearLeft) {
-                cursor = 'w-resize'; // Left edge
+                cursor = 'w-resize'; // 左边缘
             } else if (nearRight) {
-                cursor = 'e-resize'; // Right edge
+                cursor = 'e-resize'; // 右边缘
             } else {
-                cursor = 'move'; // Inside the area but not near the edges
+                cursor = 'move'; // 区域内部但不靠近边缘
             }
         }
     });
+    // 更新 canvas 的光标样式
     canvasRef.value.style.cursor = cursor;
 };
 /*
@@ -200,9 +202,14 @@ const updateCursor = (x, y, revealAreas, canvasRef) => {
     * @returns {string} - 调整方向
 */
 const determineResizeDirection = (x, y, area) => {
+    // 返回一个数字的 绝对值 
+    // 当鼠标 x 坐标距离区域左边界小于 10 像素时，nearLeft 为 true
     const nearLeft = Math.abs(x - area.x) < 10;
+    // 当鼠标 x 坐标距离区域右边界小于 10 像素时，nearRight 为 true
     const nearRight = Math.abs(x - (area.x + area.width)) < 10;
+    // 当鼠标 y 坐标距离区域上边界小于 10 像素时，nearTop 为 true
     const nearTop = Math.abs(y - area.y) < 10;
+    // 当鼠标 y 坐标距离区域下边界小于 10 像素时，nearBottom 为 true
     const nearBottom = Math.abs(y - (area.y + area.height)) < 10;
 
     if (nearLeft && nearTop) return 'top-left';

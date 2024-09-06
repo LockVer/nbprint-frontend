@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineExpose } from 'vue';
+import { ref, onMounted, watch} from 'vue';
 import { cloneDeep } from 'lodash';
 import { ElMessage } from 'element-plus'
 import { ElMessageBox } from 'element-plus'

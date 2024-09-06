@@ -62,9 +62,9 @@ import audit from '@/config/audit';
 import auditCord from '@/config/auditCord';
 import store from '@/store/index';
 import { reactive, ref, watch, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import FactoryService from '@/services/FactoryService';
+import factoryService from '@/services/FactoryService';
 
 const router = useRouter()
 const route = useRoute()
@@ -82,7 +82,8 @@ const auditCordData = reactive([...auditCord]);
 const hasException = ref(false);
 const exceptionLabels = ref([]);
 const errorMessage = ref('');
-const serviceClass = new FactoryService();
+const factoryServiceClass = new factoryService();
+const isSubmitting = ref(false); // 是否为提交状态
 
 // 监听异常描述的变化
 watch(() => textarea1.value, (newVal) => {
@@ -98,8 +99,14 @@ onMounted(() => {
     audits.forEach((item) => {
         item.items.forEach((value) => {
             // 检查 resdata 中是否存在与当前 item 的 name 属性匹配的数据
-            if (resdata[value.name]) {
-                value.datas = resdata[value.name]
+            if (resdata) {
+                if (resdata[value.name]) {
+                    value.datas = resdata[value.name]
+                } else {
+                    value.datas = ''
+                }
+            } else {
+                value.datas = ''
             }
         })
     })
@@ -107,7 +114,6 @@ onMounted(() => {
 
 // 处理异常变化
 const handleExceptionChange = (adItem) => {
-    // console.log(exceptionLabels.value)
     // 检查 adItem 的 selectedValue 是否为 "0" (表示异常)
     if (adItem.selectedValue === "0") {
         // 如果异常标签数组中不存在当前 adItem 的标签，则将其添加到异常标签数组中
@@ -137,7 +143,6 @@ const handleSubmit = () => {
     auditCordData.forEach((card) => {
         card.items.forEach((item) => {
             item.adItem.forEach((adItem) => {
-                // 检查 adItem 是否有选中的值
                 if (!adItem.selectedValue) {
                     // 如果没有选中值，设置错误信息并标记为未完成
                     adItem.errorMessage = `${adItem.label} 为必填项`;
@@ -186,7 +191,8 @@ const postDatas = () => {
         remark: textarea1.value
     };
     console.log(data)
-    serviceClass.submitFactoryCheck(data).then((res) => {
+    factoryServiceClass.submitFactoryAudit(data).then((res) => {
+        isSubmitting.value = true;
         ElMessage({
             type: 'success',
             message: '提交成功',
@@ -230,15 +236,38 @@ const clearData = () => {
 
 // 返回处理
 const backHandler = () => {
-    serviceClass.checkUnlock(route.params.id).then((res) => {
-        // 打印解锁结果
-        console.log(res)
+    factoryServiceClass.auditUnlock(route.params.id).then((res) => {
         router.go(-1)
+        // 打印解锁结果
     }).catch((err) => {
         console.log(err)
     })
 }
 
+// 在离开页面时进行解单功能
+// onBeforeRouteLeave((to, from, next) => {
+//     if (isSubmitting.value) {
+//         // 如果正在提交，则不执行解锁功能，直接放行
+//         next();
+//         return;
+//     }
+//     if (from.name === "auditdetails") {
+//         console.log("dasdasdasdas")
+//         if (from.params.id) {
+//             factoryServiceClass.auditUnlock(from.params.id).then((res) => {
+//                 console.log(res);
+//                 next(); // 只有在异步操作完成后才调用 next()
+//             }).catch((err) => {
+//                 console.log(err);
+//                 next();
+//             });
+//         } else {
+//             next();
+//         }
+//     } else {
+//         next();
+//     }
+// });
 </script>
 
 
@@ -261,7 +290,7 @@ const backHandler = () => {
 
     .value {
         color: rgba(0, 0, 0, 0.80);
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 12px;
     }
 }
@@ -278,16 +307,13 @@ const backHandler = () => {
         box-sizing: border-box;
         background: rgba(0, 34, 153, 0.04);
         color: #029;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 14px;
         font-weight: 700;
         margin-bottom: 18px;
     }
 
     .audit-content {
-        /* width: 100%; */
-        /* display: flex; */
-        /* gap: 18px; */
 
         .generalInfo {
             width: 100%;
@@ -297,7 +323,7 @@ const backHandler = () => {
 
             .value {
                 color: rgba(0, 0, 0, 0.80);
-                font-family: "Helvetica Neue";
+                font-family:"Source Han Sans CN";
                 font-size: 12px;
             }
         }
@@ -310,7 +336,7 @@ const backHandler = () => {
         flex-direction: column;
         gap: 8px;
         margin-bottom: 18px;
-        font-family: "Helvetica Neue";
+        font-family:"Source Han Sans CN";
         font-size: 12px;
         color: var(--Grey-70, #484848);
 
@@ -320,7 +346,7 @@ const backHandler = () => {
             gap: 8px;
 
             .el-tag__content {
-                font-family: "Helvetica Neue";
+                font-family:"Source Han Sans CN";
                 font-size: 12px;
             }
         }

@@ -1,27 +1,28 @@
 import ApiService from '../utils/ApiService';
+import store from '../store';
 class FactoryService {
     constructor() {
         this.apiService = new ApiService();
         this.userDatas = JSON.parse(localStorage.getItem('userInfo'));
         this.nbUserId = { nbUserId: this.userDatas.id };
-
+        this.outUserType = { outUserType: this.userDatas.outUserType };
     }
 
     getFactoryList(data) {
         return this.apiService.post('/check/getList', data, true);
     }
     // 审核锁单
-    checkLock(data) {
+    auditLock(data) {
         console.log(data)
         return this.apiService.post(`/check/lock`, { "checkId":data, ...this.nbUserId }, true);
     }
     // 审核解单
-    checkUnlock(data) {
+    auditUnlock(data) {
         return this.apiService.post(`/check/unlock?id=${data}`, {}, true);
     }
     // 提交工厂审核
-    submitFactoryCheck(data) {
-        return this.apiService.post('/check/submit', { ...data, ...this.nbUserId }, true);
+    submitFactoryAudit(data) {
+        return this.apiService.post('/check/submit', { ...data, ...this.nbUserId, ...this.outUserType }, true);
     }
 }
 

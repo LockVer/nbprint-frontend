@@ -41,7 +41,7 @@ const handleDrop = (event) => {
 const handleFiles = (files) => {
     if (files.length > 0) {
         const file = files[0];
-        commonClass.uploadImages(file,localStorage.getItem('orderId')).then((res) => {
+        commonClass.uploadImages(file).then((res) => {
             internalValue.value = res.data;
         }).catch((err) => {
             console.log(err);

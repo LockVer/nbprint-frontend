@@ -1,216 +1,514 @@
 <template>
-    <x-card title="返奖信息">
-        <div class="payout-content">
-            <x-component label="客户是否提供返奖信息" padding="0 0 10px 0">
-                <x-check-box :DataList="isPayoutList" v-model="initData.type" type="radio"></x-check-box>
-            </x-component>
-            <x-component label="上传图片" v-if="initData.type == 'image'">
-                <x-image-upload v-model="initData.image"></x-image-upload>
-            </x-component>
-            <x-component label="返奖信息编辑" padding="0 0 10px 0"  v-if="initData.type == 'input'">
-                <el-button class="xbutton" type="primary" @click="editPayoutInfo">
-                    返奖信息编辑
-                </el-button>
-            </x-component>
+    <x-card title="Payout信息">
+        <div class="basicInfo">
+            <div class="title">模板配置</div>
+            <div class="generalInfo">
+                <x-component label="数量连接符" :titleStyle="'#484848'" :width="'220px'">
+                    <el-select v-model="initData.templateConfiguration.quantitativeConnector" placeholder="请选择数量连接符"
+                        clearable>
+                        <el-option v-for="item in quantitativeConnectorList" :key="item.value" :label="item.label"
+                            :value="item.value" />
+                    </el-select>
+                </x-component>
+                <x-component label="结果连接符" :titleStyle="'#484848'" :width="'220px'">
+                    <el-select v-model="initData.templateConfiguration.resultConnector" placeholder="请选择结果连接符"
+                        clearable>
+                        <el-option v-for="item in resultConnectorList" :key="item.value" :label="item.label"
+                            :value="item.value" />
+                    </el-select>
+                </x-component>
+                <x-component label="字体" :titleStyle="'#484848'" :width="'220px'">
+                    <el-select v-model="initData.templateConfiguration.typeface" placeholder="请选择字体" clearable>
+                        <el-option v-for="item in typefaceList" :key="item.value" :label="item.label"
+                            :value="item.value" />
+                    </el-select>
+                </x-component>
+                <x-component label="边框样式" :titleStyle="'#484848'" :width="'220px'">
+                    <el-select v-model="initData.templateConfiguration.borderStyle" placeholder="请选择边框样式" clearable>
+                        <el-option v-for="item in borderStyleList" :key="item.value" :label="item.label"
+                            :value="item.value" />
+                    </el-select>
+                </x-component>
+            </div>
         </div>
-        <el-dialog v-model="payoutDialogVisible" :destroy-on-close="true" title="导入返奖信息" :close-on-click-modal="false"
-            :close-on-press-escape="false">
-            <div class="line"></div>
-            <x-component label="标题类型" padding="0 0 10px 0">
-                <x-check-box :DataList="titleTypeList" v-model="initData.titleInfo.type" type="radio"></x-check-box>
-            </x-component>
-            <x-component label="上传图片" v-if="initData.titleInfo.type == 'image'">
-                <x-image-upload v-model="initData.titleInfo.image"></x-image-upload>
-            </x-component>
-            <x-component label="请输入标题" v-if="initData.titleInfo.type == 'text'">
-                <el-input v-model="initData.titleInfo.text" placeholder="请输入标题" />
-            </x-component>
-            <x-card title="信息" :titleStyle="{ 'font-size': '18px', 'color': 'black' }"
-                :cardStyle="{ 'padding': '0', 'margin-top': '18px', 'background': 'none', 'box-shadow': 'none' }">
-                <div class="info-box">
-                    <x-component label="总数" width="220px" padding="0 0 10px 0" fontWeight="normal">
-                        <el-input placeholder="" disabled />
-                    </x-component>
-                    <x-component label="面值" width="220px" fontWeight="normal">
-                        <el-input placeholder="" :value="generalData.currency" disabled />
-                    </x-component>
-                    <x-component label="总销售额" width="220px" fontWeight="normal">
-                        <el-input placeholder="" disabled />
-                    </x-component>
-                    <x-component label="总返奖额" width="220px" fontWeight="normal">
-                        <el-input placeholder="" disabled />
-                    </x-component>
-                    <x-component label="总返奖率" width="220px" fontWeight="normal">
-                        <el-input placeholder="" disabled />
-                    </x-component>
-                    <x-component label="总利润率" width="220px" fontWeight="normal">
-                        <el-input placeholder="" disabled />
-                    </x-component>
+        <div class="basicInfo">
+            <div class="title">基础信息</div>
+            <div class="generalInfo">
+                <x-component label="添加标题形式" :titleStyle="'#484848'" :width="'200px'" :titleBottom="'12px'">
+                    <div class="title-modality">
+                        <div @click="selectTitleModality(0)"
+                            :class="{ 'title-active': initData.basicInfo?.payoutStatus === 0 }">手动输入</div>
+                        <div @click="selectTitleModality(1)"
+                            :class="{ 'title-active': initData.basicInfo.payoutStatus === 1 }">上传图片</div>
+                    </div>
+                </x-component>
+                <x-component v-if="initData.basicInfo.payoutStatus == 0" label="手动输入标题" :titleStyle="'#484848'"
+                    :width="'200px'" :titleBottom="'12px'">
+                    <el-input v-model="initData.basicInfo.payoutTitle" placeholder="请输入标题" />
+                </x-component>
+                <x-component v-if="initData.basicInfo.payoutStatus == 1" label="上传标题图片（上传png格式）" :titleStyle="'#484848'"
+                    :width="'200px'" :titleBottom="'12px'">
+                    <x-input-upload v-model:image="initData.basicInfo.payoutImage"
+                        @changeImage="handleImageChange"></x-input-upload>
+                </x-component>
+            </div>
+            <div class="generalInfo">
+                <x-component label="数量" :titleStyle="'#484848'" :width="'200px'">
+                    <el-input disabled v-model="initData.basicInfo.payoutNumber"
+                        @input="onNumberInput(initData.basicInfo, 'payoutNumber')" placeholder="小卡数量" />
+                </x-component>
+                <x-component label="单价" :titleStyle="'#484848'" :width="'200px'">
+                    <el-input disabled v-model="initData.basicInfo.payoutAmount"
+                        @input="onAmountInput(initData.basicInfo, 'payoutAmount')" placeholder="小卡单价" />
+                </x-component>
+                <x-component label="合计" :titleStyle="'#484848'" :width="'200px'">
+                    <el-input disabled v-model="initData.basicInfo.payoutTotal" />
+                </x-component>
+            </div>
+        </div>
+        <div class="basicInfo playingMethod">
+            <div class="title">玩法信息</div>
+            <div class="award-id">
+                <div class="addtype">
+                    <el-button id="Btn" color="#4d65b8" :key="item.value" v-for="item in payoutIDList"
+                        @click="showAddBatchDialog(item)">+{{ item.text
+                        }}</el-button>
                 </div>
-            </x-card>
-            <x-card title="玩法" :titleStyle="{ 'font-size': '18px', 'color': 'black' }"
-                :cardStyle="{ 'padding': '0', 'margin-top': '18px', 'background': 'none', 'box-shadow': 'none' }">
-                <div class="playtype">
-                    <el-button color="#4d65b8" :key="item.value" v-for="item in awardTypeList"
-                        @click="addGamePlay(item.value)">{{ item.text }}</el-button>
+                <div class="actions">
+                    <el-button id="Btn" color="#4d65b8" @click="onCustomName">添加自定义玩法</el-button>
+                    <el-button id="Btn" type="danger" @click="clearData">清空</el-button>
                 </div>
-            </x-card>
+            </div>
+            <div class="award-list">
+                <div class="award-item" v-for="(awardItem, index) in payoutIDList" :key="index">
+                    <div class="item-type" v-if="filterPrizeMark(awardItem.value).length > 0">
+                        <span>{{ awardItem.text }}</span>
+                        <span class="delBtn" @click="onTypeClick(awardItem)">删除</span>
+                    </div>
 
-            <x-card :title="'玩法' + item.index + ' - ' + item.awardTypeName + ''" :key="item.index"
-                v-for="item in initData.games" :titleStyle="{ 'font-size': '16px', 'color': 'black' }"
-                :cardStyle="{ 'padding': '0', 'margin-top': '18px', 'background': 'none', 'box-shadow': 'none' }">
-                <div class="x-row">
-                    <x-component label="玩法名称" width="220px" padding="0 0 10px 0" fontWeight="normal">
-                        <el-input v-model="item.name" placeholder="请输入玩法名称" />
+                    <div class="item-content" v-for="(item, eindex) in filterPrizeMark(awardItem.value)" :key="item.id">
+                        <div class="item-input">
+                            <x-component v-if="awardItem.text != 'Last Sale'" :label="eindex === 0 ? '序号' : ''"
+                                width="5%">
+                                <div style="height: 32px; line-height: 32px; font-size: 12px;">{{ eindex + 1 }}</div>
+                            </x-component>
+                            <div class="items-content">
+                                <x-component v-if="awardItem.text != 'Last Sale'" :label="eindex === 0 ? '数量' : ''"
+                                    width="15%">
+                                    <el-input placeholder="请输入数量" v-model="item.gameNumber"
+                                        @input="onNumberInput(item, 'gameNumber')" />
+                                </x-component>
+                                <x-component :label="eindex === 0 ? '金额' : ''" width="15%">
+                                    <el-input placeholder="请输入金额" v-model="item.gameAmount"
+                                        @input="onAmountInput(item, 'gameAmount')" />
+                                </x-component>
+                                <x-component v-if="awardItem.text != 'Last Sale'" :label="eindex === 0 ? '合计' : ''"
+                                    width="15%">
+                                    <el-input placeholder="" v-model="item.gameTotal" :disabled="true" />
+                                </x-component>
+                                <x-component v-if="awardItem.text != 'Last Sale'" width="100px">
+                                    <el-button class="removePrizes" @click="removePrize(item)">-</el-button>
+                                    <el-button type="primary"
+                                        v-if="eindex + 1 == filterPrizeMark(awardItem.value).length" class="addPrize"
+                                        @click="addPayoutMark(item)">+</el-button>
+                                </x-component>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="custom-dialog">
+            <el-dialog v-model="customDialogVisible" width="400px" :destroy-on-close="true"
+                :close-on-click-modal="false" :close-on-press-escape="false">
+                <template #header>
+                    <div class="dialog-header">Payout信息-添加自定义玩法</div>
+                </template>
+                <div class="custom-content" style="margin-bottom: 18px;">
+                    <label class="common-label">输入自定义玩法名称</label>
+                    <el-input style="width: 200px;" v-model="customName" placeholder="请输入自定义玩法名称" />
+                </div>
+                <template #footer>
+                    <el-button style="width: 100px;" @click="closePrizeDialog">取消</el-button>
+                    <el-button type="primary" style="width: 100px;" @click="batchAdd('addCustomPrize')">确定</el-button>
+                </template>
+            </el-dialog>
+            <el-dialog v-model="payoutDialogVisible" width="400px" :destroy-on-close="true"
+                :close-on-click-modal="false" :close-on-press-escape="false">
+                <template #header>
+                    <div class="dialog-header">批量添加-{{ batchAddInfo.text }}</div>
+                </template>
+                <div class="dialog-content">
+                    <x-component label="玩法名称" width="45%">
+                        <span class="payout-name">{{ batchAddInfo.text }}</span>
                     </x-component>
-                    <x-component label="是否计入返奖额度" :isFullWidth="true">
-                        <x-check-box :DataList="isIncludedInRewardQuota" v-model="item.countMethod"
-                            type="radio"></x-check-box>
-                    </x-component>
-                    <x-component width="220px" padding="0 0 10px 0" fontWeight="normal">
-                        <el-button color="#4d65b8" @click="addNewPrize(item.index)">添加新行</el-button>
-                        <el-button type="danger" @click="removeGamePlay(item.index)">删除玩法</el-button>
+                    <x-component label="数量" width="45%">
+                        <el-input-number v-model="batchAddInfo.qty" :min="0"
+                            :max="batchAddInfo.text == 'Last Sale' ? 1 : 200" width="100%" />
                     </x-component>
                 </div>
-                <div class="x-row" v-for="(pitem, index) in item.prize" :key="index">
-                    <x-component label="奖项数量" width="220px" padding="0 0 10px 0" fontWeight="normal">
-                        <el-input type="number" placeholder="请输入奖项数量" :min="1" :step="1" v-model="pitem.count" />
-                    </x-component>
-                    <x-component label="奖项金额" width="220px" padding="0 0 10px 0" fontWeight="normal">
-                        <el-input type="number" placeholder="请输入奖项金额" v-model="pitem.amount" />
-                    </x-component>
-                    <x-component label="奖项总额" width="220px" padding="0 0 10px 0" fontWeight="normal">
-                        <el-input placeholder="请输入奖项总额" disabled :value="getTotal(pitem.count, pitem.amount)" />
-                    </x-component>
-                    <x-component width="220px" padding="0 0 10px 0" fontWeight="normal">
-                        <el-button type="danger" @click="removePrize(item, index)">删除奖项</el-button>
-                    </x-component>
-                </div>
-            </x-card>
-            <template #footer>
-                <el-button @click="closeDialog">取消</el-button>
-                <el-button type="primary" @click="confirmPayout">确定</el-button>
-            </template>
-        </el-dialog>
+                <template #footer>
+                    <el-button @click="closePrizeDialog">取消</el-button>
+                    <el-button type="primary" @click="batchAdd">确定</el-button>
+                </template>
+            </el-dialog>
+        </div>
     </x-card>
+
+
 </template>
+
 <script setup>
-import { ref, watch } from 'vue';
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
-import XCheckBox from '@/components/functional/XCheckBox.vue';
-import XImageUpload from '@/components/functional/XImageUpload.vue';
+import XInputUpload from '@/components/functional/XInputUpload.vue';
+import { ref, watch, reactive} from 'vue';
+import { v4 as uuidv4 } from 'uuid';
+import { ElMessageBox } from 'element-plus';
+
 
 
 const initData = defineModel("initData");
-const generalData = defineModel("generalData");
+const gameData = defineModel("gameData");
+const smallCardData = defineModel("smallCard");
+const payoutDialogVisible = ref(false);
+const fileInputRefs = ref({});
 
-const payoutDialogVisible = ref(false)
-const isPayout = ref(true)
-const titleType = ref("text")
-const isPayoutList = [
-    { text: '是', value: "image" },
-    { text: '否', value: "input" }
-]
-const titleTypeList = [
-    { text: '文字', value: "text" },
-    { text: '图片', value: "image" },
-]
-const isIncludedInRewardQuota = [
-    { text: '是', value: "yes" },
-    { text: '否', value: "no" },
-    { text: '只计首项', value: "first" }
-]
-const awardTypeList = [
-    { text: '现金奖', value: 0 },
-    { text: '组合奖', value: 1 },
-    { text: 'Window奖', value: 2 },
-    { text: '自定义玩法', value: 1000 }
-]
-let rowIndex = 1
+const quantitativeConnectorList = [
+    { label: '不选', value: '' },
+    { label: '@', value: '@' },
+    { label: '#', value: '#' },
+    { label: '%', value: '%' },
+    { label: '^', value: '^' },
+    { label: '&', value: '&' },
+];
+const resultConnectorList = [
+    { label: '不选', value: '' },
+    { label: '=', value: '=' },
+    { label: '……', value: '……' },
+    { label: '----', value: '----' },
+    { label: '— —', value: '— —' },
+    { label: '~~~~', value: '~~~~' },
+];
+const typefaceList = [
+    { label: '不选', value: '' },
+    { label: 'Arial', value: 'Arial' },
+    { label: 'Times New Roman', value: 'Times New Roman' },
+    { label: 'Courier New', value: 'Courier New' },
+    { label: 'Itcalkad', value: 'Itcalkad' },
+    { label: 'Italic-VariableFont', value: 'Italic-VariableFont' },
+];
+const borderStyleList = [
+    { label: '不选', value: '' },
+    { label: '实线边框', value: 'solid' },
+    { label: '虚线边框', value: 'dashed' },
+    { label: '点状边框', value: 'dotted' },
+    { label: '双线边框', value: 'double' },
+    { label: '凹槽边框', value: 'groove' },
+];
+const payoutIDList = reactive([
+    { text: 'Instant Prize', value: 'Instant Prize', qty: 0 },
+    { text: 'Seal Prize', value: 'Seal Prize', qty: 0 },
+    { text: 'Window Prize', value: 'Window Prize', qty: 0 },
+    { text: 'Last Sale', value: 'Last Sale', qty: 0 },
+]);
 
-watch(initData, (val) => {
+const customDialogVisible = ref(false);
+const customName = ref('');
+const batchAddInfo = ref('');
 
-}, { deep: true })
+watch(() => gameData.value, (newData) => {
+    newData.forEach(item => {
+        let prize = payoutIDList.find(award => award.value === item.gameType);
+        if (!prize) {
+            payoutIDList.push({ text: item.gameType, value: item.gameType, qty: 0 })
+        }
+    })
+}, { deep: true });
 
-const closeDialog = () => {
-    payoutDialogVisible.value = false;
-    isPayout.value = true
-}
-const confirmPayout = () => {
-    payoutDialogVisible.value = false
-}
-const editPayoutInfo = () => {
-    payoutDialogVisible.value = true
-}
-const addGamePlay = (type) => {
-    let game = {
-        index: rowIndex++,
-        type: type,
-        awardTypeName: awardTypeList.find((item) => item.value === type).text,
-        name: "",
-        countMethod: "yes",
-        prize: []
-    }
-    initData.value.games.push(game)
-}
-const addNewPrize = (index) => {
-    let prize = {
-        count: "",
-        amount: "",
-        total: ""
-    }
-    initData.value.games[index - 1].prize.push(prize)
-}
-const removeGamePlay = (index) => {
-    initData.value.games = initData.value.games.filter((item) => item.index !== index)
-}
-const removePrize = (item, index) => {
-    item.prize.splice(index, 1)
-}
-const getTotal = (count, amount) => {
-    count = parseFloat(count);
-    amount = parseFloat(amount);
-    let total = 0;
-    if (isNaN(count) || isNaN(amount)) {
-        total = 0;
+watch(smallCardData, (newVal, oldVal) => {
+    console.log(newVal)
+    initData.value.basicInfo.payoutAmount = smallCardData.value.price
+    initData.value.basicInfo.payoutNumber = smallCardData.value.quantityPerBox
+    initData.value.basicInfo.payoutTotal = smallCardData.value.price * smallCardData.value.quantityPerBox
+}, { deep: true });
+
+const selectTitleModality = (value) => {
+    initData.value.basicInfo.payoutStatus = value;
+    if (value === 0) {
+        initData.value.basicInfo.payoutImage = '';
+        initData.value.basicInfo.payoutTitle = initData.value.basicInfo.payoutTitle;
     } else {
-        total = count * amount;
+        initData.value.basicInfo.payoutImage = initData.value.basicInfo.payoutImage;
+        initData.value.basicInfo.payoutTitle = '';
     }
-    return total
+}
+const handleImageChange = (value) => {
+    if (initData.value.basicInfo.payoutStatus === 0) {
+        initData.value.basicInfo.payoutImage = '';
+    } else {
+        initData.value.basicInfo.payoutImage = value;
+    }
 }
 
+// 单个添加
+const addPayoutMark = (item) => {
+    addCustomPrize(item)
+}
+// 添加自定义玩法
+const onCustomName = () => {
+    customDialogVisible.value = true;
+}
 
+// 删除游戏分类
+const onTypeClick = (item) => {
+    ElMessageBox.confirm('确定删除该奖符的全部信息？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        console.log('删除成功');
+        initData.value.game = initData.value.game.filter(items => items.gameType !== item.value);
+        let list = payoutIDList.slice(4);
+        list.forEach(type => {
+            if (type.value === item.value) {
+                payoutIDList.splice(payoutIDList.indexOf(type), 1);
+            }
+        })
+    }).catch(() => {
+        console.log('取消删除');
+    });;
+}
+
+// 批量添加
+const showAddBatchDialog = (item) => {
+    batchAddInfo.value = item;
+    payoutDialogVisible.value = true;
+    // 重置每个玩法的数量为0
+    payoutIDList.forEach(item => {
+        item.qty = 0;
+    });
+};
+// 清空数据
+const clearData = () => {
+    gameData.value = [];
+    fileInputRefs.value = {};
+    if (payoutIDList.length > 4) {
+        payoutIDList.splice(4);  // 保留前四个元素，删除其余元素
+    }
+};
+
+const closePrizeDialog = () => {
+    payoutDialogVisible.value = false;
+    customDialogVisible.value = false;
+};
+
+// 批量添加确认
+const batchAdd = (type) => {
+    if (type == 'addCustomPrize') {
+        customDialogVisible.value = false;
+        if (customName.value !== '') {
+            payoutIDList.push({ text: customName.value, value: customName.value, qty: 0 });
+        }
+        customName.value = '';
+    } else {
+        payoutDialogVisible.value = false;
+        payoutIDList.forEach(item => {
+            if (item.qty > 0) {
+                for (let i = 0; i < item.qty; i++) {
+                    // 添加玩法
+                    addPrizeMark(item);
+                }
+            }
+        });
+    }
+};
+// 删除单个玩法的函数
+const removePrize = (item) => {
+    ElMessageBox.confirm('确定删除该玩法信息？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        gameData.value = gameData.value.filter(i => i.id !== item.id);
+    }).catch(() => {
+        console.log('取消删除');
+    });
+};
+
+// 添加玩法的函数
+const addPrizeMark = (item) => {
+    const prizeMarkItem = {
+        id: uuidv4(), // 生成唯一ID
+        gameType: item.value,
+        gameName: "", // 设置初始名称
+        gameNumber: item.text === 'Last Sale' ? '1' : '',
+        gameAmount: '',
+        gameTotal: '',
+    };
+
+    if (!gameData.value) {
+        gameData.value = [];
+    }
+    gameData.value.push(prizeMarkItem);
+};
+
+// 添加自定义玩法
+const addCustomPrize = (item) => {
+    console.log(item)
+    const prizeMarkItem = {
+        id: uuidv4(), // 生成唯一ID
+        gameType: item.gameType,
+        gameName: "", // 设置初始名称
+        gameNumber: '',
+        gameAmount: '',
+        gameTotal: '',
+    };
+
+    if (!gameData.value) {
+        gameData.value = [];
+    }
+    gameData.value.push(prizeMarkItem);
+}
+
+// 过滤玩法的函数
+const filterPrizeMark = (type) => {
+    let index = 1; // 初始化索引为1
+    const filteredData = gameData.value.filter((item) => {
+        if (item.gameType === type) {
+            if (!item.gameName) {
+                const awardItem = payoutIDList.find(award => award.value === type);
+                if (awardItem) {
+                    item.gameName = `${awardItem.text}${index}`;
+                }
+            }
+            index++; // 每找到一个匹配项，索引加1
+            return true;
+        }
+        return false;
+    });
+    return filteredData;
+};
+
+const onAmountInput = (item, field) => {
+    item[field] = item[field].replace(/[^\d.]/g, ''); // 只允许输入数字和小数点
+    calculateTotal(item);
+};
+
+const onNumberInput = (item, field) => {
+    item[field] = item[field].replace(/[^\d]/g, ''); // 只允许输入整数
+    calculateTotal(item);
+};
+
+const calculateTotal = (item) => {
+    const amount = parseFloat(item.payoutAmount || item.gameAmount) || 0;
+    const number = parseInt(item.payoutNumber || item.gameNumber) || 0;
+    item.payoutTotal = (amount * number).toString();
+    item.gameTotal = (amount * number).toString();
+};
 </script>
-<style lang="scss">
-@import '@/styles/variables.scss';
+
+<style lang="scss" scoped>
+.basicInfo {
+    font-family:"Source Han Sans CN";
+    padding-bottom: 18px;
+    border-bottom: 1px solid #EEEE;
+    margin-bottom: 18px;
 
 
-.line {
-    width: 100%;
-    height: 1px;
-    background: #E4E4E4;
-    margin: 0 0 18px 0;
+    .title {
+        color: #484848;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+    &:last-child {
+        padding-bottom: 0;
+        margin-bottom: 0;
+        border-bottom: 1px solid transparent;
+    }
+
 }
 
-.payout-content {
+.playingMethod {
+    align-items: flex-start;
+    padding-bottom: 0;
+    border-bottom: 0px;
+    margin-bottom: 0px;
+}
+
+.generalInfo {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-wrap: wrap;
+    column-gap: 37px;
+    row-gap: 12px;
+    margin-bottom: 18px;
 
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    .title-modality {
+        display: flex;
+        column-gap: 8px;
+        color: #181818;
+        font-family:"Source Han Sans CN";
+        font-size: 12px;
+        cursor: pointer;
+
+        >div {
+            min-width: 100px;
+            min-height: 24px;
+            padding: 8px 20px;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid #E4E4E4;
+        }
+
+        .title-active {
+            color: rgba(0, 34, 153, 0.70);
+            border: 1px solid rgba(0, 34, 153, 0.70);
+        }
+    }
+
+
+    /* 多选框的箭头 */
+    ::v-deep(.el-select__suffix) {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        background: #F1F1F1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    ::v-deep(.el-select__wrapper) {
+        padding: 4px 8px;
+    }
 }
 
-.info-box {
+.award-id {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 12px;
 
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-gap: 10px;
-
+    .addtype,
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: 12px;
+    }
 }
-
-.x-row {
+.payout-name{
+    display: inline-block;
+    line-height: 32px;
+    height: 32px
+}
+.dialog-content {
     display: flex;
-    align-items: center;
     justify-content: space-between;
 }
 </style>

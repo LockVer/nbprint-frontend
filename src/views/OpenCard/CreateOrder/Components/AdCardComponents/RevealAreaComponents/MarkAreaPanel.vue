@@ -24,8 +24,8 @@
 import { ref,watch } from 'vue';
 
 const selectedGameArea = defineModel("selectedGameArea");
+// 用于奖符数据输入
 const PAInput = ref('');
-
 
 watch(() => selectedGameArea.value, (newVal) => {
     if (newVal) {
@@ -35,6 +35,7 @@ watch(() => selectedGameArea.value, (newVal) => {
 
 const addRange = (e) => {
     if (e.key === 'Enter') {
+        // 获取并修剪输入的奖符数据
         const range = PAInput.value.trim();
         if (range) {
             if (!selectedGameArea.value.range) {

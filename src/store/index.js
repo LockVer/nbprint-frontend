@@ -6,7 +6,9 @@ export default createStore({
   state() {
     return {
       userInfo: {},
-      permissions: []
+      permissions: [],
+      // 用于表示是否是点击清空后的标识，默认为true  如果点击则表示false
+      isPrizeDialogShow: true,
     };
   },
   mutations: {
@@ -15,6 +17,9 @@ export default createStore({
     },
     SET_PERMISSIONS(state, permissions) {
       state.permissions = permissions;
+    },
+    SET_PRIZEdIALOGSHOW(state, isPrizeDialogShow) {
+      state.isPrizeDialogShow = isPrizeDialogShow;
     }
   },
   actions: {

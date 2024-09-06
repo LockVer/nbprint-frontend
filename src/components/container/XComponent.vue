@@ -51,7 +51,7 @@ export default defineComponent({
 <template>
     <div class="xcomponent-container" :class="{ 'hide': hide, 'full': isFullWidth }"
         :style="{ width: width, padding: padding, marginBottom: marginBottom }">
-        <div class="xcomponent-header">
+        <div class="xcomponent-header" v-if="label">
             <div class="xcomponent-title"
                 :style="{ 'font-weight': fontWeight, 'color': titleStyle, 'margin-bottom': titleBottom }"
                 :class="{ 'hide': !label }">

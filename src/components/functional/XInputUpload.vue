@@ -22,7 +22,6 @@ const props = defineProps({
         default: false
     }
 });
-console.log(props.disabled);
 watch(() => props.disabled, (val) => {
     console.log(val);
 });
@@ -31,8 +30,8 @@ const image = defineModel("image");
 const imageSize = defineModel("size");
 // 注入 commonClass 实例
 const commonClass = inject('commonClass');
-console.log('commonClass.value',localStorage.getItem('orderId'));
-console.log(image.value);
+// console.log('commonClass.value',localStorage.getItem('orderId'));
+// console.log(image.value);
 
 const inputRef = ref(null);
 const componentData = ref({
@@ -40,7 +39,6 @@ const componentData = ref({
     imageName: ''
 })
 const handleFileChange = (event) => {
-    console.log(11111,commonClass.value.orderId)
     const files = event.target.files;
     if (files && files.length > 0) {
         const file = files[0];
@@ -59,12 +57,11 @@ const handleFileChange = (event) => {
             };
             reader.readAsDataURL(file);
         }
-        commonClass.uploadImages(file, localStorage.getItem('orderId')).then((res) => {
-            // console.log(11111,commonClass.value.orderId)
+        commonClass.uploadImages(file).then((res) => {
             componentData.imageSelected = true;
             componentData.imageName = res.data;
             image.value = res.data;
-            emit('changeImage');
+            emit('changeImage', res.data);
         }).catch((err) => {
             console.log(err);
             ElMessage.error(err);

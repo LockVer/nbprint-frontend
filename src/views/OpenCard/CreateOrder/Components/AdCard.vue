@@ -10,7 +10,7 @@
             <x-component :label="'宣传卡' + (index + 1) + '有无揭开口'" padding="0 0 10px 0">
                 <x-check-box :DataList="isOpenable" v-model="item.type" type="radio"></x-check-box>
             </x-component>
-            <x-component label="揭开口方向" padding="0 0 10px 0">
+            <x-component v-if="item.type == 'openable'" label="揭开口方向" padding="0 0 10px 0">
                 <x-check-box v-model="item.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
             </x-component>
             <x-component label="盒号位置">
@@ -30,7 +30,8 @@
                     <x-component label="宣传卡尺寸(mm)" width="220px">
                         <el-input :value="item.adCardSize" disabled></el-input>
                     </x-component>
-                    <x-component label="揭开区" width="220px" :hide="item.type != 'openable'">
+                    <x-component label="揭开区" width="220px" :hide="item.type != 'openable'"
+                        v-if="item.type == 'openable'">
                         <el-button class="xbutton" type="primary" :disabled="!(item.imageName)"
                             @click="addRevealArea(index)" v-if="getRevealAreaCount(index) == 0">
                             添加揭开区
@@ -42,6 +43,9 @@
                                     @click="addRevealArea(index)">修改</el-button>
                             </template>
                         </el-input>
+                    </x-component>
+                    <x-component label="备注" width="220px">
+                        <el-input v-model="item.comment" placeholder="" />
                     </x-component>
                     <!-- <x-component label="奖符" width="220px" :hide="item.type != 'openable'">
                         <el-button class="xbutton" :disabled="getRevealAreaCount(index) == 0" type="primary"
@@ -56,9 +60,7 @@
                         </el-input>
                     </x-component> -->
                 </div>
-                <x-component label="备注" width="100%">
-                    <el-input v-model="item.comment" placeholder="" />
-                </x-component>
+
             </div>
         </div>
         <el-dialog v-model="revealDialogVisible" :destroy-on-close="true" title="添加揭开区" :close-on-click-modal="false"
@@ -75,11 +77,9 @@
         <el-dialog v-model="prizeDialogVisible" width="1000px" :destroy-on-close="true" title="添加奖符区"
             :close-on-click-modal="false" :close-on-press-escape="false">
             <!-- 添加奖符区域的内容 -->
-
             <PrizeAreaEditor ref="PAEditor" :pre-areas="componentData[currentEditingIndex].prizeAreas"
                 :externalRevealAreas="componentData[currentEditingIndex].revealAreas"
                 :background-image-url="backgroundImageUrl" />
-
             <template #footer>
                 <el-button @click="closePrizeArea">取消</el-button>
                 <el-button type="primary" @click="confirmPrizeArea">确定</el-button>
@@ -96,69 +96,76 @@ import XCheckBox from '@/components/functional/XCheckBox.vue';
 import RevealAreaEditor from './AdCardComponents/RevealAreaEditor.vue';
 import PrizeAreaEditor from './AdCardComponents/PrizeAreaEditor.vue';
 import XInputUpload from '@/components/functional/XInputUpload.vue';
-import { ElMessage } from 'element-plus'
+import { useStore } from 'vuex';
 import _, { max } from 'lodash';
 
-
+const store = useStore();
 const initData = defineModel("initData");
 const smallCard = defineModel("smallCard");
 
-// console.log("adcard", initData.value)
+console.log("adcard", initData.value)
 
 const RAEditor = ref(null);
 const PAEditor = ref(null);
+// 默认宣传卡数量
 const adCardQty = ref(1);
+// 背景图片 URL 和尺寸
 const backgroundImageUrl = ref('');
 const backgroundImageSize = ref(null);
 const adCardSize = ref(null);
+// 对话框显示状态
 const revealDialogVisible = ref(false);
 const prizeDialogVisible = ref(false);
+// 当前编辑的索引
 const currentEditingIndex = ref(-1);
 
-
+// 选择是否有揭开口的选项
 const isOpenable = [
     { text: '有', value: 'openable' },
     { text: '无', value: 'non-openable' }
 ];
-
+// 盒号位置选项
 const adCardNoPostionList = [
     { text: '下左', value: 'BL' },
     { text: '下中', value: 'BC' },
     { text: '下右', value: 'BR' }
 ];
+// 方向选项
 const openDirectionList = [
     { text: '上', value: 'T' },
     { text: '下', value: 'B' },
     { text: '左', value: 'L' },
     { text: '右', value: 'R' }
 ];
-
+// 组件数据
 const componentData = ref([]);
-
+// 填充组件数据
 const populateComponentData = () => {
     if (!initData.value) {
         return;
     }
+    // 使用 initData.value 的数据来填充 componentData.value
     componentData.value = initData.value.map((item) => {
         return {
             type: item.type,
             imageSelected: item.image ? true : false,
+            // 初始化 imageFile 为一个空的 File 对象
             imageFile: new File([], ''),
             imageName: item.image,
             imageSize: item.imageSize,
+            // 揭开区信息
             revealAreas: item.openRegions,
             adCardSize: item.adCardSize,
             adBoxCode: item.adBoxCode,
             adBoxCodePosition: item.adBoxCodePosition || "BL",
+            // 备注信息
             comment: item.comment,
             openDirection: item.openDirection || "T"
         };
     });
-    // console.log('componentData', componentData.value)
 };
-
+// 更改图片时的处理函数
 const changeImage = (item) => {
-    console.log('changeImage', item)
     // smallCard.value.box 盒子大小
     // item.imageSize 图片原始尺寸
     item.adCardSize = findMaxRectBWithRatio(smallCard.value.box, item.imageSize);
@@ -177,7 +184,6 @@ const findMaxRectBWithRatio = (rectA, image) => {
      * 返回:
      * Array: 矩形B的最大可能尺寸，格式为[width, height]。
      */
-    // console.log('findMaxRectBWithRatio', rectA, image)
     if (!image || !rectA)
         return false;
     if (!image.width || !image.height) {
@@ -211,19 +217,15 @@ const findMaxRectBWithRatio = (rectA, image) => {
     // 确保rectA的宽度总是小于等于高度
     rectA.sort((a, b) => a - b);
 
-    // 初始化矩形B的最大可能尺寸为尺寸限制
+    // 初始化矩形B的最大可能尺寸为尺寸限制,定义最大矩形 B 并排序（从小到大）
     let maxRectB = [...sizeLimits].sort((a, b) => a - b);
 
-    // 调整尺寸以保持原始比例
+    // 调整最大矩形 B 的短边和长边，以保持原始比例
     // [456, 310];
     maxRectB[0] = Math.min(maxRectB[0], maxRectB[1] * originalRatio);
     maxRectB[1] = Math.min(maxRectB[1], maxRectB[0] / originalRatio);
-    // 检查在保持比例的情况下，尺寸是否仍然适合矩形A
-    console.log('maxRect', maxRectB)
-    console.log('rectA', rectA)
+     // 如果调整后的最大矩形 B 超过了矩形 A 的尺寸，则进行进一步调整
     if (maxRectB[0] > rectA[0] || maxRectB[1] > rectA[1]) {
-
-
         var tempWidth = rectA[1] * originalRatio
         if (tempWidth >= rectA[0]) {
             //长边true、以长边缩放
@@ -236,10 +238,8 @@ const findMaxRectBWithRatio = (rectA, image) => {
             maxRectB[1] = rectA[1];
         }
     }
-    // console.log('maxRectB', maxRectB)
     // 宣传卡尺寸向下取整
     maxRectB = maxRectB.map((size) => Math.floor(size));
-    // console.log('maxRectB', maxRectB)
     return maxRectB;
 }
 
@@ -249,7 +249,6 @@ onMounted(() => {
 });
 
 watch(initData, (newVal, oldVal) => {
-    // console.log('initData', newVal, oldVal)
     if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
         populateComponentData();
     }
@@ -287,7 +286,6 @@ watch(adCardQty, (newVal, oldVal) => {
 
 watch(componentData, async (newVal, oldVal) => {
     //将数据还原成initData的格式
-    // console.log('componentData', newVal)
     let pageInitData = newVal.map((item) => {
         return {
             type: item.type,
@@ -307,15 +305,14 @@ watch(componentData, async (newVal, oldVal) => {
 
 }, { deep: true });
 
-
+// 获取揭开区数量
 const getRevealAreaCount = (index) => {
     if (!componentData.value[index] || !componentData.value[index].revealAreas) {
         return 0;
     }
-    // console.log(componentData.value[index].revealAreas)
     return componentData.value[index].revealAreas.length;
 };
-
+// 获取奖符区数量
 const getPrizeAreaCount = (index) => {
     if (!componentData.value[index] || !componentData.value[index].prizeAreas) {
         return 0;
@@ -323,44 +320,54 @@ const getPrizeAreaCount = (index) => {
     return componentData.value[index].prizeAreas.length;
 };
 
-
+// 添加揭开区
 const addRevealArea = (index) => {
     currentEditingIndex.value = index;
     revealDialogVisible.value = true;
     backgroundImageUrl.value = componentData.value[index].imageName;
     backgroundImageSize.value = componentData.value[index].imageSize;
     adCardSize.value = componentData.value[index].adCardSize;
-    // console.log("addRevealArea", backgroundImageSize, adCardSize)
+
 }
 
+// 添加揭开区确认事件
 const confirmRevealArea = async () => {
-    // console.log("confirmRevealArea")
+    // 获取揭开区的区域信息
     let raAreas = RAEditor.value.getAreas();
-    console.log('raAreas', raAreas)
-    // if (raAreas.length == 0) {
-    //     revealDialogVisible.value = false;
-    //     return;
-    // }
-    // console.log(raAreas)
+    // 如果没有揭开区
+    if (raAreas.length == 0) {
+        // 判断是否是清空后点击的确定
+        if(!store.state.isPrizeDialogShow){
+            componentData.value[currentEditingIndex.value].revealAreas = raAreas;
+            revealDialogVisible.value = false;
+            // 关闭后重新将isPrizeDialogShow置为false
+            store.commit('SET_PRIZEdIALOGSHOW', true);
+            return;
+        }
+        return;
+    }
+    // 更新当前编辑的宣传卡的揭开区域信息
     componentData.value[currentEditingIndex.value].revealAreas = raAreas;
+    // 关闭揭开区对话框
     revealDialogVisible.value = false;
+
     // 这里可以添加更多逻辑来处理揭开区的内容
 }
+// 关闭揭开区对话框
 const closeRevealArea = () => {
-    // console.log(componentData.value[currentEditingIndex.value])
     revealDialogVisible.value = false;
 }
 
 const addPrizeArea = (index) => {
     currentEditingIndex.value = index;
 
-    // console.log(componentData.value[index])
     prizeDialogVisible.value = true;
     backgroundImageUrl.value = componentData.value[index].imageName;
 
 }
-
+// 确认添加奖符区
 const confirmPrizeArea = () => {
+    // 获取奖符区的区域信息
     let paAreas = PAEditor.value.getAreas();
     console.log(paAreas)
     if (!paAreas) {
@@ -387,6 +394,7 @@ const closePrizeArea = () => {
 
     .row {
         display: grid;
+        margin-top: 10px;
         grid-template-columns: repeat(5, 1fr);
         grid-gap: 10px;
     }
@@ -394,7 +402,7 @@ const closePrizeArea = () => {
 
 .row {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin-bottom: 18px;
 }
 
