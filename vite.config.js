@@ -10,12 +10,21 @@ export default defineConfig({
   plugins: [
     vue()
   ],
-  resolve:{
-    alias:{
-      '@':fileURLToPath(new URL('./src',import.meta.url))
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
   define: {
     'process.env': process.env
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "@/styles/variables.scss" as *;`,
+        // 禁用 Sass 警告
+        quietDeps: true
+      }
+    }
   }
 })

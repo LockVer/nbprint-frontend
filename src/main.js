@@ -6,6 +6,8 @@ import './styles/common.scss'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import { createPinia } from 'pinia';
 
+const pinia = createPinia();
 
-createApp(App).use(ElementPlus, { locale: zhCn }).use(store).use(router).mount('#app')
+createApp(App).use(ElementPlus, { locale: zhCn }).use(store).use(pinia).use(router).mount('#app')

@@ -1,8 +1,8 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 4616182 */
-  src: url('iconfont.woff2?t=1720864244246') format('woff2'),
-       url('iconfont.woff?t=1720864244246') format('woff'),
-       url('iconfont.ttf?t=1720864244246') format('truetype');
+  font-family: "iconfont"; /* Project id 4682361 */
+  src: url('iconfont.woff2?t=1727244574512') format('woff2'),
+       url('iconfont.woff?t=1727244574512') format('woff'),
+       url('iconfont.ttf?t=1727244574512') format('truetype');
 }
 
 .iconfont {
@@ -13,19 +13,43 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-a-shuomingwenhao:before {
-  content: "\e6a1";
+.icon-alignleft:before {
+  content: "\e719";
 }
 
-.icon-edit:before {
-  content: "\e69e";
+.icon-alignright:before {
+  content: "\e718";
 }
 
-.icon-del:before {
-  content: "\e69f";
+.icon-alignbottom:before {
+  content: "\e639";
 }
 
-.icon-down:before {
-  content: "\e6a0";
+.icon-aligntop:before {
+  content: "\e63a";
+}
+
+.icon-horizontal:before {
+  content: "\e600";
+}
+
+.icon-vertical:before {
+  content: "\e601";
+}
+
+.icon-aligncenter:before {
+  content: "\e6a9";
+}
+
+.icon-select:before {
+  content: "\e6bd";
+}
+
+.icon-yuanxing:before {
+  content: "\e692";
+}
+
+.icon-juxing:before {
+  content: "\e64d";
 }
 

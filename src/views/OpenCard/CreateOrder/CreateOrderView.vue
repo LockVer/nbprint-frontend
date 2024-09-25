@@ -340,14 +340,10 @@ clearErrorOnInput(adCard);
 clearErrorOnInput(prizeMark);
 
 </script>
-
 <style lang="scss" scoped>
 .payout {
     margin-bottom: 90px
 }
-
-@import '@/styles/variables.scss';
-
 .create-order {
     position: relative;
 

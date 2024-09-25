@@ -1,4 +1,5 @@
 <script lang="ts">
+import { column } from 'element-plus/es/components/table-v2/src/common.mjs';
 import { defineComponent, ref, reactive } from 'vue';
 export default defineComponent({
     name: "XComponents",
@@ -6,6 +7,10 @@ export default defineComponent({
         label: {
             type: String,
             default: ""
+        },
+        column: {
+            type: String,
+            default: "span 1"
         },
         width: {
             type: String,
@@ -50,13 +55,14 @@ export default defineComponent({
 </script>
 <template>
     <div class="xcomponent-container" :class="{ 'hide': hide, 'full': isFullWidth }"
-        :style="{ width: width, padding: padding, marginBottom: marginBottom }">
+        :style="{ width: width, padding: padding, marginBottom: marginBottom, gridColumn: column }">
         <div class="xcomponent-header" v-if="label">
             <div class="xcomponent-title"
                 :style="{ 'font-weight': fontWeight, 'color': titleStyle, 'margin-bottom': titleBottom }"
                 :class="{ 'hide': !label }">
                 <span>{{ label || "无" }}</span>
-                <el-tooltip v-if="label==='小卡盒号'" class="box-item" effect="light" :show-arrow="false" content="小卡盒号的位置有且仅有下左、下中、下右三种摆放方式，请检查是否符合" placement="bottom-start">
+                <el-tooltip v-if="label === '小卡盒号'" class="box-item" effect="light" :show-arrow="false"
+                    content="小卡盒号的位置有且仅有下左、下中、下右三种摆放方式，请检查是否符合" placement="bottom-start">
                     <i style="font-style: normal;">?</i>
                 </el-tooltip>
             </div>
@@ -91,6 +97,7 @@ export default defineComponent({
             align-items: center;
             column-gap: 8px;
             font-size: 12px;
+
             i {
                 display: inline-block;
                 width: 15px;
