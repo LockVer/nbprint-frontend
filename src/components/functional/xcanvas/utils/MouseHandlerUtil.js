@@ -26,9 +26,8 @@ class MouseHandlerUtil {
             for (const shape of shapeList) {
                 if (shape.contains({ x: x, y: y })) {
                     isFind = true;
-                    shape.handleEvent({ x: x, y: y, type: e.type, offsetX, offsetY });
                 }
-                if (shape.dragging) {
+                if (shape.dragging || shape.contains({ x: x, y: y })) {
                     shape.handleEvent({ x: x, y: y, type: e.type, offsetX, offsetY });
                 }
             }
@@ -56,7 +55,8 @@ class MouseHandlerUtil {
         }
     }
     handleMouseDown(e) {
-        const { hotkey, backgroundImagePosition, shapeList, rendererUtil } = this.communicator.data;
+        const { hotkey, backgroundImagePosition, shapeList, rendererUtil, operateCanvasRef } = this.communicator.data;
+        operateCanvasRef.focus();
         if (hotkey.Space) {
             // 拖动
             this.dragging = true;

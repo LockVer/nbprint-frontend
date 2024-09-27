@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "2518398",
+      "name": "close",
+      "font_class": "close",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "5085759",
+      "name": "网格关",
+      "font_class": "grid",
+      "unicode": "e783",
+      "unicode_decimal": 59267
+    },
+    {
+      "icon_id": "35886694",
+      "name": "游戏区",
+      "font_class": "gamearea",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
       "icon_id": "8990449",
       "name": "左对齐",
       "font_class": "alignleft",

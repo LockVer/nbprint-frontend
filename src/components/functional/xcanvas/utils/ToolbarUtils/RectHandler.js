@@ -6,7 +6,7 @@ class RectHandler extends ShapeBase {
         this.dragDirection = '';
     }
     handleMouseDown(event) {
-        const { rendererUtil, shapeList } = this.communicator.data;
+        const { rendererUtil, shapeList, hotkey } = this.communicator.data;
 
         //取消其他选中的形状
         shapeList.forEach(shape => {
@@ -15,13 +15,27 @@ class RectHandler extends ShapeBase {
                 shape.setInitialPosition(); //设置初始位置
             }
         });
-        this.active = true;
+        
+        //如果没有其他选中的形状，则取消选中当前形状
+        if (this.selected) {
+            const selectedShape = shapeList.filter(shape => shape.selected);
+            if (selectedShape.length <= 1) {
+                this.selected = false;
+            }
+        }
+
+        console.log(hotkey.Control,this.selected )
+        if (hotkey.Control) { 
+            this.selected = !this.selected; 
+        } else {
+            this.active = true;
+        } 
         this.dragging = true;
         this.dragStart = event;
         this.dragStartRect = { x: this.x, y: this.y, width: this.width, height: this.height };
         this.dragDirection = this.getCursorStyle(event.x, event.y);
         this.calculateDistanceLines();
-        this.calculateAlignmentLines();
+        this.calculateAlignmentLines(false);
         rendererUtil.render();
         // 处理 mousedown 事件
     }
@@ -397,29 +411,38 @@ class RectHandler extends ShapeBase {
                 // 检测垂直对齐
                 if (Math.abs(rectX - shapeX) < snapThresholdSwitch) {
                     this.alignmentLines.push({ type: 'vertical', x: shapeX, y1: Math.min(rectY, shapeY), y2: Math.max(rectY + rectHeight, shapeY + shapeHeight) });
-                    rectX = shapeX;
-                    this.x = (shapeX - backgroundImagePosition.x) / virtualScale; // 吸附
-                    snapped = true;
+                    if ((!shiftKey && isSnap)) {
+                        rectX = shapeX;
+                        this.x = (shapeX - backgroundImagePosition.x) / virtualScale; // 吸附
+                        snapped = true;
+                    }
                 }
                 if (Math.abs(rectX + rectWidth - (shapeX + shapeWidth)) < snapThresholdSwitch) {
                     this.alignmentLines.push({ type: 'vertical', x: shapeX + shapeWidth, y1: Math.min(rectY, shapeY), y2: Math.max(rectY + rectHeight, shapeY + shapeHeight) });
-                    rectX = shapeX + shapeWidth - rectWidth;
-                    this.x = (rectX - backgroundImagePosition.x) / virtualScale; // 吸附
-                    snapped = true;
+                    if ((!shiftKey && isSnap)) {
+                        rectX = shapeX + shapeWidth - rectWidth;
+                        this.x = (rectX - backgroundImagePosition.x) / virtualScale; // 吸附
+                        snapped = true;
+                    }
+
                 }
 
                 // 检测水平对齐
                 if (Math.abs(rectY - shapeY) < snapThresholdSwitch) {
                     this.alignmentLines.push({ type: 'horizontal', x1: Math.min(rectX, shapeX), x2: Math.max(rectX + rectWidth, shapeX + shapeWidth), y: shapeY });
-                    rectY = shapeY;
-                    this.y = (shapeY - backgroundImagePosition.y) / virtualScale; // 吸附
-                    snapped = true;
+                    if ((!shiftKey && isSnap)) {
+                        rectY = shapeY;
+                        this.y = (shapeY - backgroundImagePosition.y) / virtualScale; // 吸附
+                        snapped = true;
+                    }
                 }
                 if (Math.abs(rectY + rectHeight - (shapeY + shapeHeight)) < snapThresholdSwitch) {
                     this.alignmentLines.push({ type: 'horizontal', x1: Math.min(rectX, shapeX), x2: Math.max(rectX + rectWidth, shapeX + shapeWidth), y: shapeY + shapeHeight });
-                    rectY = shapeY + shapeHeight - rectHeight;
-                    this.y = (rectY - backgroundImagePosition.y) / virtualScale; // 吸附
-                    snapped = true;
+                    if ((!shiftKey && isSnap)) {
+                        rectY = shapeY + shapeHeight - rectHeight;
+                        this.y = (rectY - backgroundImagePosition.y) / virtualScale; // 吸附
+                        snapped = true;
+                    }
                 }
             }
         });

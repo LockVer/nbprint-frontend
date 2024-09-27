@@ -29,6 +29,7 @@ class ImageHandlerUtil {
                 resolve(img);
             };
             img.onerror = (err) => {
+                console.error("图片加载失败：", err);
                 reject("图片加载失败：" + err);
             };
         });

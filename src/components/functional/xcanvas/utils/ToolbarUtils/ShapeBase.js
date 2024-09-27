@@ -6,6 +6,8 @@ class ShapeBase {
         this.height = shape.height;
         this.active = false;
         this.handleSize = 10
+        this.awardCount=0;
+        this.awardList=[];
         this.communicator = communicator;
         this.distanceThreshold = communicator.data.minGridSize;
     }
@@ -51,7 +53,8 @@ class ShapeBase {
         this.communicator.data.alignmentLines = [];
     }
     handleKeyDown(e) {
-        const { hotkey, shapeList, showImageSize } = this.communicator.data;
+        const { hotkey, shapeList, showImageSize, virtualScale } = this.communicator.data;
+
         if (hotkey.Control) {
             switch (e.key) {
                 case 'c':
@@ -81,11 +84,13 @@ class ShapeBase {
                     break;
             }
         } else {
+            const moveDistance = 1 * virtualScale;
+            console.log('moveDistance:', moveDistance);
             switch (e.key) {
                 //上移
                 case 'ArrowUp':
                     console.log('上移');
-                    this.y -= 1;
+                    this.y -= moveDistance;
                     if (this.y < 0) {
                         this.y = 0;
                     }
@@ -95,7 +100,7 @@ class ShapeBase {
                 //下移
                 case 'ArrowDown':
                     console.log('下移');
-                    this.y += 1;
+                    this.y += moveDistance;
                     if (this.y > showImageSize.height - this.height) {
                         this.y = showImageSize.height - this.height;
                     }
@@ -105,7 +110,7 @@ class ShapeBase {
                 //左移
                 case 'ArrowLeft':
                     console.log('左移');
-                    this.x -= 1;
+                    this.x -= moveDistance;
                     if (this.x < 0) {
                         this.x = 0;
                     }
@@ -115,7 +120,7 @@ class ShapeBase {
                 //右移
                 case 'ArrowRight':
                     console.log('右移');
-                    this.x += 1;
+                    this.x += moveDistance;
                     if (this.x > showImageSize.width - this.width) {
                         this.x = showImageSize.width - this.width;
                     }
@@ -123,7 +128,7 @@ class ShapeBase {
                     this.calculateAlignmentLines(false);
                     break;
             }
-
+            console.log('this.x:', this.x, 'this.y:', this.y);
             this.communicator.data.rendererUtil.render();
         }
     }

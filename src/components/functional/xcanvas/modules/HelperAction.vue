@@ -2,13 +2,13 @@
     <div class="helper-action">
         <div class="main-action">
             <div class="action-item" :class="{ 'active': item.active }" @click="action(item)"
-                v-for="(item, index) in actions" :key="index">
+                v-for="(item, index) in filterActions" :key="index">
                 <span class="iconfont" :class="item.icon"></span>
                 <span>{{ item.text }}</span>
             </div>
         </div>
         <div class="dynamic-action">
-            <el-button type="primary" plain v-for="(item, index) in filterDynamicAction" :key="index"
+            <el-button type="primary" :plain="!item.notplain" v-for="(item, index) in filterDynamicAction" :key="index"
                 @click="item.onClick">
                 <span class="iconfont" :style="{ transform: 'rotate(' + (item.rotate || 0) + 'deg)' }"
                     :class="item.icon"></span>
@@ -21,10 +21,12 @@
 import { ref, inject, defineEmits, watch, computed } from 'vue';
 import AutoArrangementUtil from '../utils/AutoArrangementUtil';
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 const communicator = inject('communicator');
-const rendererUtil = inject('rendererUtil');
 const autoArrangementUtil = new AutoArrangementUtil(communicator);
 const emit = defineEmits(['clickAction']);
+let gameAreaIndex = 0;
+
 const dynamicAction = ref([
     {
         text: '横向排列',
@@ -97,82 +99,160 @@ const dynamicAction = ref([
         onClick: () => {
             autoArrangementUtil.alignVerticalCenter();
         }
+    },
+    {
+        text: '创建游戏区',
+        type: 'createGameArea',
+        icon: 'icon-gamearea',
+        show: false,
+        notplain: true,
+        onClick: () => {
+            const selectedItems = communicator.data.shapeList.filter(i => i.selected);
+            const gameAreaId = uuidv4();
+            const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+            selectedItems.forEach((item, index) => {
+                item.id = gameAreaId;
+                item.text = `揭开区${index + 1}`;
+                item.borderColor = randomColor;
+            });
+            gameAreaIndex++;
+            communicator.data.gameList.push({
+                id: gameAreaId,
+                text: `游戏区${gameAreaIndex}`,
+                awardInput: "",
+                awardList: [],
+                awardUsedList: []
+            });
+            //查找所有游戏区，查看是否还有揭开区，如果没有则删除游戏区
+            let indicesToRemove = [];
+
+            // 首先收集需要删除的元素的索引
+            communicator.data.gameList.forEach((game, index) => {
+                const shapeList = communicator.data.shapeList.filter(i => i.id == game.id);
+                if (shapeList.length == 0) {
+                    indicesToRemove.push(index);
+                }
+            });
+
+            // 反向遍历并删除元素，这样不会影响到其他元素的索引
+            for (let i = indicesToRemove.length - 1; i >= 0; i--) {
+                communicator.data.gameList.splice(indicesToRemove[i], 1);
+            }
+            console.log('randomColor:', randomColor);
+
+            // selectedItems.forEach((item, index) => {
+            //     if (item.id) return;
+            //     item.id = gameAreaId;
+            //     item.text = `揭开区${index + 1}`;
+            //     item.borderColor = randomColor;
+            // });
+
+            // if (newGameList.length > 0) {
+            //     communicator.data.gameList.push({
+            //         id: gameAreaId,
+            //         text: `游戏区${communicator.data.gameList.length + 1}`
+            //     });
+            // }
+            communicator.data.currentGameArea = communicator.data.gameList[communicator.data.gameList.length - 1];
+            communicator.data.showOperatePanel = true;
+            communicator.data.rendererUtil.render();
+        }
     }
 ])
+if (!communicator.data.showHelperActions) {
+    communicator.data.showHelperActions = ['alignTop', 'alignBottom', 'alignLeft', 'alignRight', 'alignMiddle', 'alignCenter', 'horizontal', 'vertical'];
+}
+
 const filterDynamicAction = computed(() => {
     return dynamicAction.value.filter(i => i.show);
 })
 const actions = ref([
     {
-        mode: 'select',
-        icon: 'icon-select',
-        text: '选择',
-        active: true
-    },
-    {
         mode: 'grid',
-        icon: 'icon-wangge',
+        icon: 'icon-grid',
         text: '网格',
         multiple: true,
-        active: false
+        active: false,
+        show: true
     },
     {
         mode: 'rect',
         icon: 'icon-juxing',
         text: '添加矩形',
-        active: false
+        active: false,
+        show: true
     },
     {
         mode: 'circular',
         icon: 'icon-yuanxing',
         text: '添加圆形',
-        active: false
+        active: false,
+        show: true
     }
 ])
-
+const filterActions = computed(() => {
+    return actions.value.filter(i => i.show);
+})
+if (!communicator.data.showMainActions) {
+    communicator.data.showMainActions = ["grid", "rect", "circular"];
+}
 const action = (item) => {
-    if (!item.multiple) {
-        // Deactivate other single-select items
-        actions.value.forEach((action) => {
-            if (!action.multiple && action.mode !== item.mode) {
-                action.active = false;
-            }
-        });
+    // if (!item.multiple) {
+    //     // Deactivate other single-select items
+    //     actions.value.forEach((action) => {
+    //         if (!action.multiple && action.mode !== item.mode) {
+    //             action.active = false;
+    //         }
+    //     });
 
-        // Ensure at least one single-select item is always active
-        if (item.active) {
-            // Check if there's another active single-select item
-            const anyActive = actions.value.some(action => !action.multiple && action.active && action.mode !== item.mode);
-            if (anyActive) {
-                item.active = false;
-            }
-        } else {
-            item.active = true;
-        }
+    //     // Ensure at least one single-select item is always active
+    //     if (item.active) {
+    //         // Check if there's another active single-select item
+    //         const anyActive = actions.value.some(action => !action.multiple && action.active && action.mode !== item.mode);
+    //         if (anyActive) {
+    //             item.active = false;
+    //         }
+    //     } else {
+    //         item.active = true;
+    //     }
 
-        // Update the current action in the communicator only for single-select items
-        communicator.data.currentAction = item.active ? item.mode : null;
-    } else {
-        // For multiple items like 'grid', simply toggle the state
-        item.active = !item.active;
-    }
+    //     // Update the current action in the communicator only for single-select items
+    //     communicator.data.currentAction = item.active ? item.mode : null;
+    // } else {
+    //     // For multiple items like 'grid', simply toggle the state
+    //     item.active = !item.active;
+    // }
 
     // Ensure grid visibility is only updated based on the grid item itself
     if (item.mode === 'grid') {
+        item.active = !item.active;
         communicator.data.gridVisible = item.active;
-        rendererUtil.drawGrid();
+        communicator.data.rendererUtil.drawGrid();
     }
 
     console.log('gridVisible:', communicator.data.gridVisible);
-    rendererUtil.render();
+    communicator.data.rendererUtil.render();
 
     emit('clickAction', item);
 };
+watch(() => communicator.data.showMainActions, (newVal, oldVal) => {
+    console.log('showMainActions:', newVal);
+    if (!newVal) {
+        return;
+    }
+    actions.value.forEach(item => {
+        if (newVal.includes(item.mode)) {
+            item.show = true;
+        } else {
+            item.show = false;
+        }
+    })
+}, { deep: true, immediate: true })
 
 watch(() => communicator.data.shapeList, (newVal, oldVal) => {
     //判断两个数组不相同
     const selectedItems = newVal.filter(i => i.selected);
-    const whenSelectElementsShowItems = ['alignTop', 'alignBottom', 'alignLeft', 'alignRight', 'alignMiddle', 'alignCenter', 'horizontal', 'vertical'];
+    const whenSelectElementsShowItems = communicator.data.showHelperActions;
     if (selectedItems.length > 1) {
         dynamicAction.value.forEach(item => {
             if (whenSelectElementsShowItems.includes(item.type)) {
@@ -213,6 +293,14 @@ watch(() => communicator.data.shapeList, (newVal, oldVal) => {
         cursor: pointer;
         font-size: 18px;
         user-select: none;
+
+        &:active {
+            color: #409eff;
+        }
+
+        &:hover {
+            color: #409eff;
+        }
 
         &.active {
             color: #409eff;

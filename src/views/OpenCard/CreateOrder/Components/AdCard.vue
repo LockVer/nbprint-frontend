@@ -32,7 +32,7 @@
                     <div class="row full" v-if="item.type == 'openable'">
                         <x-component label="揭开区" width="220px">
                             <el-button class="xbutton" type="primary" :disabled="!(item.imageName)"
-                                @click="showRevealArea">
+                                @click="showRevealArea(item)">
                                 添加揭开区
                             </el-button>
                             <!-- <el-input placeholder="请添加揭开区" :value="getRevealAreaCount(index)" readonly
@@ -69,7 +69,7 @@
         <el-dialog v-model="revealDialogVisible" :destroy-on-close="true" title="添加揭开区" :show-close="false" :close-on-click-modal="false"
             :close-on-press-escape="false" :fullscreen="true" class="reveal-dialog">
             <!-- 添加揭开区的内容 -->
-            <RevealAreaEditor ref="revealAreaEditorRef" />
+            <RevealAreaEditor ref="revealAreaEditorRef" :currentAdCard="currentAdCard"/>
         </el-dialog>
     </x-card>
 </template>
@@ -121,6 +121,7 @@ const adCardNoPostionList = [
     { text: '自定义', value: 'CUSTOM' }
 ];
 const revealDialogVisible = ref(false);
+const currentAdCard=ref(null);
 
 watch(() => communicator.data.adCardQty, (newVal, oldVal) => {
     if (newVal > communicator.data.adCardList.length) {
@@ -145,7 +146,8 @@ watch(smallCard.value, (newVal, oldVal) => {
 }, { deep: true });
 
 
-const showRevealArea = () => {
+const showRevealArea = (item) => {
+    currentAdCard.value = item;
     revealDialogVisible.value = true;
 };
 const changeBackgroundImage = (item) => {

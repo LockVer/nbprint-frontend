@@ -51,8 +51,9 @@ class HotkeyBindingUtil {
     }
     // 绑定快捷键 
     bindHotkey() {
-        window.addEventListener('keydown', this.handleEvent.bind(this));
-        window.addEventListener('keyup', this.handleEvent.bind(this));
+        const { operateCanvasRef } = this.communicator.data;
+        operateCanvasRef.addEventListener('keydown', this.handleEvent.bind(this));
+        operateCanvasRef.addEventListener('keyup', this.handleEvent.bind(this));
         if (!this.communicator.data.hotkey)
             this.communicator.data.hotkey = {};
     }
@@ -84,8 +85,9 @@ class HotkeyBindingUtil {
     }
     // 解绑快捷键
     unbindHotkey() {
-        window.removeEventListener('keydown', this.onKeyDown);
-        window.removeEventListener('keyup', this.onKeyUp);
+        const { operateCanvasRef } = this.communicator.data;
+        operateCanvasRef.removeEventListener('keydown', this.onKeyDown);
+        operateCanvasRef.removeEventListener('keyup', this.onKeyUp);
         this.communicator.data.hotkey = {};
     }
     //处理快捷键按下事件
@@ -95,6 +97,7 @@ class HotkeyBindingUtil {
             this.communicator.data.shapeList.forEach(shape => {
                 shape.selected = true;
             });
+            this.communicator.data.rendererUtil.render();
         }
         //删除按键
         if (hotkey == 'Delete') {

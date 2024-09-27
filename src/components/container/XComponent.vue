@@ -65,11 +65,12 @@ export default defineComponent({
                     content="小卡盒号的位置有且仅有下左、下中、下右三种摆放方式，请检查是否符合" placement="bottom-start">
                     <i style="font-style: normal;">?</i>
                 </el-tooltip>
+                <slot name="header"></slot>
             </div>
 
         </div>
         <div class="xcomponent-content">
-            <slot></slot>
+            <slot name="default"></slot>
         </div>
     </div>
 </template>
@@ -97,7 +98,7 @@ export default defineComponent({
             align-items: center;
             column-gap: 8px;
             font-size: 12px;
-
+            width: 100%;
             i {
                 display: inline-block;
                 width: 15px;
