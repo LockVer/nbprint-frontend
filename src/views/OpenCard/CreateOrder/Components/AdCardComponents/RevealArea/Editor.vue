@@ -89,7 +89,7 @@ const communicatorName = 'revealAreaCommunicator';  // 通信器名称
 const communicator = reactive(new Communicator());
 const adCommunicator = inject('adCardCommunicator');
 communicator.data.adCardSize = props.currentAdCard.adCardSize;
-communicator.data.backgroundImage = props.currentAdCard.imageName;
+communicator.data.backgroundImage = props.currentAdCard.image;
 communicator.data.showShapeDistance = true;
 
 const initData = () => {

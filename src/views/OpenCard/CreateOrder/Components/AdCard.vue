@@ -11,7 +11,7 @@
                 <div class="list-body">
                     <div class="row">
                         <x-component label="背景图" width="220px">
-                            <x-input-upload v-model:size="item.imageSize" v-model:image="item.imageName"
+                            <x-input-upload v-model:size="item.imageSize" v-model:image="item.image"
                                 @changeImage="changeBackgroundImage(item)"></x-input-upload>
                         </x-component>
                         <x-component label="宣传卡尺寸(mm)" width="220px">
@@ -31,7 +31,7 @@
                     </div>
                     <div class="row full" v-if="item.type == 'openable'">
                         <x-component label="揭开区" width="220px">
-                            <el-button class="xbutton" type="primary" :disabled="!(item.imageName)"
+                            <el-button class="xbutton" type="primary" :disabled="!(item.image)"
                                 @click="showRevealArea(item)">
                                 添加揭开区
                             </el-button>
@@ -92,6 +92,7 @@ import Communicator from '@/utils/Communicator';
 import CalculationUtils from './AdCardComponents/AdCardUtils/CalculationUtils';
 
 const smallCard = defineModel("smallCard");
+const initData = defineModel("initData");
 const communicatorName = 'adCardCommunicator';  // 通信器名称
 
 // 实例化 Communicator 并创建响应式对象
@@ -100,8 +101,9 @@ communicator.data.adCardQty = 1;    // 宣传卡数量
 communicator.data.adCardList = [
     {
         imageSize: '',
-        imageName: '',
+        image: '',
         adCardSize: '',
+        adBoxCode: '',
         type: 'non-openable',
         openDirection: 'T',
         adBoxCodePosition: 'BL',
@@ -109,6 +111,8 @@ communicator.data.adCardList = [
         boxNumberRegions: []
     }
 ];
+communicator.data.adCardList = initData;
+console.log('initData:', initData);
 // 将通信器提供给子组件
 provide(communicatorName, communicator);
 // 选择是否有揭开口的选项
@@ -139,8 +143,9 @@ watch(() => communicator.data.adCardQty, (newVal, oldVal) => {
         for (let i = communicator.data.adCardList.length; i < newVal; i++) {
             communicator.data.adCardList.push({
                 imageSize: '',
-                imageName: '',
+                image: '',
                 adCardSize: '',
+                adBoxCode: '',
                 type: 'non-openable',
                 openDirection: 'T',
                 adBoxCodePosition: 'BL',

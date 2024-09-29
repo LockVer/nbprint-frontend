@@ -73,11 +73,15 @@ const smallCard = ref({
 });
 const adCard = ref([
     {
-        "type": "non-openable",
-        "name": "",
-        "image": "",
-        "comment": "",
-        "openRegions": []
+        imageSize: '',
+        image: '',
+        adCardSize: '',
+        adBoxCode: '',
+        type: 'non-openable',
+        openDirection: 'T',
+        adBoxCodePosition: 'BL',
+        openRegions: [],
+        boxNumberRegions: []
     }
 ]);
 const rewardInfo = ref({
