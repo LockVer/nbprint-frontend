@@ -5,9 +5,8 @@
 class GridHandlerUtil {
     constructor(communicator) {
         this.communicator = communicator;
-        this.gridSize = communicator.data.minGridSize;    // 网格大小, 单位mm
+        this.gridSize = communicator.data.minGridSize||6;    // 网格大小, 单位mm
     }
-
     // 生成网格
     generateGridData() {
         const { mmToPx, virtualScale, gridCanvasRef } = this.communicator.data;

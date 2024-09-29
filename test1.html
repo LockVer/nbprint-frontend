@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="loadingCanvas" width="200" height="200"></canvas>
+    <script>
+        const LoadingAnimation = {
+            canvas: null,
+            ctx: null,
+            centerX: 0,
+            centerY: 0,
+            radius: 50,
+            lineWidth: 10,
+            segments: 12,
+            segmentAngle: 0,
+            currentSegment: 0,
+            animationFrameId: null,
+
+            init(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                if (!this.canvas) {
+                    console.error(`Canvas element with id ${canvasId} not found.`);
+                    return;
+                }
+                this.ctx = this.canvas.getContext('2d');
+                this.centerX = this.canvas.width / 2;
+                this.centerY = this.canvas.height / 2;
+                this.segmentAngle = (2 * Math.PI) / this.segments;
+            },
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                for (let i = 0; i < this.segments; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(this.centerX, this.centerY, this.radius, i * this.segmentAngle, (i + 1) * this.segmentAngle);
+                    this.ctx.lineWidth = this.lineWidth;
+                    this.ctx.strokeStyle = `rgba(0, 0, 0, ${1 - i / this.segments})`;
+                    this.ctx.stroke();
+                }
+
+                this.currentSegment = (this.currentSegment + 1) % this.segments;
+                this.ctx.save();
+                this.ctx.translate(this.centerX, this.centerY);
+                this.ctx.rotate(this.currentSegment * this.segmentAngle);
+                this.ctx.translate(-this.centerX, -this.centerY);
+                this.ctx.restore();
+
+                this.animationFrameId = requestAnimationFrame(this.draw.bind(this));
+            },
+
+            start(canvasId) {
+                this.init(canvasId);
+                this.draw();
+            },
+
+            stop() {
+                if (this.animationFrameId) {
+                    cancelAnimationFrame(this.animationFrameId);
+                }
+            }
+        };
+
+        // 启动加载动画
+        LoadingAnimation.start('loadingCanvas');
+    </script>
+</body>
+</html>

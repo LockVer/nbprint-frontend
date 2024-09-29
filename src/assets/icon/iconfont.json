@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "3521124",
+      "name": "完成",
+      "font_class": "done",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "11355011",
+      "name": "取消",
+      "font_class": "cancel",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
       "icon_id": "2518398",
       "name": "close",
       "font_class": "close",

@@ -106,10 +106,18 @@ class HotkeyBindingUtil {
         }
         //Ctrl + Q
         if (this.communicator.data.hotkey.Control && hotkey == 'q') {
+            this.communicator.data.minGridSize = parseFloat(this.communicator.data.minGridSize -  0.1);
+            if (this.communicator.data.minGridSize < 6) {
+                this.communicator.data.minGridSize = 6;
+            }
             this.autoArrangementUtil.arrangeShapes();
         }
         //Ctrl + E
         if (this.communicator.data.hotkey.Control && hotkey == 'e') {
+            this.communicator.data.minGridSize = parseFloat(this.communicator.data.minGridSize + 0.1);
+            if (this.communicator.data.minGridSize > 20) {
+                this.communicator.data.minGridSize = 20;
+            }
             this.autoArrangementUtil.arrangeShapesVertically();
         }
         if (this.communicator.data.hotkey.Alt) {

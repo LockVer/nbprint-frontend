@@ -15,7 +15,7 @@ class ImageHandlerUtil {
             img.onload = () => {
                 const { gridCanvasRef, operateCanvasRef } = this.communicator.data;
 
-                this.communicator.data.backgroundImage = img;
+                this.communicator.data.backgroundImageObject = img;
                 this.communicator.data.backgroundImageSize = {
                     width: img.width,
                     height: img.height

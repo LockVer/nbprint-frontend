@@ -52,7 +52,7 @@
                             <x-check-box :DataList="adCardNoPostionList" v-model="item.adBoxCodePosition"
                                 type="radio"></x-check-box>
                         </x-component>
-                        <x-component label="设置自定义盒号位置" width="220px" v-if="item.adBoxCodePosition == 'CUSTOM'">
+                        <x-component label="设置自定义盒号位置" width="220px" @click="showBoxNumberDiglog(item)" v-if="item.adBoxCodePosition == 'CUSTOM'">
                             <el-button class="xbutton" type="primary">
                                 添加盒号位置
                             </el-button>
@@ -66,10 +66,17 @@
                 </div>
             </div>
         </div>
-        <el-dialog v-model="revealDialogVisible" :destroy-on-close="true" title="添加揭开区" :show-close="false" :close-on-click-modal="false"
-            :close-on-press-escape="false" :fullscreen="true" class="reveal-dialog">
+        <el-dialog v-model="boxNumberDialogVisible" :destroy-on-close="true" title="添加盒号位置" :show-close="false"
+            :close-on-click-modal="false" :close-on-press-escape="false" :fullscreen="true" class="reveal-dialog">
             <!-- 添加揭开区的内容 -->
-            <RevealAreaEditor ref="revealAreaEditorRef" :currentAdCard="currentAdCard"/>
+            <BoxNumberEditor ref="boxNumberAreaEditorRef" :currentAdCard="currentAdCard"
+                @addDone="addDone" @closePanel="closePanel" />
+        </el-dialog>
+        <el-dialog v-model="revealDialogVisible" :destroy-on-close="true" title="添加揭开区" :show-close="false"
+            :close-on-click-modal="false" :close-on-press-escape="false" :fullscreen="true" class="reveal-dialog">
+            <!-- 添加揭开区的内容 -->
+            <RevealAreaEditor ref="revealAreaEditorRef" :currentAdCard="currentAdCard" @addDone="addDone"
+                @closePanel="closePanel" />
         </el-dialog>
     </x-card>
 </template>
@@ -80,6 +87,7 @@ import XComponent from '@/components/container/XComponent.vue';
 import XInputUpload from '@/components/functional/XInputUpload.vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
 import RevealAreaEditor from './AdCardComponents/RevealArea/Editor.vue';
+import BoxNumberEditor from './AdCardComponents/BoxNumberPosition/Editor.vue';
 import Communicator from '@/utils/Communicator';
 import CalculationUtils from './AdCardComponents/AdCardUtils/CalculationUtils';
 
@@ -96,9 +104,11 @@ communicator.data.adCardList = [
         adCardSize: '',
         type: 'non-openable',
         openDirection: 'T',
-        adBoxCodePosition: 'BL'
+        adBoxCodePosition: 'BL',
+        openRegions: [],
+        boxNumberRegions: []
     }
-];    // 宣传卡列表
+];
 // 将通信器提供给子组件
 provide(communicatorName, communicator);
 // 选择是否有揭开口的选项
@@ -121,7 +131,8 @@ const adCardNoPostionList = [
     { text: '自定义', value: 'CUSTOM' }
 ];
 const revealDialogVisible = ref(false);
-const currentAdCard=ref(null);
+const boxNumberDialogVisible = ref(false);
+const currentAdCard = ref(null);
 
 watch(() => communicator.data.adCardQty, (newVal, oldVal) => {
     if (newVal > communicator.data.adCardList.length) {
@@ -132,7 +143,9 @@ watch(() => communicator.data.adCardQty, (newVal, oldVal) => {
                 adCardSize: '',
                 type: 'non-openable',
                 openDirection: 'T',
-                adBoxCodePosition: 'BL'
+                adBoxCodePosition: 'BL',
+                openRegions: [],
+                boxNumberRegions: []
             });
         }
     } else {
@@ -150,10 +163,23 @@ const showRevealArea = (item) => {
     currentAdCard.value = item;
     revealDialogVisible.value = true;
 };
+const showBoxNumberDiglog = (item) => {
+    currentAdCard.value = item;
+    boxNumberDialogVisible.value = true;
+};
 const changeBackgroundImage = (item) => {
     item.adCardSize = CalculationUtils.findMaxRectBWithRatio(smallCard.value.box, item.imageSize);
 }
+const addDone = () => {
+    console.log(communicator.data)
+    revealDialogVisible.value = false;
+    boxNumberDialogVisible.value = false;
+}
 
+const closePanel = () => {
+    revealDialogVisible.value = false;
+    boxNumberDialogVisible.value = false;
+}
 
 </script>
 <style scoped lang="scss">
@@ -202,6 +228,7 @@ const changeBackgroundImage = (item) => {
 .reveal-dialog {
     padding: 0;
     border-radius: 0px;
+
     .el-dialog__header {
         display: none;
     }

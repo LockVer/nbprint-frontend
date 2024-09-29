@@ -15,7 +15,7 @@ class RectHandler extends ShapeBase {
                 shape.setInitialPosition(); //设置初始位置
             }
         });
-        
+
         //如果没有其他选中的形状，则取消选中当前形状
         if (this.selected) {
             const selectedShape = shapeList.filter(shape => shape.selected);
@@ -24,12 +24,12 @@ class RectHandler extends ShapeBase {
             }
         }
 
-        console.log(hotkey.Control,this.selected )
-        if (hotkey.Control) { 
-            this.selected = !this.selected; 
+        console.log(hotkey.Control, this.selected)
+        if (hotkey.Control) {
+            this.selected = !this.selected;
         } else {
             this.active = true;
-        } 
+        }
         this.dragging = true;
         this.dragStart = event;
         this.dragStartRect = { x: this.x, y: this.y, width: this.width, height: this.height };
@@ -197,8 +197,8 @@ class RectHandler extends ShapeBase {
         }
 
         // 限制最小宽度和高度
-        newWidth = Math.max(newWidth, 50);
-        newHeight = Math.max(newHeight, 50);
+        newWidth = Math.max(newWidth, 25);
+        newHeight = Math.max(newHeight, 25);
 
         // 限制矩形在背景图内
         if (newX < 0) {
@@ -479,8 +479,24 @@ class RectHandler extends ShapeBase {
         this.communicator.data.alignmentLines = this.alignmentLines;
         this.communicator.data.rendererUtil.render();
     }
+    calculateAndStoreShapeSizeText() {
+        const { virtualScale, pxToMm } = this.communicator.data;
 
+        // 计算矩形的边框长度（以毫米为单位）
+        const widthMm = pxToMm(this.width).toFixed(2);
+        const heightMm = pxToMm(this.height).toFixed(2);
 
+        // 计算文本显示位置（边框中间位置）
+        const positions = [
+            { x: this.x + this.width / 2, y: this.y - 10, text: `${widthMm} mm` }, // 上边框中间
+            { x: this.x + this.width / 2, y: this.y + this.height + 10, text: `${widthMm} mm` }, // 下边框中间
+            { x: this.x - 10, y: this.y + this.height / 2, text: `${heightMm} mm` }, // 左边框中间
+            { x: this.x + this.width + 10, y: this.y + this.height / 2, text: `${heightMm} mm` } // 右边框中间
+        ];
+
+        // 保存到 this.communicator.data.shapeSizeText 数组中
+        this.shapeSizeText = positions;
+    }
 
 
 }

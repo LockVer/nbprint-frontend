@@ -6,8 +6,11 @@ class ShapeBase {
         this.height = shape.height;
         this.active = false;
         this.handleSize = 10
-        this.awardCount=0;
-        this.awardList=[];
+        this.awardCount = 0;
+        this.awardList = shape.awardList || [];
+        this.text = shape.text || '';
+        this.id = shape.id;
+        this.borderColor = shape.borderColor || '';
         this.communicator = communicator;
         this.distanceThreshold = communicator.data.minGridSize;
     }
@@ -70,6 +73,10 @@ class ShapeBase {
                 case 'v':
                     //粘贴当前类对象
                     console.log('粘贴当前类对象');
+                    if (this.communicator.data.shapeList.length >= this.communicator.data.maxShapeCount) {
+                        this.communicator.data.errorHandlerUtil.showWarning('已超过最大添加数量！');
+                        return;
+                    }
                     if (this.copyShape) {
                         const newShape = new this.constructor({
                             x: this.x + 20,
@@ -77,7 +84,7 @@ class ShapeBase {
                             width: this.width,
                             height: this.height
                         }, this.communicator)
-                        newShape.selected = true;
+                        //newShape.selected = true;
                         this.communicator.data.shapeList.push(newShape);
                         this.communicator.data.rendererUtil.render();
                     }
@@ -142,6 +149,9 @@ class ShapeBase {
             width: this.width,
             height: this.height
         }
+    }
+    saveData() {
+
     }
 }
 

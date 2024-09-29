@@ -24,7 +24,7 @@ import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 const communicator = inject('communicator');
 const autoArrangementUtil = new AutoArrangementUtil(communicator);
-const emit = defineEmits(['clickAction']);
+const emit = defineEmits(['clickAction','addDone','closePanel']); //定义事件
 let gameAreaIndex = 0;
 
 const dynamicAction = ref([
@@ -116,6 +116,7 @@ const dynamicAction = ref([
                 item.borderColor = randomColor;
             });
             gameAreaIndex++;
+            if (!communicator.data.gameList) communicator.data.gameList = [];
             communicator.data.gameList.push({
                 id: gameAreaId,
                 text: `游戏区${gameAreaIndex}`,
@@ -153,9 +154,29 @@ const dynamicAction = ref([
             //         text: `游戏区${communicator.data.gameList.length + 1}`
             //     });
             // }
-            communicator.data.currentGameArea = communicator.data.gameList[communicator.data.gameList.length - 1];
-            communicator.data.showOperatePanel = true;
+            //communicator.data.currentGameArea = communicator.data.gameList[communicator.data.gameList.length - 1];
+            //communicator.data.showOperatePanel = true;
             communicator.data.rendererUtil.render();
+        }
+    },
+    {
+        text: '操作完成',
+        type: 'addDone',
+        icon: 'icon-done',
+        show: false,
+        notplain: true,
+        onClick: () => {
+            emit('addDone');
+        }
+    },
+    {
+        text: '关闭窗口',
+        type: 'closePanel',
+        icon: 'icon-cancel',
+        show: false,
+        notplain: false,
+        onClick: () => {
+            emit('closePanel');
         }
     }
 ])
@@ -253,7 +274,7 @@ watch(() => communicator.data.shapeList, (newVal, oldVal) => {
     //判断两个数组不相同
     const selectedItems = newVal.filter(i => i.selected);
     const whenSelectElementsShowItems = communicator.data.showHelperActions;
-    if (selectedItems.length > 1) {
+    if (selectedItems.length > 1||communicator.data.showHelperActionsAlways) {
         dynamicAction.value.forEach(item => {
             if (whenSelectElementsShowItems.includes(item.type)) {
                 item.show = true;

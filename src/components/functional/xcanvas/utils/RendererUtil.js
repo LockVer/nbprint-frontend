@@ -1,3 +1,5 @@
+import RectHandler from "./ToolbarUtils/RectHandler";
+
 /*
 * 渲染器工具类
 */
@@ -6,7 +8,7 @@ class RendererUtil {
         this.communicator = communicator;
         this.hoverColor = 'green';
         this.selectColor = '#00a1ff';
-        this.normalColor = 'rgba(0,0,0,0.5)';
+        this.normalColor = 'rgba(0,0,0,0.65)';
         this.warningColor = 'rgba(255, 165,0,0.5)';
     }
     // 渲染
@@ -18,9 +20,10 @@ class RendererUtil {
         this.drawDistanceLines();
         this.drawAlignmentLines();
         this.drawAwardText();
+        this.drawShapeSizeText();
     }
     drawImage() {
-        const { operateCanvasRef, backgroundImage, backgroundImagePosition, virtualScale, showImageSize } = this.communicator.data;
+        const { operateCanvasRef, backgroundImageObject, backgroundImagePosition, virtualScale, showImageSize } = this.communicator.data;
         const imageCanvas = operateCanvasRef;
         if (imageCanvas == null) { return; }
         const ctx = imageCanvas.getContext('2d');
@@ -28,7 +31,7 @@ class RendererUtil {
         ctx.save();
         ctx.translate(backgroundImagePosition.x, backgroundImagePosition.y);
         ctx.scale(virtualScale, virtualScale);
-        ctx.drawImage(backgroundImage, 0, 0, showImageSize.width, showImageSize.height);
+        ctx.drawImage(backgroundImageObject, 0, 0, showImageSize.width, showImageSize.height);
         ctx.restore();
     }
     drawGrid() {
@@ -84,6 +87,7 @@ class RendererUtil {
 
         shapeList.forEach(shape => {
             if (hotkey.Alt) {
+                shape.checkProximity();
                 if (shape.proximityWarning) {
                     this.drawWarningSign(shape, ctx);
                     return;
@@ -105,7 +109,7 @@ class RendererUtil {
                         gradient.addColorStop(0.8, 'blue');
                         gradient.addColorStop(1, 'purple');
                         ctx.strokeStyle = gradient;
-                        ctx.lineWidth = 5;
+                        ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.moveTo(shape.x, shape.y);
                         ctx.lineTo(shape.x + shape.width, shape.y);
@@ -151,15 +155,19 @@ class RendererUtil {
                         ctx.beginPath();
                         ctx.moveTo(shape.x, shape.y + shape.height);
                         ctx.lineTo(shape.x, shape.y);
-                        ctx.fillStyle = "#ffffff";
+                        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
                         ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
                         ctx.stroke();
-
                         // 绘制文字
                         ctx.font = '12px Arial';
-                        ctx.fillStyle = 'red';
+                        ctx.fillStyle = 'white';
                         ctx.textBaseline = 'top'; // 设置文本基线为顶部对齐
-                        ctx.fillText(shape.text, shape.x + 5, shape.y + 5);
+                        // 绘制文字边框
+                        ctx.lineWidth = 3; // 边框宽度
+                        ctx.strokeStyle = 'black'; // 边框颜色
+                        ctx.strokeText(shape.text, shape.x + 5, shape.y - 15);
+
+                        ctx.fillText(shape.text, shape.x + 5, shape.y - 15);
                     } else {
                         ctx.fillStyle = this.normalColor;
                         ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
@@ -297,7 +305,8 @@ class RendererUtil {
     }
 
     drawDistanceLines() {
-        const { operateCanvasRef, distanceLines, hotkey } = this.communicator.data;
+        const { operateCanvasRef, distanceLines, hotkey, showShapeDistance } = this.communicator.data;
+        if (!showShapeDistance) { return; }
         if (operateCanvasRef == null) { return; }
         if (distanceLines == null) { return; }
         if (hotkey.Alt) { return; }
@@ -370,89 +379,120 @@ class RendererUtil {
         ctx.restore();
     }
     drawAwardText() {
-        console.log('drawAwardText');
-        const { operateCanvasRef, shapeList, mmToPx, virtualScale, actualScale, backgroundImagePosition } = this.communicator.data;
+        const { operateCanvasRef, shapeList, virtualScale, backgroundImagePosition } = this.communicator.data;
         if (operateCanvasRef == null) { return; }
         if (shapeList == null) { return; }
         const ctx = operateCanvasRef.getContext('2d');
         ctx.save();
         ctx.translate(backgroundImagePosition.x, backgroundImagePosition.y);
         ctx.scale(virtualScale, virtualScale);
-        
+        ctx.fillStyle = 'white';
         shapeList.forEach(shape => {
-            if (shape.awardList.length === 0) return; 
-            let fontSize = 30; // 初始字体大小
-            const minFontSize = 7; // 最小字体大小
-            const padding = mmToPx(3); // 边界间距
-            let columns = 1; // 初始列数
-            const maxColumns = 3; // 最大列数
-            let maxWidth = (shape.width - 2 * padding) / columns; // 最大宽度
-            let sectionHeight; // 均分区域的高度
-            let awardList = shape.awardList;
-            ctx.textBaseline = 'middle'; // 设置文本基线为中间对齐
-            ctx.fillStyle = 'white';
+            const padding = 5;
+            const cellPadding = 1; // Padding between cells
+            let fontSize = 20; // Initial font size
+            const texts = shape.awardList;
+            if (texts == null) { return; }
+            // Determine the number of rows and columns
+            const cols = Math.ceil(Math.sqrt(texts.length));
+            const rows = Math.ceil(texts.length / cols);
 
-            let drawTextArea = [];
-            for (let i = 0; i < awardList.length; i++) {
-                let fits = false;
-                let text = awardList[i];
-                let textWidth, textHeight;
+            // Calculate the maximum font size that fits all texts within the shape
+            const cellWidth = (shape.width - 2 * padding - (cols - 1) * cellPadding) / cols;
+            const cellHeight = (shape.height - 2 * padding - (rows - 1) * cellPadding) / rows;
 
-                // 重置列数和字体大小
-                columns = 1;
-                fontSize = 30;
-                maxWidth = (shape.width - 2 * padding) / columns;
-
-                // 尝试降低字体大小以适应区域
-                while (!fits && columns <= maxColumns) {
-                    sectionHeight = ((shape.height - 2 * padding) / Math.ceil(awardList.length / columns)); // 重新计算均分区域的高度
-                    while (fontSize >= minFontSize && !fits) {
-                        ({ width: textWidth, height: textHeight } = this.measureText(ctx, text, fontSize));
-                        if (textWidth <= maxWidth && textHeight <= sectionHeight) {
-                            fits = true; // 文本适应当前区域
-                        } else {
-                            fontSize--; // 减小字体大小尝试再次适应
-                        }
-                    }
-                    if (!fits && columns < maxColumns) {
-                        columns++; // 增加列数
-                        fontSize = 30; // 重置字体大小
-                        maxWidth = (shape.width - 2 * padding) / columns; // 重新计算最大宽度
-                    } else {
+            // Adjust font size to fit within cell dimensions
+            ctx.font = `${fontSize}px Arial`;
+            while (true) {
+                let fits = true;
+                for (const text of texts) {
+                    const lines = text.split('\n');
+                    const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+                    const totalHeight = lines.length * fontSize;
+                    if (maxWidth > cellWidth || totalHeight > cellHeight) {
+                        fits = false;
                         break;
                     }
                 }
-
-                if (!fits) {
-                    // 如果最小字体也不适应，则跳过当前文本
-                    // ElMessageBox.alert('应用已经尽力自适应文本，但是奖符数量过多过长无法渲染，请调整文本或区域大小后重试！', '超出限制', {
-                    //     confirmButtonText: '好的',
-                    // });
+                if (fits) {
                     break;
                 }
-
-                // 计算文本渲染位置
-                const columnWidth = (shape.width - 2 * padding) / columns;
-                const columnIndex = i % columns;
-                const rowIndex = Math.floor(i / columns);
-                const x = (padding) + columnWidth * columnIndex + (columnWidth - textWidth) / 2; // 水平居中
-                const y = (padding) + sectionHeight * rowIndex + sectionHeight / 2; // 垂直居中
-                ctx.fillText(text, shape.x + x, shape.y + y);
-                // 保存绘制的文本区域并且恢复缩放比例
-                drawTextArea.push({ x: x / actualScale, y: y / actualScale, width: textWidth / actualScale, height: textHeight / actualScale, text: text, fontSize: fontSize });
+                fontSize -= 1;
+                ctx.font = `${fontSize}px Arial`;
             }
-            shape.mark = drawTextArea; // 保存绘制的文本区域
 
-        });
+            // Set the final font size
+            ctx.font = `${fontSize}px Arial`;
+            ctx.textBaseline = 'top';
+
+            // Calculate the positions to render the texts
+            const positions = [];
+            for (let i = 0; i < texts.length; i++) {
+                const col = i % cols;
+                const row = Math.floor(i / cols);
+                const x = shape.x + padding + col * (cellWidth + cellPadding);
+                const y = shape.y + padding + row * (cellHeight + cellPadding);
+                positions.push({ x, y });
+            }
+            shape.mark = [];
+            // Render the texts
+            for (let i = 0; i < texts.length; i++) {
+                const { x, y } = positions[i];
+                const lines = texts[i].split('\n');
+                const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+                const totalHeight = lines.length * fontSize;
+                const offsetX = (cellWidth - maxWidth) / 2;
+                const offsetY = (cellHeight - totalHeight) / 2;
+                for (let j = 0; j < lines.length; j++) {
+                    const lineWidth = ctx.measureText(lines[j]).width;
+                    ctx.fillText(lines[j], x + (cellWidth - lineWidth) / 2, y + offsetY + j * fontSize);
+                    shape.mark.push({ x: x + (cellWidth - lineWidth) / 2, y: y + offsetY + j * fontSize, width: lineWidth, height: fontSize, text: lines[j], fontSize: fontSize });
+                }
+            }
+        })
         ctx.restore();
     }
-    measureText(ctx, text, fontSize) {
-        ctx.font = `${fontSize}px Arial`;
-        return {
-            width: ctx.measureText(text).width,
-            height: fontSize + 4, // 字体的高度约等于字体大小
-        };
+    drawShapeSizeText() {
+        const { operateCanvasRef, shapeList, virtualScale, backgroundImagePosition, showShapeSizeText } = this.communicator.data;
+        if (!showShapeSizeText) { return; }
+        if (operateCanvasRef == null) { return; }
+        if (shapeList == null) { return; }
+        console.log('drawShapeSizeText');
+        const ctx = operateCanvasRef.getContext('2d');
+        ctx.save();
+        ctx.translate(backgroundImagePosition.x, backgroundImagePosition.y);
+        ctx.scale(virtualScale, virtualScale);
+
+        shapeList.forEach(item => {
+            item.calculateAndStoreShapeSizeText();
+            item.shapeSizeText.forEach(sitem => {
+                const { x, y, text } = sitem;
+
+                // 设置文字阴影
+                ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                ctx.shadowBlur = 4;
+
+                // 测量文字宽度和高度
+                ctx.font = '12px Arial';
+                const textMetrics = ctx.measureText(text);
+                const textWidth = textMetrics.width;
+                const textHeight = 12; // 12px Arial 的大致高度
+
+                // 绘制文字背景
+                ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                ctx.fillRect(x - textWidth / 2 - 2, y - textHeight / 2 - 2, textWidth + 4, textHeight + 4);
+
+                // 绘制文字
+                ctx.fillStyle = "black";
+                ctx.fillText(text, x - textWidth / 2, y + textHeight / 4);
+            })
+        });
+
+        ctx.restore();
     }
+
     clear() {
 
     }
