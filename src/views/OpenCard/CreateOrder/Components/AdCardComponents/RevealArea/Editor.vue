@@ -217,7 +217,14 @@ const addDone = () => {
             width: shape.width / actualScale,
             height: shape.height / actualScale,
             awardList: shape.awardList,
-            mark: shape.mark,
+            mark: {
+                x: shape.mark.x / actualScale,
+                y: shape.mark.y / actualScale,
+                width: shape.mark.width / actualScale,
+                height: shape.mark.height / actualScale,
+                fontsize: shape.mark.fontsize / actualScale,
+                text: shape.mark.text
+            },
             id: shape.id,
             borderColor: shape.borderColor,
             text: shape.text
