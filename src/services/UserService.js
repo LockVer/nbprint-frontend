@@ -12,8 +12,8 @@ class UserService {
     getPermissions() {
         return this.apiService.get('/auth/permissions');
     }
-    changePassword(){
-        return this.apiService.get('/user/resetPwd');
+    changePassword(data){
+        return this.apiService.post('/user/resetPwd',data,true);
     }
 }
 

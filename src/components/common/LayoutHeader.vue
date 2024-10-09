@@ -16,7 +16,10 @@
             </span>
             <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item @click="helpDocumentHandler">帮助文档</el-dropdown-item>
+                    <!-- <el-dropdown-item @click="helpDocumentHandler"> -->
+                    <el-dropdown-item >
+                        <a href="https://huivodata.feishu.cn/docx/EOyOdYW8zoGC2Tx1K76c60XbnYe?from=from_copylink" target="_blank" rel="noopener noreferrer">帮助文档</a>
+                    </el-dropdown-item>
                     <el-dropdown-item @click="console.log(222)" disabled>意见反馈</el-dropdown-item>
                     <el-dropdown-item disabled>个人设置</el-dropdown-item>
                     <el-dropdown-item @click="changePassword">修改密码</el-dropdown-item>
@@ -132,11 +135,23 @@ const submitForm = (formEl) => {
     formEl.validate((valid) => {
         if (valid) {
             console.log('submit!', ruleForm)
-            // userService.changePassword({
-            //     password: ruleForm.originalPass,
-            //     rePassword1: ruleForm.pass,
-            //     rePassword2: ruleForm.checkPass
-            // })
+            userService.changePassword({
+                password: ruleForm.originalPass,
+                rePassword1: ruleForm.pass,
+                rePassword2: ruleForm.checkPass
+            }).then((res) => {
+                ElMessage({
+                    type: 'success',
+                    message: res.msg,
+                });
+                localStorage.clear(); // 清除本地存储
+                setInterval(() => {
+                    window.location.reload();
+                }, 3000)
+                dialogFormVisible.value = false
+            }).catch((err) => {
+                console.log(err)
+            })
         } else {
             console.log('error submit!', ruleForm)
         }
