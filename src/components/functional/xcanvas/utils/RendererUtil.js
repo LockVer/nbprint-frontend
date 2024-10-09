@@ -379,7 +379,7 @@ class RendererUtil {
         ctx.restore();
     }
     drawAwardText() {
-        const { operateCanvasRef, shapeList, virtualScale, backgroundImagePosition } = this.communicator.data;
+        const { operateCanvasRef, shapeList, virtualScale,actualScale, backgroundImagePosition } = this.communicator.data;
         if (operateCanvasRef == null) { return; }
         if (shapeList == null) { return; }
         const ctx = operateCanvasRef.getContext('2d');
