@@ -96,6 +96,8 @@ const currentGameShapeList = computed(() => {
     return communicator.data.shapeList.filter(item => item.id === communicator.data.currentGameArea.id);
 });
 const initData = () => {
+    const { actualScale } = communicator.data;
+
     if (!props.currentAdCard.adCardStatus) {
         return;
     }
@@ -104,21 +106,9 @@ const initData = () => {
     communicator.data.gameList.forEach((game) => {
         game.active = false;
     });
-    communicator.data.shapeList = props.currentAdCard.openRegions.map((region) => {
-        const rectHandler = new RectHandler({
-            x: region.x,
-            y: region.y,
-            width: region.width,
-            height: region.height,
-            awardList: region.awardList,
-            id: region.id,
-            mark: region.mark,
-            text: region.text,
-            borderColor: region.borderColor,
-            type: 'rect',
-        }, communicator);
-        return rectHandler;
-    });
+    communicator.data.regions = props.currentAdCard.openRegions;
+    console.log(actualScale)
+    
     console.log('communicator.data:', communicator.data);
 }
 
@@ -211,20 +201,23 @@ const addDone = () => {
         return;
     }
     props.currentAdCard.openRegions = shapeList.map((shape) => {
+        console.log('shape:', shape);
         return {
             x: shape.x / actualScale,
             y: shape.y / actualScale,
             width: shape.width / actualScale,
             height: shape.height / actualScale,
             awardList: shape.awardList,
-            mark: {
-                x: shape.mark.x / actualScale,
-                y: shape.mark.y / actualScale,
-                width: shape.mark.width / actualScale,
-                height: shape.mark.height / actualScale,
-                fontsize: shape.mark.fontsize / actualScale,
-                text: shape.mark.text
-            },
+            mark: shape.mark.map((item) => {
+                return {
+                    x: item.x / actualScale,
+                    y: item.y / actualScale,
+                    width: item.width / actualScale,
+                    height: item.height / actualScale,
+                    fontsize: item.fontsize / actualScale,
+                    text: item.text
+                }
+            }),
             id: shape.id,
             borderColor: shape.borderColor,
             text: shape.text
