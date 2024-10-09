@@ -40,7 +40,7 @@
                                 <template #default>
                                     <div class="award-operate-list">
                                         <div class="award-operate-item"
-                                            v-for="(item, index) in communicator.data.shapeList" :key="index">
+                                            v-for="(item, index) in currentGameShapeList" :key="index">
                                             <label>{{ item.text }}</label>
                                             <el-input-number :min="0" :max="10" :step="1" style="width: 90px;"
                                                 size="small" v-model="item.awardCount" />
@@ -68,7 +68,7 @@
     </div>
 </template>
 <script setup>
-import { ref, reactive, provide, inject, defineProps, defineEmits, toRaw, onMounted } from 'vue';
+import { ref, reactive, provide, inject, defineProps, defineEmits, toRaw, onMounted,computed } from 'vue';
 import OperationArea from './Components/OperationArea.vue';
 import XCanvas from '@/components/functional/xcanvas/XCanvas.vue';
 import XComponent from '@/components/container/XComponent.vue';
@@ -91,7 +91,10 @@ const adCommunicator = inject('adCardCommunicator');
 communicator.data.adCardSize = props.currentAdCard.adCardSize;
 communicator.data.backgroundImage = props.currentAdCard.image;
 communicator.data.showShapeDistance = true;
-
+const currentGameShapeList = computed(() => {
+    //过滤出当前游戏区的shapeList，不修改原始数据
+    return communicator.data.shapeList.filter(item => item.id === communicator.data.currentGameArea.id);
+});
 const initData = () => {
     if (!props.currentAdCard.adCardStatus) {
         return;

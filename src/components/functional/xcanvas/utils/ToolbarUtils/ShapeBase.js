@@ -84,7 +84,7 @@ class ShapeBase {
                             width: this.width,
                             height: this.height
                         }, this.communicator)
-                        //newShape.selected = true;
+                        newShape.selected = true;
                         this.communicator.data.shapeList.push(newShape);
                         this.communicator.data.rendererUtil.render();
                     }
