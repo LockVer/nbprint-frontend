@@ -1,6 +1,6 @@
 <template>
     <div class="xcanvas">
-        <helper-action @clickAction="clickAction" @addDone="addDone" @closePanel="closePanel"/>
+        <helper-action @clickAction="clickAction" @addDone="addDone" @closePanel="closePanel" />
         <div class="canvas-area">
 
             <slot></slot>
@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, render, provide, inject, defineProps,defineEmits } from 'vue';
+import { ref, onMounted, reactive, render, provide, inject, defineProps, defineEmits } from 'vue';
 import HelperAction from './modules/HelperAction.vue';
 import ErrorHandlerUtil from '@/utils/ErrorHandlerUtil';
 import Communicator from '@/utils/Communicator';
@@ -95,6 +95,8 @@ const initCanvasPage = () => {
         //绑定鼠标事件
         mouseHandlerUtil.bindMouseEvent();
         console.log('绑定鼠标事件成功');
+
+        initShapeList();
         //绘制
         rendererUtil.render();
 
@@ -105,6 +107,44 @@ const initCanvasPage = () => {
     }).catch((error) => errorHandlerUtil.showConfirm(error));
 }
 
+const initShapeList = () => {
+    if (!communicator.data.regions) {
+        return;
+    }
+    const { actualScale } = communicator.data;
+
+    console.log('communicator.data.regions:', communicator.data.regions);
+
+    communicator.data.shapeList = communicator.data.regions.map((region) => {
+        const rect = {
+            x: region.x * actualScale,
+            y: region.y * actualScale,
+            width: region.width * actualScale,
+            height: region.height * actualScale,
+            awardList: region.awardList || [],
+            id: region.id || '',
+            text: region.text || '',
+            borderColor: region.borderColor || 'black',
+            type: 'rect'
+        }
+        if (region.mark) {
+            rect.mark = region.mark.map((item) => {
+                return {
+                    x: item.x * actualScale,
+                    y: item.y * actualScale,
+                    width: item.width * actualScale,
+                    height: item.height * actualScale,
+                    fontsize: item.fontsize * actualScale,
+                    text: item.text
+                }
+            })
+        }
+
+        const rectHandler = new RectHandler(rect, communicator);
+        console.log('rectHandler:', rectHandler);
+        return rectHandler;
+    });
+}
 
 const scaleChanged = (event) => {
     const { shapeList } = communicator.data;
@@ -138,7 +178,7 @@ const clickAction = (item) => {
                 height: 100,
                 type: 'rect',
             }
-            if(communicator.data.shapeList.length>=communicator.data.maxShapeCount){
+            if (communicator.data.shapeList.length >= communicator.data.maxShapeCount) {
                 errorHandlerUtil.showWarning('已超过最大添加数量！');
                 return;
             }
@@ -184,7 +224,7 @@ const closePanel = () => {
         display: flex;
         height: calc(100% - 70px);
 
-        
+
 
     }
 }

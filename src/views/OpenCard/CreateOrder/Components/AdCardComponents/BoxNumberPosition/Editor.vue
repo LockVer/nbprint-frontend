@@ -31,17 +31,18 @@ communicator.data.showShapeDistance = false;
 communicator.data.showShapeSizeText = true;
 provide(communicatorName, communicator);
 const initData = () => {
-    communicator.data.shapeList = props.currentAdCard.boxNumberRegions.map((region) => {
-        const rectHandler = new RectHandler({
-            x: region.x,
-            y: region.y,
-            width: region.width,
-            height: region.height,
-            id: region.id,
-            type: 'rect',
-        }, communicator);
-        return rectHandler;
-    });
+    communicator.data.regions = props.currentAdCard.boxNumberRegions;
+    // communicator.data.shapeList = props.currentAdCard.boxNumberRegions.map((region) => {
+    //     const rectHandler = new RectHandler({
+    //         x: region.x,
+    //         y: region.y,
+    //         width: region.width,
+    //         height: region.height,
+    //         id: region.id,
+    //         type: 'rect',
+    //     }, communicator);
+    //     return rectHandler;
+    // });
     console.log('communicator.data:', communicator.data);
 }
 
