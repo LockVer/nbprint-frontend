@@ -3,13 +3,13 @@ import { ElLoading } from 'element-plus';
 import { useRouter } from 'vue-router';
 
 class ApiService {
-  constructor(baseURL) { 
+  constructor(baseURL) {
     this.api = axios.create({
       baseURL: baseURL || import.meta.env.VITE_API_BASE_URL, // 使用环境变量配置的API基础URL'
       timeout: 120000, // 请求超时时间
     });
     this.router = useRouter();
-    this.$loading=[];
+    this.$loading = [];
     // console.log(this.router)
     // 请求拦截器
     this.api.interceptors.request.use((config) => {
@@ -98,8 +98,8 @@ class ApiService {
               resolve(response.data);
               break;
             case -1:
-                this.router.push('/login');
-                reject("请重新登录");
+              this.router.push('/login');
+              reject("请重新登录");
               break;
             default:
               reject(response.data.msg);
@@ -115,15 +115,16 @@ class ApiService {
     })
   }
 
-  post(url, data, requireAuth = true) {
+  post(url, data, requireAuth = true, hideLoading = false) {
     //EventBus.$emit('showloading');
-    this.$loading.push(ElLoading.service({
-      lock: true,
-      text: '处理中...',
-      background: 'rgba(0, 0, 0, 0.7)',
-      customClass: 'loading'
-    }));
-
+    if (!hideLoading) {
+      this.$loading.push(ElLoading.service({
+        lock: true,
+        text: '处理中...',
+        background: 'rgba(0, 0, 0, 0.7)',
+        customClass: 'loading'
+      }));
+    }
     return new Promise((resolve, reject) => {
       this.api.post(url, data, { requireAuth }).then(response => {
         //EventBus.$emit('closeloading');

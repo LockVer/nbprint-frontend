@@ -1,37 +1,121 @@
 {
-  "id": "4616182",
-  "name": "揭开卡",
+  "id": "4682361",
+  "name": "nbprint",
   "font_family": "iconfont",
   "css_prefix_text": "icon-",
   "description": "",
   "glyphs": [
     {
-      "icon_id": "41077602",
-      "name": "说明，问号",
-      "font_class": "a-shuomingwenhao",
-      "unicode": "e6a1",
-      "unicode_decimal": 59041
+      "icon_id": "15838551",
+      "name": "warning",
+      "font_class": "warning",
+      "unicode": "e682",
+      "unicode_decimal": 59010
     },
     {
-      "icon_id": "41024905",
-      "name": "编辑",
-      "font_class": "edit",
-      "unicode": "e69e",
-      "unicode_decimal": 59038
+      "icon_id": "3521124",
+      "name": "完成",
+      "font_class": "done",
+      "unicode": "e603",
+      "unicode_decimal": 58883
     },
     {
-      "icon_id": "41024904",
-      "name": "删除",
-      "font_class": "del",
-      "unicode": "e69f",
-      "unicode_decimal": 59039
+      "icon_id": "11355011",
+      "name": "取消",
+      "font_class": "cancel",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
     },
     {
-      "icon_id": "41024903",
-      "name": "下载",
-      "font_class": "down",
-      "unicode": "e6a0",
-      "unicode_decimal": 59040
+      "icon_id": "2518398",
+      "name": "close",
+      "font_class": "close",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "5085759",
+      "name": "网格关",
+      "font_class": "grid",
+      "unicode": "e783",
+      "unicode_decimal": 59267
+    },
+    {
+      "icon_id": "35886694",
+      "name": "游戏区",
+      "font_class": "gamearea",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "8990449",
+      "name": "左对齐",
+      "font_class": "alignleft",
+      "unicode": "e719",
+      "unicode_decimal": 59161
+    },
+    {
+      "icon_id": "8990454",
+      "name": "右对齐",
+      "font_class": "alignright",
+      "unicode": "e718",
+      "unicode_decimal": 59160
+    },
+    {
+      "icon_id": "28679990",
+      "name": "底部对齐1",
+      "font_class": "alignbottom",
+      "unicode": "e639",
+      "unicode_decimal": 58937
+    },
+    {
+      "icon_id": "28680013",
+      "name": "顶部对齐1",
+      "font_class": "aligntop",
+      "unicode": "e63a",
+      "unicode_decimal": 58938
+    },
+    {
+      "icon_id": "34346601",
+      "name": "横向排列1-copy",
+      "font_class": "horizontal",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "34346604",
+      "name": "横向排列2-copy",
+      "font_class": "vertical",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "37640113",
+      "name": "横向居中对齐",
+      "font_class": "aligncenter",
+      "unicode": "e6a9",
+      "unicode_decimal": 59049
+    },
+    {
+      "icon_id": "423632",
+      "name": "选择",
+      "font_class": "select",
+      "unicode": "e6bd",
+      "unicode_decimal": 59069
+    },
+    {
+      "icon_id": "1083345",
+      "name": "圆形",
+      "font_class": "yuanxing",
+      "unicode": "e692",
+      "unicode_decimal": 59026
+    },
+    {
+      "icon_id": "1517009",
+      "name": "矩形",
+      "font_class": "juxing",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
     }
   ]
 }

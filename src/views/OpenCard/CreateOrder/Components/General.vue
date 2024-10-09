@@ -1,13 +1,13 @@
 <template>
     <x-card title="通用信息">
         <div class="general-content gap">
-            <x-component label="名字" width="220px">
+            <x-component label="名字" width="220px" :showErrorMsg="!initData.name">
                 <el-input v-model="initData.name" placeholder="请输入名称" />
             </x-component>
-            <x-component label="译名" width="220px">
+            <x-component label="译名" width="220px" :showErrorMsg="!initData.translatedName">
                 <el-input v-model="initData.translatedName" placeholder="请输入译名" />
             </x-component>
-            <x-component label="客户名字" width="220px">
+            <x-component label="客户名字" width="220px" :showErrorMsg="!initData.client.clientName">
                 <el-input v-model="initData.client.clientName" placeholder="请输入客户名字" />
             </x-component>
             <x-component label="业务员" width="220px">
@@ -21,7 +21,7 @@
             </x-component>
         </div>
         <div class="general-content gap">
-            <x-component label="公司名称" width="220px">
+            <x-component label="公司名称" width="220px" :showErrorMsg="!initData.company">
                 <el-select v-model="initData.company" placeholder="请选择公司名称">
                     <el-option v-for="item in companyList" :label="item.label" :value="item.label"></el-option>
                 </el-select>

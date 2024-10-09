@@ -68,6 +68,29 @@
                 </template>
             </el-dialog>
         </div>
+        <div class="process-dialog">
+            <el-dialog v-model="processDialogVisible" width="700px" :destroy-on-close="true"
+                :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+                <template #header>
+                    <div class="dialog-header">正在上传奖符...</div>
+
+                </template>
+                <div class="line"></div>
+                <div class="tip"><b>处理进度</b></div>
+                <el-progress :percentage="((processValue * 100) / (processCount * 100) * 100).toFixed(2)" :stroke-width="15"
+                    :text-inside="true" />
+                <div class="process-tip">
+                    <span>{{ processValue >= processCount ? "处理完成" : "处理中" }}</span>
+                    <span>{{ processValue }}/{{ processCount }}</span>
+                </div>
+                <div class="footer">
+                    <el-button plain size="large" v-if="processValue < processCount"
+                        @click="cancelUploadProcess">终止上传</el-button>
+                    <el-button size="large" type="primary" v-if="processValue >= processCount"
+                        @click="processDialogVisible = false">完成</el-button>
+                </div>
+            </el-dialog>
+        </div>
     </x-card>
 </template>
 
@@ -86,6 +109,11 @@ const commonClass = inject('commonClass');
 const fileInputRefs = ref({});
 const prizeDialogVisible = ref(false);
 const customDialogVisible = ref(false);
+const processDialogVisible = ref(false);
+const processValue = ref(1);
+const processCount = ref(1);
+const cancelUpload = ref(false);
+
 const awardIDList = ref([
     { text: 'Instant Winning', value: 'cash', qty: 0 },
     { text: 'Instant No Winning', value: 'noPrize', qty: 0 },
@@ -242,23 +270,42 @@ const batchUpload = async (awardType) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true; // 允许选择多个文件
+
+
     input.onchange = async (event) => {
+        processDialogVisible.value = true; // 显示进度条
+        processValue.value = 0;
         const files = Array.from(event.target.files);
+        processCount.value = files.length;
         files.sort((a, b) => a.name.localeCompare(b.name)); // 根据文件名排序
 
         for (const file of files) {
+            if (cancelUpload.value) {
+                processValue.value = 1;
+                processCount.value = 1;
+                cancelUpload.value = false;
+                break;
+            }
             try {
                 // 使用你提供的上传方法
-                const res = await commonClass.uploadImages(file, localStorage.getItem('orderId'));
+                const res = await commonClass.uploadImages(file, true);
                 // 上传成功后添加数据到awardIDList
                 addPrizeMark(awardType, res.data);
+                processValue.value++;
             } catch (err) {
+                processValue.value++;
                 ElMessage.error(err);
             }
         }
     };
     input.click(); // 触发文件选择
 };
+
+const cancelUploadProcess = () => {
+    cancelUpload.value = true;
+    processDialogVisible.value = false; // 关闭进度条
+};
+
 onMounted(() => {
     initData.value.forEach((item) => {
         if (!item.id) item.id = uuidv4();
@@ -498,6 +545,25 @@ onMounted(() => {
     /* height: 300px; */
 
     img {
+        width: 100%;
+    }
+}
+
+.process-dialog {
+    .tip {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .process-tip {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .footer {
+        margin-top: 20px;
+        text-align: center;
         width: 100%;
     }
 }

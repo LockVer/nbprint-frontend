@@ -1,0 +1,265 @@
+{
+    "orderId": "c4563471-5c94-4eaf-8fec-4634942b209e",
+    "companyName": "东莞市大朗聚印贸易行有限公司",
+    "general": {
+        "name": "11",
+        "translatedName": "22",
+        "client": {
+            "clientName": "33"
+        },
+        "sales": {
+            "employeeName": "",
+            "nbUserName": "徐旭",
+            "nbUserId": 1454
+        },
+        "currency": "USD",
+        "backgroundColor": "#409EFF",
+        "company": "东莞市大朗聚印贸易行有限公司"
+    },
+    "smallCard": {
+        "size": {
+            "width": 48,
+            "height": 76
+        },
+        "openQuantity": 1,
+        "price": "11",
+        "boxCount": 1,
+        "smallBoxCodePosition": "BL",
+        "openDirection": "T",
+        "quantityPerBox": 3333,
+        "frontImage": "https://nbprint-release.oss-cn-shenzhen.aliyuncs.com/printing-proof/68007aab-3379-4d14-bbf9-c7677286f076/resources/Granny_Ho_full_game_42.jpg",
+        "backImage": "https://nbprint-release.oss-cn-shenzhen.aliyuncs.com/printing-proof/68007aab-3379-4d14-bbf9-c7677286f076/resources/Granny_Ho_full_game_43.jpg",
+        "box": {
+            "width": 336,
+            "height": 76,
+            "thickness": 335
+        },
+        "smallBoxCode": "2222",
+        "columnCount": 7,
+        "columnQuantity": 476.14285714285717
+    },
+    "adCard": [
+        {
+            "imageSize": {
+                "width": 1728,
+                "height": 2304
+            },
+            "image": "https://nbprint-release.oss-cn-shenzhen.aliyuncs.com/printing-proof/e8d84d86-652d-47ae-9acf-3b84461a8d38/resources/Granny_Ho_full_game_00.jpg",
+            "adCardSize": [
+                252,
+                336
+            ],
+            "adBoxCode": "123123",
+            "type": "openable",
+            "openDirection": "T",
+            "adBoxCodePosition": "CUSTOM",
+            "openRegions": [
+                {
+                    "x": 16,
+                    "y": 229,
+                    "width": 100,
+                    "height": 100,
+                    "awardList": [
+                        "100"
+                    ],
+                    "mark": [
+                        {
+                            "x": 49.3154296875,
+                            "y": 269,
+                            "width": 33.369140625,
+                            "height": 20,
+                            "text": "100",
+                            "fontSize": 20
+                        }
+                    ],
+                    "id": "051c0d2a-12e8-4c87-83f4-a6933769c2a4",
+                    "borderColor": "#564527",
+                    "text": "揭开区1"
+                },
+                {
+                    "x": 131.625,
+                    "y": 229,
+                    "width": 100,
+                    "height": 100,
+                    "awardList": [
+                        "100"
+                    ],
+                    "mark": [
+                        {
+                            "x": 164.9404296875,
+                            "y": 269,
+                            "width": 33.369140625,
+                            "height": 20,
+                            "text": "100",
+                            "fontSize": 20
+                        }
+                    ],
+                    "id": "051c0d2a-12e8-4c87-83f4-a6933769c2a4",
+                    "borderColor": "#564527",
+                    "text": "揭开区2"
+                },
+                {
+                    "x": 247.25,
+                    "y": 229,
+                    "width": 100,
+                    "height": 100,
+                    "awardList": [
+                        "100"
+                    ],
+                    "mark": [
+                        {
+                            "x": 280.5654296875,
+                            "y": 269,
+                            "width": 33.369140625,
+                            "height": 20,
+                            "text": "100",
+                            "fontSize": 20
+                        }
+                    ],
+                    "id": "051c0d2a-12e8-4c87-83f4-a6933769c2a4",
+                    "borderColor": "#564527",
+                    "text": "揭开区3"
+                },
+                {
+                    "x": 362.875,
+                    "y": 229,
+                    "width": 100,
+                    "height": 100,
+                    "awardList": [
+                        "100"
+                    ],
+                    "mark": [
+                        {
+                            "x": 396.1904296875,
+                            "y": 269,
+                            "width": 33.369140625,
+                            "height": 20,
+                            "text": "100",
+                            "fontSize": 20
+                        }
+                    ],
+                    "id": "051c0d2a-12e8-4c87-83f4-a6933769c2a4",
+                    "borderColor": "#564527",
+                    "text": "揭开区4"
+                }
+            ],
+            "boxNumberRegions": [
+                {
+                    "x": 392,
+                    "y": 634,
+                    "width": 100,
+                    "height": 100,
+                    "text": ""
+                }
+            ],
+            "adCardStatus": {
+                "adCardSize": [
+                    252,
+                    336
+                ],
+                "allowSaveStateItem": [
+                    "virtualScale",
+                    "actualScale",
+                    "backgroundImagePosition",
+                    "shapeList"
+                ],
+                "backgroundImage": "https://nbprint-release.oss-cn-shenzhen.aliyuncs.com/printing-proof/e8d84d86-652d-47ae-9acf-3b84461a8d38/resources/Granny_Ho_full_game_00.jpg",
+                "gameList": [
+                    {
+                        "id": "051c0d2a-12e8-4c87-83f4-a6933769c2a4",
+                        "text": "游戏区1",
+                        "awardInput": "",
+                        "awardList": [
+                            "100"
+                        ],
+                        "awardUsedList": [
+                            "100",
+                            "100",
+                            "100",
+                            "100"
+                        ],
+                        "active": true
+                    }
+                ]
+            },
+            "comment": "222"
+        }
+    ],
+    "rewardInfo": {
+        "type": "image",
+        "image": "",
+        "titleInfo": {
+            "type": "text",
+            "image": ""
+        },
+        "games": []
+    },
+    "prizeMark": [
+        {
+            "id": "339d35a8-1d88-4abb-aed4-f01b88a029d4",
+            "type": "cash",
+            "name": "Instant Winning1",
+            "imageSelected": false,
+            "imageName": "",
+            "image": "https://nbprint-release.oss-cn-shenzhen.aliyuncs.com/printing-proof/d9155abf-07df-4a45-9ed1-6f9bb614950c/resources/Granny_Ho_full_game_01.jpg",
+            "amount": "",
+            "count": "",
+            "total": "",
+            "comment": ""
+        },
+        {
+            "id": "cd958cb2-3f79-490c-b248-df7e40613fef",
+            "type": "cash",
+            "name": "Instant Winning2",
+            "imageSelected": false,
+            "imageName": "",
+            "image": "https://nbprint-release.oss-cn-shenzhen.aliyuncs.com/printing-proof/d9155abf-07df-4a45-9ed1-6f9bb614950c/resources/Granny_Ho_full_game_02.jpg",
+            "amount": "",
+            "count": "",
+            "total": "",
+            "comment": ""
+        },
+        {
+            "id": "4e366859-a00c-4bc6-8901-c3724248b27a",
+            "type": "cash",
+            "name": "Instant Winning3",
+            "imageSelected": false,
+            "imageName": "",
+            "image": "https://nbprint-release.oss-cn-shenzhen.aliyuncs.com/printing-proof/d9155abf-07df-4a45-9ed1-6f9bb614950c/resources/Granny_Ho_full_game_03.jpg",
+            "amount": "",
+            "count": "",
+            "total": "",
+            "comment": ""
+        },
+        {
+            "id": "aafa35c0-004c-44d7-acfb-296156870fe8",
+            "type": "cash",
+            "name": "Instant Winning4",
+            "imageSelected": false,
+            "imageName": "",
+            "image": "https://nbprint-release.oss-cn-shenzhen.aliyuncs.com/printing-proof/d9155abf-07df-4a45-9ed1-6f9bb614950c/resources/Granny_Ho_full_game_04.jpg",
+            "amount": "",
+            "count": "",
+            "total": "",
+            "comment": ""
+        }
+    ],
+    "payout": {
+        "templateConfiguration": {
+            "quantitativeConnector": "#",
+            "resultConnector": "----",
+            "typeface": "Arial",
+            "borderStyle": "solid"
+        },
+        "basicInfo": {
+            "payoutStatus": 0,
+            "payoutTitle": "123",
+            "payoutNumber": 3333,
+            "payoutAmount": "11",
+            "payoutTotal": 36663,
+            "payoutImage": ""
+        },
+        "game": []
+    },
+    "status": "0"
+}
