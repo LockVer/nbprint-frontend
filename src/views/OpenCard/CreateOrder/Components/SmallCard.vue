@@ -4,16 +4,25 @@
             <x-check-box :disabled="hasOpenRegion" disabledText="宣传卡揭开区已创建，禁止修改，如需修改，请先清空揭开区。" v-model="initData.size"
                 :DataList="cardSizeList" type="radio"></x-check-box>
         </x-component>
+        <x-component width="440px" label="自定义尺寸(mm)" padding="0 0 18px 0" v-if="initData.size.type == 'CUSTOM'"
+            :showErrorMsg="!(initData.size.width && initData.size.height)">
+            <div class="custom-size">
+                <el-input-number v-model="initData.size.width" :precision="1" :step="0.1" :min="1" :controls="false" />
+                <span>*</span>
+                <el-input-number v-model="initData.size.height" :precision="1" :step="0.1" :min="1"
+                    :controls="false" />
+            </div>
+        </x-component>
         <x-component label="揭开口数量" padding="0 0 10px 0">
             <x-check-box v-model="initData.openQuantity" :DataList="cardOpenList" type="radio"></x-check-box>
         </x-component>
-        <x-component label="小卡单价" width="220px" padding="0 0 18px 0">
+        <x-component label="小卡单价" width="220px" padding="0 0 18px 0" :showErrorMsg="!initData.price">
             <el-input v-model="initData.price" placeholder="请输入小卡单价" />
         </x-component>
         <x-component label="刀模开口方向" padding="0 0 10px 0">
             <x-check-box v-model="initData.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>
         </x-component>
-        <x-component label="小卡盒号" padding="0 0 18px 0" width="220px">
+        <x-component label="小卡盒号" padding="0 0 18px 0" width="220px" :showErrorMsg="!initData.smallBoxCode">
             <el-input v-model="initData.smallBoxCode" placeholder="请输入小卡盒号" />
         </x-component>
         <x-component label="小卡盒号位置" padding="0 0 10px 0">
@@ -35,10 +44,10 @@
             </x-component>
         </div>
         <div class="bg-img">
-            <x-component label="正面背景" width="48%">
+            <x-component label="正面背景" width="48%" :showErrorMsg="!initData.frontImage">
                 <x-image-upload v-model="initData.frontImage"></x-image-upload>
             </x-component>
-            <x-component label="小卡揭开面背景" width="48%">
+            <x-component label="小卡揭开面背景" width="48%" :showErrorMsg="!initData.backImage">
                 <x-image-upload v-model="initData.backImage"></x-image-upload>
             </x-component>
         </div>
@@ -54,7 +63,7 @@ import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XCheckBox from '@/components/functional/XCheckBox.vue';
 import XImageUpload from '@/components/functional/XImageUpload.vue';
-import { ElMessageBox,ElMessage } from 'element-plus';
+import { ElMessageBox, ElMessage } from 'element-plus';
 
 
 const props = defineProps({
@@ -76,6 +85,7 @@ const cardSizeList = [
     { text: '51*51', value: { width: 51, height: 51 } },
     { text: '42*71', value: { width: 42, height: 71 } },
     { text: '44*60', value: { width: 44, height: 60 } },
+    { text: '自定义尺寸', value: { width: 0, height: 0, type: "CUSTOM" } }
 ];
 
 const cardOpenList = [
@@ -171,7 +181,7 @@ const calcRowCount = () => {
     //如果没有找到合适的尺寸，就取能找到的最大尺寸
     if (box.width === 0) {
         //ElMessage.error('根据当前的限制条件，无法找到合适的尺寸，请手动更改列数选择一个尺寸。');
-    }else{
+    } else {
         ElMessage.success('已找到合适的尺寸：' + box.width + 'x' + box.height + 'x' + box.thickness + 'mm');
     }
 }
@@ -322,5 +332,14 @@ watch(() => initData.value.columnQuantity, (newVal) => {
     top: 0;
     right: 0;
     z-index: 30;
+}
+
+.custom-size {
+    display: flex;
+    align-items: center;
+
+    span {
+        margin: 0 10px;
+    }
 }
 </style>

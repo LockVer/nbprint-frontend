@@ -10,7 +10,7 @@
                 <div class="list-header">宣传卡{{ index + 1 }}</div>
                 <div class="list-body">
                     <div class="row">
-                        <x-component label="背景图" width="220px">
+                        <x-component label="背景图" width="220px" :showErrorMsg="!item.image">
                             <x-input-upload v-model:size="item.imageSize" v-model:image="item.image"
                                 @changeImage="changeBackgroundImage(item)"></x-input-upload>
                         </x-component>
@@ -30,7 +30,7 @@
                         </x-component>
                     </div>
                     <div class="row full" v-if="item.type == 'openable'">
-                        <x-component label="揭开区" width="220px">
+                        <x-component label="揭开区" width="220px" :showErrorMsg="item.openRegions.length == 0">
                             <el-button class="xbutton" type="primary" :disabled="!(item.image)"
                                 @click="showRevealArea(item)">
                                 添加揭开区
@@ -45,15 +45,17 @@
                         </x-component>
                     </div>
                     <div class="row">
-                        <x-component label="盒号" width="220px">
+                        <x-component label="盒号" width="220px" :showErrorMsg="!item.adBoxCode">
                             <el-input v-model="item.adBoxCode" placeholder="请填写盒号" />
                         </x-component>
                         <x-component label="盒号位置" column="span 2">
                             <x-check-box :DataList="adCardNoPostionList" v-model="item.adBoxCodePosition"
                                 type="radio"></x-check-box>
                         </x-component>
-                        <x-component label="设置自定义盒号位置" width="220px" @click="showBoxNumberDiglog(item)" v-if="item.adBoxCodePosition == 'CUSTOM'">
-                            <el-button class="xbutton" type="primary">
+                        <x-component label="设置自定义盒号位置" width="220px" v-if="item.adBoxCodePosition == 'CUSTOM'"
+                            :showErrorMsg="item.boxNumberRegions.length == 0">
+                            <el-button class="xbutton" type="primary" @click="showBoxNumberDiglog(item)"
+                                :disabled="!(item.image)">
                                 添加盒号位置
                             </el-button>
                         </x-component>
@@ -69,8 +71,8 @@
         <el-dialog v-model="boxNumberDialogVisible" :destroy-on-close="true" title="添加盒号位置" :show-close="false"
             :close-on-click-modal="false" :close-on-press-escape="false" :fullscreen="true" class="reveal-dialog">
             <!-- 添加揭开区的内容 -->
-            <BoxNumberEditor ref="boxNumberAreaEditorRef" :currentAdCard="currentAdCard"
-                @addDone="addDone" @closePanel="closePanel" />
+            <BoxNumberEditor ref="boxNumberAreaEditorRef" :currentAdCard="currentAdCard" @addDone="addDone"
+                @closePanel="closePanel" />
         </el-dialog>
         <el-dialog v-model="revealDialogVisible" :destroy-on-close="true" title="添加揭开区" :show-close="false"
             :close-on-click-modal="false" :close-on-press-escape="false" :fullscreen="true" class="reveal-dialog">

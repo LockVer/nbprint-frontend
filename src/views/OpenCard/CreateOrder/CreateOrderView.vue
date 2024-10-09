@@ -122,6 +122,8 @@ const adCardRef = ref(null);
 // const rewardInfoRef = ref(null);
 const payoutRef = ref(null);
 const prizeMarkRef = ref(null);
+const validateStatus = ref(false);
+provide('validateStatus', validateStatus);
 
 const scrollToElement = (refName) => {
     const element = refName.value?.$el || refName.value;
@@ -160,6 +162,7 @@ onMounted(() => {
 
 
 const handleSubmit = () => {
+    validateStatus.value = true;
     // 检查数据是否完整
     if (general.value.name == '') {
         ElMessage.error('请填写名字');
@@ -322,6 +325,7 @@ const handleSubmit = () => {
         status: editMode.value ? '1' : '0'  // 0:新增 1:编辑
     };
     console.log(submitData);
+    validateStatus.value = false;
     localStorage.setItem('submitData', JSON.stringify(submitData));
     serviceClass.createOrder(submitData).then(res => {
         ElMessageBox.alert(res.msg, '提交结果', {

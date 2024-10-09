@@ -1,57 +1,55 @@
-<script lang="ts">
-import { column } from 'element-plus/es/components/table-v2/src/common.mjs';
-import { defineComponent, ref, reactive } from 'vue';
-export default defineComponent({
-    name: "XComponents",
-    props: {
-        label: {
-            type: String,
-            default: ""
-        },
-        column: {
-            type: String,
-            default: "span 1"
-        },
-        width: {
-            type: String,
-            default: "100%"
-        },
-        padding: {
-            type: String,
-            default: "0px"
-        },
-        marginBottom: {
-            type: String,
-            default: "0px"
-        },
-        hide: {
-            type: Boolean,
-            default: false
-        },
-        fontWeight: {
-            type: String,
-            default: 'bold'
-        },
-        isFullWidth: {
-            type: Boolean,
-            default: false
-        },
-        titleStyle: {
-            type: String,
-            default: ""
-        },
-        titleBottom: {
-            type: String,
-            default: '8px'
-        }
+<script setup>
+import { defineProps, ref, inject, watch } from 'vue';
+
+const props = defineProps({
+    label: {
+        type: String,
+        default: ""
     },
-    setup() {
-
-        return {
-
-        }
+    column: {
+        type: String,
+        default: "span 1"
+    },
+    width: {
+        type: String,
+        default: "100%"
+    },
+    padding: {
+        type: String,
+        default: "0px"
+    },
+    marginBottom: {
+        type: String,
+        default: "0px"
+    },
+    hide: {
+        type: Boolean,
+        default: false
+    },
+    fontWeight: {
+        type: String,
+        default: 'bold'
+    },
+    isFullWidth: {
+        type: Boolean,
+        default: false
+    },
+    titleStyle: {
+        type: String,
+        default: ""
+    },
+    titleBottom: {
+        type: String,
+        default: '8px'
+    },
+    showErrorMsg: {
+        type: Boolean,
+        default: false
     }
 })
+
+const validateStatus = inject('validateStatus');
+
 </script>
 <template>
     <div class="xcomponent-container" :class="{ 'hide': hide, 'full': isFullWidth }"
@@ -66,6 +64,10 @@ export default defineComponent({
                     <i style="font-style: normal;">?</i>
                 </el-tooltip>
                 <slot name="header"></slot>
+                <div class="error-msg" v-if="showErrorMsg && validateStatus">
+                    <span class="iconfont icon-warning"></span>
+                    必填
+                </div>
             </div>
 
         </div>
@@ -99,6 +101,7 @@ export default defineComponent({
             column-gap: 8px;
             font-size: 12px;
             width: 100%;
+
             i {
                 display: inline-block;
                 width: 15px;

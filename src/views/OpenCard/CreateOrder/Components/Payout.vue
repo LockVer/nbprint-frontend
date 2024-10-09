@@ -1,29 +1,36 @@
 <template>
     <x-card title="Payout信息">
-        <div class="basicInfo">
+        <x-component label="填写Payout方式">
+            <x-check-box v-model="payoutType" :DataList="payoutTypeList" type="radio"></x-check-box>
+        </x-component>
+        <x-component label="背景图" width="220px" v-if="payoutType == 'upload'"
+            :showErrorMsg="!(initData.payoutImage)">
+            <x-input-upload v-model:image="initData.payoutImage"></x-input-upload>
+        </x-component>
+        <div class="basicInfo" v-if="payoutType == 'manual'">
             <div class="title">模板配置</div>
             <div class="generalInfo">
-                <x-component label="数量连接符" :titleStyle="'#484848'" :width="'220px'">
+                <x-component label="数量连接符" :titleStyle="'#484848'" :width="'220px'" :showErrorMsg="!(initData.templateConfiguration.quantitativeConnector)">
                     <el-select v-model="initData.templateConfiguration.quantitativeConnector" placeholder="请选择数量连接符"
                         clearable>
                         <el-option v-for="item in quantitativeConnectorList" :key="item.value" :label="item.label"
                             :value="item.value" />
                     </el-select>
                 </x-component>
-                <x-component label="结果连接符" :titleStyle="'#484848'" :width="'220px'">
+                <x-component label="结果连接符" :titleStyle="'#484848'" :width="'220px'" :showErrorMsg="!(initData.templateConfiguration.resultConnector)">
                     <el-select v-model="initData.templateConfiguration.resultConnector" placeholder="请选择结果连接符"
                         clearable>
                         <el-option v-for="item in resultConnectorList" :key="item.value" :label="item.label"
                             :value="item.value" />
                     </el-select>
                 </x-component>
-                <x-component label="字体" :titleStyle="'#484848'" :width="'220px'">
+                <x-component label="字体" :titleStyle="'#484848'" :width="'220px'" :showErrorMsg="!(initData.templateConfiguration.typeface)">
                     <el-select v-model="initData.templateConfiguration.typeface" placeholder="请选择字体" clearable>
                         <el-option v-for="item in typefaceList" :key="item.value" :label="item.label"
                             :value="item.value" />
                     </el-select>
                 </x-component>
-                <x-component label="边框样式" :titleStyle="'#484848'" :width="'220px'">
+                <x-component label="边框样式" :titleStyle="'#484848'" :width="'220px'" :showErrorMsg="!(initData.templateConfiguration.borderStyle)">
                     <el-select v-model="initData.templateConfiguration.borderStyle" placeholder="请选择边框样式" clearable>
                         <el-option v-for="item in borderStyleList" :key="item.value" :label="item.label"
                             :value="item.value" />
@@ -31,7 +38,7 @@
                 </x-component>
             </div>
         </div>
-        <div class="basicInfo">
+        <div class="basicInfo" v-if="payoutType == 'manual'">
             <div class="title">基础信息</div>
             <div class="generalInfo">
                 <x-component label="添加标题形式" :titleStyle="'#484848'" :width="'200px'" :titleBottom="'12px'">
@@ -43,10 +50,10 @@
                     </div>
                 </x-component>
                 <x-component v-if="initData.basicInfo.payoutStatus == 0" label="手动输入标题" :titleStyle="'#484848'"
-                    :width="'200px'" :titleBottom="'12px'">
+                    :width="'200px'" :titleBottom="'12px'" :showErrorMsg="!(initData.basicInfo.payoutTitle)">
                     <el-input v-model="initData.basicInfo.payoutTitle" placeholder="请输入标题" />
                 </x-component>
-                <x-component v-if="initData.basicInfo.payoutStatus == 1" label="上传标题图片（上传png格式）" :titleStyle="'#484848'"
+                <x-component v-if="initData.basicInfo.payoutStatus == 1"  :showErrorMsg="!(initData.basicInfo.payoutImage)" label="上传标题图片（上传png格式）" :titleStyle="'#484848'"
                     :width="'200px'" :titleBottom="'12px'">
                     <x-input-upload v-model:image="initData.basicInfo.payoutImage"
                         @changeImage="handleImageChange"></x-input-upload>
@@ -66,7 +73,7 @@
                 </x-component>
             </div>
         </div>
-        <div class="basicInfo playingMethod">
+        <div class="basicInfo playingMethod" v-if="payoutType == 'manual'">
             <div class="title">玩法信息</div>
             <div class="award-id">
                 <div class="addtype">
@@ -162,7 +169,9 @@
 import XCard from '@/components/container/XCard.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import XInputUpload from '@/components/functional/XInputUpload.vue';
-import { ref, watch, reactive} from 'vue';
+import XCheckBox from '@/components/functional/XCheckBox.vue';
+
+import { ref, watch, reactive } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { ElMessageBox } from 'element-plus';
 
@@ -173,6 +182,18 @@ const gameData = defineModel("gameData");
 const smallCardData = defineModel("smallCard");
 const payoutDialogVisible = ref(false);
 const fileInputRefs = ref({});
+const payoutType = ref('upload');
+
+const payoutTypeList = [
+    {
+        text: '手动填写',
+        value: 'manual'
+    },
+    {
+        text: '上传文件',
+        value: 'upload'
+    }
+]
 
 const quantitativeConnectorList = [
     { label: '不选', value: '' },
@@ -212,6 +233,8 @@ const payoutIDList = reactive([
     { text: 'Window Prize', value: 'Window Prize', qty: 0 },
     { text: 'Last Sale', value: 'Last Sale', qty: 0 },
 ]);
+
+
 
 const customDialogVisible = ref(false);
 const customName = ref('');
@@ -410,7 +433,7 @@ const calculateTotal = (item) => {
 
 <style lang="scss" scoped>
 .basicInfo {
-    font-family:"Source Han Sans CN";
+    font-family: "Source Han Sans CN";
     padding-bottom: 18px;
     border-bottom: 1px solid #EEEE;
     margin-bottom: 18px;
@@ -454,7 +477,7 @@ const calculateTotal = (item) => {
         display: flex;
         column-gap: 8px;
         color: #181818;
-        font-family:"Source Han Sans CN";
+        font-family: "Source Han Sans CN";
         font-size: 12px;
         cursor: pointer;
 
@@ -502,11 +525,13 @@ const calculateTotal = (item) => {
         row-gap: 12px;
     }
 }
-.payout-name{
+
+.payout-name {
     display: inline-block;
     line-height: 32px;
     height: 32px
 }
+
 .dialog-content {
     display: flex;
     justify-content: space-between;
