@@ -7,9 +7,9 @@
             <input class="einput" v-model="username" type="text" placeholder="用户名">
             <input class="einput" v-model="password" type="password" placeholder="密码">
             <button class="ebutton" @click="login">登录</button>
-            <p>默认用户名为<b>姓名全拼</b></p>
-            <p>默认密码为姓<b>拼音+手机号</b></p>
-            <p>例如：章三 - zhangsan - zhang17666266366</p>
+            <p>默认用户名为<b>手机号</b></p>
+            <p>默认密码为姓<b>手机号+@King1936</b></p>
+            <p>例如：章三 - 13062081022 - 13062081022@King1936</p>
         </div>
     </div>
 </template>
