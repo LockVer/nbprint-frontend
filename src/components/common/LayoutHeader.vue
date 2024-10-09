@@ -19,13 +19,13 @@
                     <el-dropdown-item @click="helpDocumentHandler">帮助文档</el-dropdown-item>
                     <el-dropdown-item @click="console.log(222)" disabled>意见反馈</el-dropdown-item>
                     <el-dropdown-item disabled>个人设置</el-dropdown-item>
-                    <!-- <el-dropdown-item @click="changePassword">修改密码</el-dropdown-item> -->
+                    <el-dropdown-item @click="changePassword">修改密码</el-dropdown-item>
                     <el-dropdown-item @click="goOutHandler">退出</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
     </div>
-    <!-- <el-dialog v-model="dialogFormVisible" title="修改密码" width="500">
+    <el-dialog v-model="dialogFormVisible" title="修改密码" width="500">
     <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" status-icon :rules="rules" label-width="auto"
       class="demo-ruleForm">
       <el-form-item label="原始密码" prop="originalPass">
@@ -43,7 +43,7 @@
         <el-button @click="resetForm(ruleFormRef)">重置</el-button>
       </el-form-item>
     </el-form>
-  </el-dialog> -->
+  </el-dialog>
 </template>
 <script setup>
 import pdfUrl from '@/assets/揭开卡系统操作手册.pdf';
@@ -52,6 +52,8 @@ import { ElMessage } from 'element-plus';
 import { useStore } from 'vuex';
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
+
+const dialogFormVisible = ref(false);
 
 const headerData = reactive({
     title: "揭开卡",
