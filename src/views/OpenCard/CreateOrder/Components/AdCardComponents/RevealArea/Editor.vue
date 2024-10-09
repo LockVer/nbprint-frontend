@@ -1,7 +1,7 @@
 <template>
     <div class="panel">
         <div class="left-panel">
-            <OperationArea @addDone="addDone" @closePanel="closePanel"/>
+            <OperationArea @addDone="addDone" @closePanel="closePanel" />
         </div>
         <div class="right-panel">
             <XCanvas :communicatorName="communicatorName">
@@ -39,8 +39,8 @@
                                 </template>
                                 <template #default>
                                     <div class="award-operate-list">
-                                        <div class="award-operate-item"
-                                            v-for="(item, index) in currentGameShapeList" :key="index">
+                                        <div class="award-operate-item" v-for="(item, index) in currentGameShapeList"
+                                            :key="index">
                                             <label>{{ item.text }}</label>
                                             <el-input-number :min="0" :max="10" :step="1" style="width: 90px;"
                                                 size="small" v-model="item.awardCount" />
@@ -68,7 +68,7 @@
     </div>
 </template>
 <script setup>
-import { ref, reactive, provide, inject, defineProps, defineEmits, toRaw, onMounted,computed } from 'vue';
+import { ref, reactive, provide, inject, defineProps, defineEmits, toRaw, onMounted, computed } from 'vue';
 import OperationArea from './Components/OperationArea.vue';
 import XCanvas from '@/components/functional/xcanvas/XCanvas.vue';
 import XComponent from '@/components/container/XComponent.vue';
@@ -196,7 +196,7 @@ const removeAward = (index) => {
 }
 
 const addDone = () => {
-    const { shapeList } = communicator.data;
+    const { shapeList, actualScale } = communicator.data;
     let isPass = true;
     shapeList.forEach((shape) => {
         shape.checkProximity();
@@ -212,10 +212,10 @@ const addDone = () => {
     }
     props.currentAdCard.openRegions = shapeList.map((shape) => {
         return {
-            x: shape.x,
-            y: shape.y,
-            width: shape.width,
-            height: shape.height,
+            x: shape.x / actualScale,
+            y: shape.y / actualScale,
+            width: shape.width / actualScale,
+            height: shape.height / actualScale,
             awardList: shape.awardList,
             mark: shape.mark,
             id: shape.id,

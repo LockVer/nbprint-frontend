@@ -1,6 +1,7 @@
 <template>
     <div class="panel">
-        <x-canvas :communicatorName="'boxNumberCommunicator'" :initData="initData" @addDone="addDone" @closePanel="closePanel">
+        <x-canvas :communicatorName="'boxNumberCommunicator'" :initData="initData" @addDone="addDone"
+            @closePanel="closePanel">
         </x-canvas>
     </div>
 </template>
@@ -24,7 +25,7 @@ communicator.data.adCardSize = props.currentAdCard.adCardSize;
 communicator.data.backgroundImage = props.currentAdCard.image;
 communicator.data.showMainActions = ['rect'];
 communicator.data.showHelperActions = ['addDone', 'closePanel'];
-communicator.data.showHelperActionsAlways= true;
+communicator.data.showHelperActionsAlways = true;
 communicator.data.maxShapeCount = 1;
 communicator.data.showShapeDistance = false;
 communicator.data.showShapeSizeText = true;
@@ -49,13 +50,13 @@ onMounted(() => {
 });
 
 const addDone = () => {
-    const { shapeList } = communicator.data;
+    const { shapeList, actualScale } = communicator.data;
     props.currentAdCard.boxNumberRegions = shapeList.map((shape) => {
         return {
-            x: shape.x,
-            y: shape.y,
-            width: shape.width,
-            height: shape.height,
+            x: shape.x / actualScale,
+            y: shape.y / actualScale,
+            width: shape.width / actualScale,
+            height: shape.height / actualScale,
             id: shape.id,
             text: shape.text
         }
