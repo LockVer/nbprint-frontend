@@ -134,7 +134,7 @@ const initShapeList = () => {
                     y: item.y * actualScale,
                     width: item.width * actualScale,
                     height: item.height * actualScale,
-                    fontsize: item.fontsize * actualScale,
+                    fontSize: item.fontSize * actualScale,
                     text: item.text
                 }
             })
