@@ -48,9 +48,11 @@
 <script setup>
 import pdfUrl from '@/assets/揭开卡系统操作手册.pdf';
 import { defineComponent, ref, reactive, computed } from 'vue';
+import UserService from '../../services/UserService';
 import { ElMessage } from 'element-plus';
 import { useStore } from 'vuex';
 const store = useStore();
+const userService = new UserService();
 const userInfo = computed(() => store.state.userInfo);
 
 const dialogFormVisible = ref(false);
@@ -130,6 +132,11 @@ const submitForm = (formEl) => {
     formEl.validate((valid) => {
         if (valid) {
             console.log('submit!', ruleForm)
+            // userService.changePassword({
+            //     password: ruleForm.originalPass,
+            //     rePassword1: ruleForm.pass,
+            //     rePassword2: ruleForm.checkPass
+            // })
         } else {
             console.log('error submit!', ruleForm)
         }

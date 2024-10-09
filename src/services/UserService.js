@@ -12,6 +12,9 @@ class UserService {
     getPermissions() {
         return this.apiService.get('/auth/permissions');
     }
+    changePassword(){
+        return this.apiService.get('/user/resetPwd');
+    }
 }
 
 export default UserService;
