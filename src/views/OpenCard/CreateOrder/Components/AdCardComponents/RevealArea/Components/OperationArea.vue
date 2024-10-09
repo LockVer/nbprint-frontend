@@ -103,11 +103,12 @@ const selectGameItem = (item) => {
     communicator.data.gameList.forEach((game) => {
         if (game.id == item.id) {
             game.active = !game.active;
+            communicator.data.showOperatePanel = game.active;
         } else {
             game.active = false;
         }
-        communicator.data.showOperatePanel = game.active;
     });
+    console.log(communicator.data);
     communicator.data.rendererUtil.render();
 }
 const addDone = () => {
