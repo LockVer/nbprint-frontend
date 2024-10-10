@@ -173,8 +173,10 @@ const allocationAward = () => {
 
 const resetAll = () => {
     communicator.data.shapeList.forEach(item => {
-        item.awardCount = 1;
-        item.awardList = [];
+        if (item.id === communicator.data.currentGameArea.id) {
+            item.awardList = [];
+            item.awardCount = 1;
+        }
     });
     communicator.data.currentGameArea.awardList.push(...communicator.data.currentGameArea.awardUsedList);
     communicator.data.currentGameArea.awardUsedList = [];
