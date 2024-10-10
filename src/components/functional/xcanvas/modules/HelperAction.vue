@@ -24,7 +24,7 @@ import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 const communicator = inject('communicator');
 const autoArrangementUtil = new AutoArrangementUtil(communicator);
-const emit = defineEmits(['clickAction','addDone','closePanel']); //定义事件
+const emit = defineEmits(['clickAction', 'addDone', 'closePanel']); //定义事件
 let gameAreaIndex = 0;
 
 const dynamicAction = ref([
@@ -107,7 +107,7 @@ const dynamicAction = ref([
         show: false,
         notplain: true,
         onClick: () => {
-            const selectedItems = communicator.data.shapeList.filter(i => i.selected);
+            const selectedItems = communicator.data.shapeList.filter(i => i.selected || i.active);
             const gameAreaId = uuidv4();
             const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
             selectedItems.forEach((item, index) => {
@@ -272,9 +272,9 @@ watch(() => communicator.data.showMainActions, (newVal, oldVal) => {
 
 watch(() => communicator.data.shapeList, (newVal, oldVal) => {
     //判断两个数组不相同
-    const selectedItems = newVal.filter(i => i.selected);
+    const selectedItems = newVal.filter(i => i.selected || i.active);
     const whenSelectElementsShowItems = communicator.data.showHelperActions;
-    if (selectedItems.length > 1||communicator.data.showHelperActionsAlways) {
+    if (selectedItems.length > 1 || communicator.data.showHelperActionsAlways || (communicator.data.step == 2 && selectedItems.length > 0)) {
         dynamicAction.value.forEach(item => {
             if (whenSelectElementsShowItems.includes(item.type)) {
                 item.show = true;
