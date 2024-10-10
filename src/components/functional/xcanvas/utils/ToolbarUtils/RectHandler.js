@@ -376,8 +376,11 @@ class RectHandler extends ShapeBase {
 
     // 计算两个形状之间的最小距离
     getDistanceBetweenShapes(shape1, shape2) {
-        const xDist = Math.max(0, Math.abs(shape1.x - shape2.x) - (shape1.width + shape2.width) / 2);
-        const yDist = Math.max(0, Math.abs(shape1.y - shape2.y) - (shape1.height + shape2.height) / 2);
+        // 计算水平距离
+        const xDist = Math.max(0, Math.max(shape1.x, shape2.x) - Math.min(shape1.x + shape1.width, shape2.x + shape2.width));
+        // 计算垂直距离
+        const yDist = Math.max(0, Math.max(shape1.y, shape2.y) - Math.min(shape1.y + shape1.height, shape2.y + shape2.height));
+        // 返回欧几里得距离
         return Math.sqrt(xDist * xDist + yDist * yDist);
     }
 

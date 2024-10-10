@@ -134,6 +134,7 @@ const addAward = () => {
         communicator.data.currentGameArea.awardList.push(awardInput.value);
         console.log(communicator.data.currentGameArea.awardList);
     }
+    awardInput.value = "";
 }
 
 const resetAward = () => {
