@@ -216,7 +216,7 @@ const addDone = () => {
                     y: item.y / actualScale,
                     width: item.width / actualScale,
                     height: item.height / actualScale,
-                    fontSize: item.fontSize / actualScale,
+                    fontSize: item.fontSize,
                     text: item.text
                 }
             }),
