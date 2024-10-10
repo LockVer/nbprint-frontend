@@ -17,7 +17,7 @@
             <x-check-box v-model="initData.openQuantity" :DataList="cardOpenList" type="radio"></x-check-box>
         </x-component>
         <x-component label="小卡单价" width="220px" padding="0 0 18px 0" :showErrorMsg="!initData.price">
-            <el-input v-model="initData.price" placeholder="请输入小卡单价" />
+            <el-input-number :step="0.1" :min="0.01" :precision="2" :controls="false" v-model="initData.price" placeholder="请输入小卡单价" />
         </x-component>
         <x-component label="刀模开口方向" padding="0 0 10px 0">
             <x-check-box v-model="initData.openDirection" :DataList="openDirectionList" type="radio"></x-check-box>

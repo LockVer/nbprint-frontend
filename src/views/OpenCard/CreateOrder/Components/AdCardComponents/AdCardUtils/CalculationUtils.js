@@ -71,7 +71,8 @@ class CalculationUtils {
         }
         // 宣传卡尺寸向下取整
         maxRectB = maxRectB.map((size) => Math.floor(size));
-        return maxRectB;
+        console.log(maxRectB);
+        return maxRectB || [];
     }
 }
 

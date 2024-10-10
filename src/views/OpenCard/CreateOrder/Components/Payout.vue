@@ -78,7 +78,7 @@
             <div class="award-id">
                 <div class="addtype">
                     <el-button id="Btn" color="#4d65b8" :key="item.value" v-for="item in payoutIDList"
-                        @click="showAddBatchDialog(item)">+{{ item.text
+                        @click="showAddBatchDialog(item)" :disabled="item.value === 'Last Sale' && filterPrizeMark('Last Sale').length > 0">+{{ item.text
                         }}</el-button>
                 </div>
                 <div class="actions">
@@ -255,6 +255,10 @@ watch(smallCardData, (newVal, oldVal) => {
     initData.value.basicInfo.payoutTotal = smallCardData.value.price * smallCardData.value.quantityPerBox
 }, { deep: true });
 
+watch(payoutIDList, (newVal, oldVal) => {
+    console.log(newVal)
+})
+
 const selectTitleModality = (value) => {
     initData.value.basicInfo.payoutStatus = value;
     if (value === 0) {
@@ -360,6 +364,9 @@ const removePrize = (item) => {
 
 // 添加玩法的函数
 const addPrizeMark = (item) => {
+    if (item.text === 'Last Sale' && filterPrizeMark('Last Sale').length > 0) {
+        return; // 如果已有“Last Sale”，则不执行添加操作
+    }
     const prizeMarkItem = {
         id: uuidv4(), // 生成唯一ID
         gameType: item.value,
@@ -377,7 +384,6 @@ const addPrizeMark = (item) => {
 
 // 添加自定义玩法
 const addCustomPrize = (item) => {
-    console.log(item)
     const prizeMarkItem = {
         id: uuidv4(), // 生成唯一ID
         gameType: item.gameType,

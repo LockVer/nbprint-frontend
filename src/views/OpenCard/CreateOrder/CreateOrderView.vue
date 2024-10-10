@@ -197,47 +197,47 @@ onUnmounted(() => {
 const handleSubmit = () => {
     validateStatus.value = true;
     // 检查数据是否完整
-    if (general.value.name == '') {
+    if (!general.value.name) {
         ElMessage.error('请填写名字');
         scrollToElement(generalRef);
         return;
     }
-    if (general.value.translatedName == '') {
+    if (!general.value.translatedName) {
         ElMessage.error('请填写翻译名字');
         scrollToElement(generalRef);
         return;
     }
-    if (general.value.client.clientName == '') {
+    if (!general.value.client.clientName) {
         ElMessage.error('请填写客户名');
         scrollToElement(generalRef);
         return;
     }
-    if (general.value.sales.nbUserId == '') {
+    if (!general.value.sales.nbUserId) {
         ElMessage.error('业务员不能为空');
         scrollToElement(generalRef);
         return;
     }
-    if (general.value.company == '') {
+    if (!general.value.company) {
         ElMessage.error('请选择公司');
         scrollToElement(generalRef);
         return;
     }
-    if (smallCard.value.price == '') {
+    if (!smallCard.value.price) {
         ElMessage.error('请填写小卡价格');
         scrollToElement(smallCardRef);
         return;
     }
-    if (smallCard.value.smallBoxCode == '') {
+    if (!smallCard.value.smallBoxCode) {
         ElMessage.error('请填写小卡盒号');
         scrollToElement(smallCardRef);
         return;
     }
-    if (smallCard.value.frontImage == '') {
+    if (!smallCard.value.frontImage) {
         ElMessage.error('请上传小卡正面图片');
         scrollToElement(smallCardRef);
         return;
     }
-    if (smallCard.value.backImage == '') {
+    if (!smallCard.value.backImage) {
         ElMessage.error('请上传小卡背面图片');
         scrollToElement(smallCardRef);
         return;
@@ -250,7 +250,7 @@ const handleSubmit = () => {
     // 判断宣传卡信息是否完整，如果有openable类型的宣传卡，需要检查openRegion是否填写完整
     const incompleteCard = adCard.value.find(card => {
         if (card.type === 'openable') {
-            if (card.adBoxCode == '' || card.adBoxCode == undefined) {
+            if (!card.adBoxCode) {
                 ElMessage.error('请填写宣传卡盒号');
                 scrollToElement(adCardRef);
                 return true;
@@ -266,7 +266,7 @@ const handleSubmit = () => {
                 return true;
             }
         } else {
-            if (card.adBoxCode == '' || card.adBoxCode == undefined) {
+            if (!card.adBoxCode) {
                 ElMessage.error('请填写宣传卡盒号');
                 scrollToElement(adCardRef);
                 return true;
@@ -302,27 +302,27 @@ const handleSubmit = () => {
     // 判断玩法信息是否完整
     console.log(payout.templateConfiguration)
     if (payout.value.payoutType == 'manual') {
-        if (payout.value.templateConfiguration.quantitativeConnector == '') {
+        if (!payout.value.templateConfiguration.quantitativeConnector) {
             ElMessage.error('请选择数量连接符');
             scrollToElement(payoutRef);
             return;
         }
-        if (payout.value.templateConfiguration.resultConnector == '') {
+        if (!payout.value.templateConfiguration.resultConnector) {
             ElMessage.error('请选择结果连接符');
             scrollToElement(payoutRef);
             return;
         }
-        if (payout.value.templateConfiguration.typeface == '') {
+        if (!payout.value.templateConfiguration.typeface) {
             ElMessage.error('请选择字体');
             scrollToElement(payoutRef);
             return;
         }
-        if (payout.value.basicInfo.payoutNumber == '') {
+        if (!payout.value.basicInfo.payoutNumber) {
             ElMessage.error('请输入小卡数量');
             scrollToElement(payoutRef);
             return;
         }
-        if (payout.value.basicInfo.payoutAmount == '') {
+        if (!payout.value.basicInfo.payoutAmount) {
             ElMessage.error('请输入小卡单价');
             scrollToElement(payoutRef);
             return;

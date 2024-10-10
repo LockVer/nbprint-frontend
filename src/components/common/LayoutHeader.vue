@@ -59,7 +59,7 @@
         </div>
         <div class="info">
             <div class="title">更新时间</div>
-            <div class="value">2024-09-16</div>
+            <div class="value">2024-10-10</div>
         </div>
         <div class="content">
             <div class="title">更新内容</div>
@@ -121,7 +121,9 @@ const promotionalCardInfoList = [
         title: "个人设置优化",
         contents: [
             "添加修改密码功能；",
-            "添加了版本信息功能"
+            "添加了版本信息功能；",
+            "添加了帮助文档链接；",
+            "添加了意见反馈链接"
         ]
     }
 ]
