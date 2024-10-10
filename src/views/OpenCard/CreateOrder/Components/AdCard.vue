@@ -104,7 +104,7 @@ communicator.data.adCardList = [
     {
         imageSize: '',
         image: '',
-        adCardSize: '',
+        adCardSize: null,
         adBoxCode: '',
         type: 'non-openable',
         openDirection: 'T',
@@ -146,7 +146,7 @@ watch(() => communicator.data.adCardQty, (newVal, oldVal) => {
             communicator.data.adCardList.push({
                 imageSize: '',
                 image: '',
-                adCardSize: '',
+                adCardSize: null,
                 adBoxCode: '',
                 type: 'non-openable',
                 openDirection: 'T',

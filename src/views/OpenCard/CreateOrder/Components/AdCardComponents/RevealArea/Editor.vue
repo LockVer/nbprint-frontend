@@ -13,7 +13,7 @@
                                 <el-input placeholder="游戏区名称" v-model="communicator.data.currentGameArea.text" />
                             </x-component>
                             <x-component label="添加奖符数据" padding="0 0 18px 0">
-                                <el-input type="textarea" placeholder="游戏区名称" :rows="2" v-model="awardInput" />
+                                <el-input type="textarea" placeholder="请输入奖符数据" :rows="2" v-model="awardInput" />
                             </x-component>
                             <div class="add-award">
                                 <div class="qty">

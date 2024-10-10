@@ -6,7 +6,8 @@
         <RewardInfo v-if="false" v-model:initData="rewardInfo" v-model:generalData="general" ref="rewardRef">
         </RewardInfo>
         <prize-mark v-model:initData="prizeMark" class="prize-mark" ref="prizeMarkRef"></prize-mark>
-        <Payout v-model:initData="payout" v-model:smallCard="smallCard"  v-model:gameData="payout.game" class="payout" ref="payoutRef"></Payout>
+        <Payout v-model:initData="payout" v-model:smallCard="smallCard" v-model:gameData="payout.game" class="payout"
+            ref="payoutRef"></Payout>
         <layout-footer @submit="handleSubmit"></layout-footer>
         <!-- 悬浮定位 -->
         <FloatingButton :generalRef="generalRef" :smallCardRef="smallCardRef" :adCardRef="adCardRef"
@@ -16,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, provide, computed, watch } from 'vue';
+import { ref, onMounted, onUnmounted, provide, computed, watch } from 'vue';
 import General from './Components/General.vue';
 import SmallCard from './Components/SmallCard.vue';
 import AdCard from './Components/AdCard.vue';
@@ -53,7 +54,7 @@ const general = ref({
     },
     currency: 'USD',
     backgroundColor: '#409EFF',
-    company:""
+    company: ""
 });
 const smallCard = ref({
     size: { width: 48, height: 76 },
@@ -75,7 +76,7 @@ const adCard = ref([
     {
         imageSize: '',
         image: '',
-        adCardSize: '',
+        adCardSize: null,
         adBoxCode: '',
         type: 'non-openable',
         openDirection: 'T',
@@ -95,6 +96,7 @@ const rewardInfo = ref({
 });
 const prizeMark = ref([]);
 const payout = ref({
+    payoutType: 'upload',
     templateConfiguration: {
         quantitativeConnector: '',
         resultConnector: '',
@@ -123,6 +125,8 @@ const adCardRef = ref(null);
 const payoutRef = ref(null);
 const prizeMarkRef = ref(null);
 const validateStatus = ref(false);
+let autoSaveTimer = null;
+
 provide('validateStatus', validateStatus);
 
 const scrollToElement = (refName) => {
@@ -156,10 +160,39 @@ onMounted(() => {
         });
     } else {
         orderId.value = uuidv4();
+        serviceClass.loadDraft(store.state.userInfo.id).then(res => {
+            if (res.code == 1) {
+                ElMessageBox.confirm('检测到您有未提交的订单草稿，是否加载？', '提示', {
+                    confirmButtonText: '是',
+                    cancelButtonText: '否',
+                    type: 'warning'
+                }).then(() => {
+                    let data = res.data.json;
+                    general.value = data.general;
+                    smallCard.value = data.smallCard;
+                    adCard.value = data.adCard;
+                    rewardInfo.value = data.rewardInfo;
+                    prizeMark.value = data.prizeMark;
+                    payout.value = data.payout;
+                    orderId.value = data.orderId;
+                    console.log('orderId', orderId.value);
+                }).catch(() => {
+                    console.log('不加载草稿');
+                });
+            }
+            console.log('loadDraft', res);
+        })
+        autoSaveTimer = setInterval(() => {
+            autoSave();
+        }, 10000);
         console.log('orderId', orderId.value);
     }
+
 });
 
+onUnmounted(() => {
+    clearInterval(autoSaveTimer);
+});
 
 const handleSubmit = () => {
     validateStatus.value = true;
@@ -184,7 +217,7 @@ const handleSubmit = () => {
         scrollToElement(generalRef);
         return;
     }
-    if(general.value.company == ''){
+    if (general.value.company == '') {
         ElMessage.error('请选择公司');
         scrollToElement(generalRef);
         return;
@@ -268,48 +301,56 @@ const handleSubmit = () => {
 
     // 判断玩法信息是否完整
     console.log(payout.templateConfiguration)
-    if (payout.value.templateConfiguration.quantitativeConnector == '') {
-        ElMessage.error('请选择数量连接符');
-        scrollToElement(payoutRef);
-        return;
-    }
-    if (payout.value.templateConfiguration.resultConnector == '') {
-        ElMessage.error('请选择结果连接符');
-        scrollToElement(payoutRef);
-        return;
-    }
-    if (payout.value.templateConfiguration.typeface == '') {
-        ElMessage.error('请选择字体');
-        scrollToElement(payoutRef);
-        return;
-    }
-    if (payout.value.basicInfo.payoutNumber == '') {
-        ElMessage.error('请输入小卡数量');
-        scrollToElement(payoutRef);
-        return;
-    }
-    if (payout.value.basicInfo.payoutAmount == '') {
-        ElMessage.error('请输入小卡单价');
-        scrollToElement(payoutRef);
-        return;
-    }
-    // 判断奖符信息是否完整
-    const incompletePayoutMark = payout.value.game.find(mark => {
-        if (!mark.gameAmount) {
-            ElMessage.error('请填写玩法金额');
+    if (payout.value.payoutType == 'manual') {
+        if (payout.value.templateConfiguration.quantitativeConnector == '') {
+            ElMessage.error('请选择数量连接符');
             scrollToElement(payoutRef);
-            return true;
+            return;
         }
-        if (!mark.gameNumber) {
-            ElMessage.error('请填写玩法数量');
+        if (payout.value.templateConfiguration.resultConnector == '') {
+            ElMessage.error('请选择结果连接符');
             scrollToElement(payoutRef);
-            return true;
+            return;
         }
-        return false;
-    });
+        if (payout.value.templateConfiguration.typeface == '') {
+            ElMessage.error('请选择字体');
+            scrollToElement(payoutRef);
+            return;
+        }
+        if (payout.value.basicInfo.payoutNumber == '') {
+            ElMessage.error('请输入小卡数量');
+            scrollToElement(payoutRef);
+            return;
+        }
+        if (payout.value.basicInfo.payoutAmount == '') {
+            ElMessage.error('请输入小卡单价');
+            scrollToElement(payoutRef);
+            return;
+        }
+        // 判断奖符信息是否完整
+        const incompletePayoutMark = payout.value.game.find(mark => {
+            if (!mark.gameAmount) {
+                ElMessage.error('请填写玩法金额');
+                scrollToElement(payoutRef);
+                return true;
+            }
+            if (!mark.gameNumber) {
+                ElMessage.error('请填写玩法数量');
+                scrollToElement(payoutRef);
+                return true;
+            }
+            return false;
+        });
 
-    if (incompletePayoutMark) {
-        return;
+        if (incompletePayoutMark) {
+            return;
+        }
+    } else {
+        if (!payout.value.payoutImage) {
+            ElMessage.error('请上传Payout图片');
+            scrollToElement(payoutRef);
+            return;
+        }
     }
 
     let submitData = {
@@ -326,8 +367,13 @@ const handleSubmit = () => {
     };
     console.log(submitData);
     validateStatus.value = false;
+
     localStorage.setItem('submitData', JSON.stringify(submitData));
     serviceClass.createOrder(submitData).then(res => {
+        clearInterval(autoSaveTimer);
+        serviceClass.deleteDraft(store.state.userInfo.id).then(res => {
+            console.log('删除草稿成功');
+        });
         ElMessageBox.alert(res.msg, '提交结果', {
             confirmButtonText: 'OK',
             callback: (action) => {
@@ -338,9 +384,28 @@ const handleSubmit = () => {
         }).catch((err) => {
             ElMessage.error(err);
         });
-    });
+    })
 };
 
+
+const autoSave = () => {
+    let submitData = {
+        orderId: orderId.value,
+        companyName: general.value.company,
+        general: general.value,
+        smallCard: smallCard.value,
+        adCard: adCard.value,
+        rewardInfo: rewardInfo.value,
+        prizeMark: prizeMark.value,
+        payout: payout.value,
+        // 新增状态
+        status: editMode.value ? '1' : '0'  // 0:新增 1:编辑
+    };
+    console.log(submitData);
+    serviceClass.autoSave(submitData).then(res => {
+        console.log('自动保存成功');
+    });
+};
 // 监听输入内容，清除错误提示
 clearErrorOnInput(general);
 clearErrorOnInput(smallCard);
@@ -352,6 +417,7 @@ clearErrorOnInput(prizeMark);
 .payout {
     margin-bottom: 90px
 }
+
 .create-order {
     position: relative;
 

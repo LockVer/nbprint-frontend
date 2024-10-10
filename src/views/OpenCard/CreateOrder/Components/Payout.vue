@@ -1,13 +1,13 @@
 <template>
     <x-card title="Payout信息">
         <x-component label="填写Payout方式">
-            <x-check-box v-model="payoutType" :DataList="payoutTypeList" type="radio"></x-check-box>
+            <x-check-box v-model="initData.payoutType" :DataList="payoutTypeList" type="radio"></x-check-box>
         </x-component>
-        <x-component label="背景图" width="220px" v-if="payoutType == 'upload'"
+        <x-component label="Payout图片" width="220px" v-if="initData.payoutType == 'upload'"
             :showErrorMsg="!(initData.payoutImage)">
             <x-input-upload v-model:image="initData.payoutImage"></x-input-upload>
         </x-component>
-        <div class="basicInfo" v-if="payoutType == 'manual'">
+        <div class="basicInfo" v-if="initData.payoutType == 'manual'">
             <div class="title">模板配置</div>
             <div class="generalInfo">
                 <x-component label="数量连接符" :titleStyle="'#484848'" :width="'220px'" :showErrorMsg="!(initData.templateConfiguration.quantitativeConnector)">
@@ -38,7 +38,7 @@
                 </x-component>
             </div>
         </div>
-        <div class="basicInfo" v-if="payoutType == 'manual'">
+        <div class="basicInfo" v-if="initData.payoutType == 'manual'">
             <div class="title">基础信息</div>
             <div class="generalInfo">
                 <x-component label="添加标题形式" :titleStyle="'#484848'" :width="'200px'" :titleBottom="'12px'">
@@ -73,7 +73,7 @@
                 </x-component>
             </div>
         </div>
-        <div class="basicInfo playingMethod" v-if="payoutType == 'manual'">
+        <div class="basicInfo playingMethod" v-if="initData.payoutType == 'manual'">
             <div class="title">玩法信息</div>
             <div class="award-id">
                 <div class="addtype">
@@ -182,7 +182,6 @@ const gameData = defineModel("gameData");
 const smallCardData = defineModel("smallCard");
 const payoutDialogVisible = ref(false);
 const fileInputRefs = ref({});
-const payoutType = ref('upload');
 
 const payoutTypeList = [
     {

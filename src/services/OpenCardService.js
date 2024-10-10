@@ -28,6 +28,15 @@ class OpenCardService {
     getOrderById(id) {
         return this.apiService.get(`/uncardOrder/edit?id=${id}`, {}, true);
     }
+    autoSave(data) {
+        return this.apiService.post('/draft/save', data, true, true);
+    }
+    loadDraft(id) {
+        return this.apiService.get(`/draft/load?nbUserId=${id}`, {}, true);
+    }
+    deleteDraft(id) {
+        return this.apiService.get(`/draft/delete?nbUserId=${id}`, {}, true);
+    }
 }
 
 export default OpenCardService;
