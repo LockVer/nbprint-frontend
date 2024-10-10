@@ -7,16 +7,22 @@
             <input class="einput" v-model="username" type="text" placeholder="用户名">
             <input class="einput" v-model="password" type="password" placeholder="密码">
             <button class="ebutton" @click="login">登录</button>
-            <p>默认用户名为<b>手机号</b></p>
-            <p>默认密码为姓<b>手机号+@King1936</b></p>
-            <p>例如：章三 - 13062081022 - 13062081022@King1936</p>
+            <!-- <button class="ebutton feishu">
+                <img src="../../assets/feishu.png" alt="">
+                <span>飞书登录</span>
+            </button> -->
+            <p>默认用户名为个人公司备案手机号</p>
+            <p>默认密码为“手机号@King1936”</p>
+            <p>例如：章三公司备案手机号为17666266366</p>
+            <p>用户名即为“17666266366”</p>
+            <p>密码即为“17666266366@King1936”</p>
         </div>
     </div>
 </template>
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import UserService from '../../services/UserService';
-import { useRouter,useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { ElMessage } from 'element-plus'
 const userService = new UserService();
@@ -87,6 +93,21 @@ const login = () => {
             font-size: 36px;
             margin-bottom: 20px;
             font-weight: bold;
+        }
+
+        .feishu {
+            background-color: white;
+            border-radius: 2px;
+            border: 1px solid #EEE;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            img {
+                width: 44px;
+                height: 44px;
+                margin-right: 10px;
+            }
         }
 
         .ebutton {

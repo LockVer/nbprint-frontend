@@ -16,40 +16,66 @@
             </span>
             <template #dropdown>
                 <el-dropdown-menu>
-                    <!-- <el-dropdown-item @click="helpDocumentHandler"> -->
-                    <el-dropdown-item >
-                        <a href="https://huivodata.feishu.cn/docx/EOyOdYW8zoGC2Tx1K76c60XbnYe?from=from_copylink" target="_blank" rel="noopener noreferrer">帮助文档</a>
-                    </el-dropdown-item>
-                    <el-dropdown-item @click="console.log(222)" disabled>意见反馈</el-dropdown-item>
-                    <el-dropdown-item disabled>个人设置</el-dropdown-item>
                     <el-dropdown-item @click="changePassword">修改密码</el-dropdown-item>
+                    <el-dropdown-item>
+                        <a class="infoLink"
+                            href="https://huivodata.feishu.cn/docx/EOyOdYW8zoGC2Tx1K76c60XbnYe?from=from_copylink"
+                            target="_blank" rel="noopener noreferrer">帮助文档</a>
+                    </el-dropdown-item>
+                    <el-dropdown-item >
+                        <a class="infoLink"
+                            href="https://huivodata.feishu.cn/share/base/form/shrcnVDYEo0xgRzPEU72Ao5mSJf"
+                            target="_blank" rel="noopener noreferrer">意见反馈</a>
+                        </el-dropdown-item>
+                    <el-dropdown-item @click="dialogVersionInforVisible = true">版本信息</el-dropdown-item>
                     <el-dropdown-item @click="goOutHandler">退出</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
     </div>
-    <el-dialog v-model="dialogFormVisible" title="修改密码" width="500">
-    <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" status-icon :rules="rules" label-width="auto"
-      class="demo-ruleForm">
-      <el-form-item label="原始密码" prop="originalPass">
-        <el-input type="password" v-model="ruleForm.originalPass" placeholder="请输入原密码" />
-      </el-form-item>
-      <el-form-item class="newPass" label="新密码" prop="pass">
-        <el-input v-model="ruleForm.pass" type="password" autocomplete="off" placeholder="请输入新密码" />
-      </el-form-item>
-      <el-form-item label="确认密码" prop="checkPass">
-        <el-input v-model="ruleForm.checkPass" type="password" autocomplete="off" placeholder="请再次输入密码" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm(ruleFormRef)">提交
-        </el-button>
-        <el-button @click="resetForm(ruleFormRef)">重置</el-button>
-      </el-form-item>
-    </el-form>
-  </el-dialog>
+    <el-dialog class="version-dialog" v-model="dialogPasswordVisible" title="修改密码" width="500">
+        <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" status-icon :rules="rules"
+            label-width="80px" class="demo-ruleForm" hide-required-asterisk="false">
+            <el-form-item label="旧密码" prop="originalPass">
+                <el-input type="password" v-model="ruleForm.originalPass" placeholder="请输入旧密码" />
+            </el-form-item>
+            <el-form-item class="newPass" label="新密码" prop="pass">
+                <el-input v-model="ruleForm.pass" type="password" autocomplete="off" placeholder="请输入新密码" />
+            </el-form-item>
+            <el-form-item label="确认密码" prop="checkPass">
+                <el-input v-model="ruleForm.checkPass" type="password" autocomplete="off" placeholder="请再次输入密码" />
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm(ruleFormRef)">提交
+                </el-button>
+                <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+    <el-dialog class="version-dialog" v-model="dialogVersionInforVisible" title="版本信息" width="500" :show-close="false">
+        <div class="info">
+            <div class="title">当前版本号</div>
+            <div class="value">V1.3.0</div>
+        </div>
+        <div class="info">
+            <div class="title">更新时间</div>
+            <div class="value">2024-09-16</div>
+        </div>
+        <div class="content">
+            <div class="title">更新内容</div>
+            <div class="item" v-for="(item, index) in promotionalCardInfoList" :key="index">
+                <div class="item-title">· {{ item.title }}</div>
+                <div class="item-content" v-for="(content, index) in item.contents" :key="index">&nbsp;&nbsp;{{ content
+                    }}
+                </div>
+            </div>
+        </div>
+        <div class="button-container">
+            <button class="goout" @click="dialogVersionInforVisible = false">退出</button>
+        </div>
+    </el-dialog>
 </template>
 <script setup>
-import pdfUrl from '@/assets/揭开卡系统操作手册.pdf';
 import { defineComponent, ref, reactive, computed } from 'vue';
 import UserService from '../../services/UserService';
 import { ElMessage } from 'element-plus';
@@ -57,8 +83,51 @@ import { useStore } from 'vuex';
 const store = useStore();
 const userService = new UserService();
 const userInfo = computed(() => store.state.userInfo);
+const promotionalCardInfoList = [
+    {
+        title: "宣传卡信息",
+        contents: [
+            "添加多个宣传卡时的样式；",
+            "订单详情-页面底部添加了返回按钮；",
+            "盒号位置添加 自定义位置"
+        ]
+    },
+    {
+        title: "小卡信息优化",
+        contents: [
+            "添加自定义尺寸；",
+            "添加层数，每层均分"
+        ]
+    },
+    {
+        title: "payout优化",
+        contents: [
+            "添加直接上传客户payout文件功能"
+        ]
+    },
+    {
+        title: "添加揭开区优化",
+        contents: [
+            "全局操作步骤与布局优化"
+        ]
+    },
+    {
+        title: "全局优化",
+        contents: [
+            "提交时自动定位到报错位置，飘红"
+        ]
+    },
+    {
+        title: "个人设置优化",
+        contents: [
+            "添加修改密码功能；",
+            "添加了版本信息功能"
+        ]
+    }
+]
 
-const dialogFormVisible = ref(false);
+const dialogPasswordVisible = ref(false);
+const dialogVersionInforVisible = ref(false);
 
 const headerData = reactive({
     title: "揭开卡",
@@ -76,17 +145,13 @@ const handleClick = (index) => {
         action.isActive = i === index;
     });
 }
-
-const helpDocumentHandler = () => {
-    window.open(pdfUrl, '_blank');
-}
 const changePassword = () => {
-    dialogFormVisible.value = true
+    dialogPasswordVisible.value = true
 }
 const ruleFormRef = ref()
 const checkoriginalPass = (rule, value, callback) => {
     if (value === '') {
-        return callback(new Error('请输入您的原密码'))
+        return callback(new Error('请输入您的旧密码'))
     } else {
         callback()
     }
@@ -148,9 +213,12 @@ const submitForm = (formEl) => {
                 setInterval(() => {
                     window.location.reload();
                 }, 3000)
-                dialogFormVisible.value = false
+                dialogPasswordVisible.value = false
             }).catch((err) => {
-                console.log(err)
+                ElMessage({
+                    type: 'error',
+                    message: err,
+                });
             })
         } else {
             console.log('error submit!', ruleForm)
@@ -244,7 +312,79 @@ const goOutHandler = () => {
             }
         }
     }
+
 }
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    color: #484848;
+    font-family: "Source Han Sans CN";
+    font-size: 14px;
+    font-weight: 600;
+
+    .value {
+        text-align: end;
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+
+    .title {
+        font-weight: 600;
+        color: #484848;
+    }
+
+    .item {
+        padding-left: 10px;
+        box-sizing: border-box;
+    }
+
+    .item-title {
+        color: #666;
+        font-family: "Source Han Sans CN";
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 21px;
+        margin-bottom: 4px;
+    }
+
+    .item-content {
+        color: #999;
+        font-family: "Source Han Sans CN";
+        font-size: 12px;
+        line-height: 18px;
+    }
+}
+
+.button-container {
+    display: flex;
+    justify-content: center; // 水平居中
+    margin-top: 20px; // 可选：增加一点顶部间距
+
+    .goout {
+        color: #029;
+        text-align: center;
+        font-family: "Source Han Sans CN";
+        font-size: 12px;
+        min-width: 100px;
+        padding: 8px 20px;
+        border-radius: 4px;
+        border: 1px solid #029;
+        background-color: #fff;
+        cursor: pointer;
+        &:hover {
+            background-color: #f0f0f0;
+        }
+    }
+}
+
+
 
 ::v-deep(.el-button) {
     padding: 8px 25px;
@@ -259,12 +399,37 @@ const goOutHandler = () => {
     text-align: start;
     margin-left: 0px !important;
 }
+
+.infoLink {
+    text-decoration: none;
+    color: #606266;
+
+    &:hover {
+        color: #002299;
+    }
+}
 </style>
 <style lang="scss">
 .newPass {
     .el-form-item__label-wrap {
         width: 68px !important;
         margin-right: 12px;
+    }
+}
+
+.version-dialog {
+    .el-dialog__header{
+        border-bottom: 1px solid #E4E4E4;
+        margin-bottom: 18px;
+    }
+    .el-dialog__title {
+        color: #333;
+        font-family: "Source Han Sans CN";
+        font-size: 24px;
+        font-weight: 700;
+    }
+    .el-form-item__label{
+        justify-content: flex-start;
     }
 }
 </style>
