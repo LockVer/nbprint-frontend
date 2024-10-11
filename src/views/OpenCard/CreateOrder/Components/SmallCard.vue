@@ -7,9 +7,9 @@
         <x-component width="440px" label="自定义尺寸(mm)" padding="0 0 18px 0" v-if="initData.size.type == 'CUSTOM'"
             :showErrorMsg="!(initData.size.width && initData.size.height)">
             <div class="custom-size">
-                <el-input-number v-model="initData.size.width" :precision="1" :step="0.1" :min="1" :controls="false" />
+                <el-input-number :disabled="hasOpenRegion" v-model="initData.size.width" :precision="1" :step="0.1" :min="1" :controls="false" />
                 <span>*</span>
-                <el-input-number v-model="initData.size.height" :precision="1" :step="0.1" :min="1"
+                <el-input-number :disabled="hasOpenRegion" v-model="initData.size.height" :precision="1" :step="0.1" :min="1"
                     :controls="false" />
             </div>
         </x-component>
