@@ -40,7 +40,7 @@
                 <el-input-number :step="1" :disabled="hasOpenRegion" v-model="initData.columnCount" :min="1" />
             </x-component>
             <x-component label="每列数量" padding="0 0 18px 0" width="220px">
-                <el-input-number :disabled="hasOpenRegion" v-model="initData.columnQuantity" :min="1" />
+                <el-input-number :disabled="hasOpenRegion" v-model="initData.columnQuantity" :min="1" :step="1"/>
             </x-component>
         </div>
         <div class="bg-img">
@@ -157,6 +157,7 @@ const calcRowCount = () => {
             initData.value.columnCount = columnCount;
             //计算每列数量，如果每列数量不是整数，向上取最接近的整数
             initData.value.columnQuantity = Math.ceil(quantityPerBox / columnCount);
+            console.log('box:', initData.value.columnQuantity);
             initData.value.box = box;
         }
     }
@@ -192,7 +193,7 @@ const calcBoxSize = (columnCount, columnQuantity) => {
     const height = initData.value.size.height;  //小卡高度
     const thickness = 0.67;                      //小卡厚度
     if (!columnQuantity) {
-        columnQuantity = initData.value.quantityPerBox / columnCount;
+        columnQuantity = Math.ceil(initData.value.quantityPerBox / columnCount);
     }
     if (!columnCount) {
         columnCount = initData.value.quantityPerBox / columnQuantity;
