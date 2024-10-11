@@ -1,7 +1,9 @@
 <template>
     <div class="card-container" :style="cardStyle">
       <div class="card-header" v-if="title" :style="headerStyle">
-        <div class="card-title" :style="titleStyle">{{ title }}</div>
+        <div class="card-title" :style="titleStyle">{{ title }}
+          
+        </div>
         <div class="card-btn">
           <el-button color="#4d65b8" v-if="title == '订单管理'" style="border-color: #4d65b8;" @click="updateOrderStatus">
             <el-icon :class="{ spin: isSpinning }" style="vertical-align: middle">
@@ -12,6 +14,7 @@
           <el-button color="#4d65b8" v-if="title == '订单管理'" style="border-color: #4d65b8;" @click="createOrderHandler">
             + 创建订单
           </el-button>
+          <slot name="header"></slot>
         </div>
       </div>
       <div class="card-content">

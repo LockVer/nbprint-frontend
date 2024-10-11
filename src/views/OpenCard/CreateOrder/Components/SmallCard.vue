@@ -1,7 +1,7 @@
 <template>
     <x-card title="小卡信息">
         <x-component label="尺寸(mm)" padding="0 0 10px 0">
-            <x-check-box :disabled="hasOpenRegion" disabledText="宣传卡揭开区已创建，禁止修改，如需修改，请先清空揭开区。" v-model="initData.size"
+            <x-check-box :disabled="hasOpenRegion" disabledText="宣传卡信息已创建，禁止修改，如需修改，请先清空宣传卡信息。" v-model="initData.size"
                 :DataList="cardSizeList" type="radio"></x-check-box>
         </x-component>
         <x-component width="440px" label="自定义尺寸(mm)" padding="0 0 18px 0" v-if="initData.size.type == 'CUSTOM'"

@@ -1,5 +1,10 @@
 <template>
     <x-card title="宣传卡信息">
+        <template #header>
+            <div>
+                <el-button type="danger" @click="clearAdCardInfo">清空宣传卡信息</el-button>
+            </div>
+        </template>
         <div class="ad-card-header">
             <x-component label="宣传卡数量" padding="0 0 18px 0">
                 <el-input-number v-model="communicator.data.adCardQty" :min="1" :max="10" />
@@ -92,6 +97,7 @@ import RevealAreaEditor from './AdCardComponents/RevealArea/Editor.vue';
 import BoxNumberEditor from './AdCardComponents/BoxNumberPosition/Editor.vue';
 import Communicator from '@/utils/Communicator';
 import CalculationUtils from './AdCardComponents/AdCardUtils/CalculationUtils';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 const smallCard = defineModel("smallCard");
 const initData = defineModel("initData");
@@ -186,6 +192,31 @@ const addDone = () => {
 const closePanel = () => {
     revealDialogVisible.value = false;
     boxNumberDialogVisible.value = false;
+}
+
+const clearAdCardInfo = () => {
+    ElMessageBox.confirm('确定清空宣传卡信息吗？清空后不可恢复！', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        communicator.data.adCardList = [
+            {
+                imageSize: '',
+                image: '',
+                adCardSize: null,
+                adBoxCode: '',
+                type: 'non-openable',
+                openDirection: 'T',
+                adBoxCodePosition: 'BL',
+                openRegions: [],
+                boxNumberRegions: []
+            }
+        ];
+        communicator.data.adCardQty = 1;
+    }).catch(() => {
+        console.log('取消清空');
+    });
 }
 
 </script>
