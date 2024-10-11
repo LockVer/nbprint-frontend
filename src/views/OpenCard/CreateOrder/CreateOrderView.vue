@@ -402,7 +402,10 @@ const autoSave = () => {
         status: editMode.value ? '1' : '0'  // 0:新增 1:编辑
     };
     console.log(submitData);
-    serviceClass.autoSave(submitData).then(res => {
+    serviceClass.autoSave({
+        nbUserId: store.state.userInfo.id,
+        json: JSON.stringify(submitData)
+    }).then(res => {
         console.log('自动保存成功');
     });
 };

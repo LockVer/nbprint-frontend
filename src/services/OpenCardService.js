@@ -29,7 +29,7 @@ class OpenCardService {
         return this.apiService.get(`/uncardOrder/edit?id=${id}`, {}, true);
     }
     autoSave(data) {
-        return this.apiService.post('/draft/save', data, true, true);
+        return this.apiService.post('/draft/saveByStr', data, true, true);
     }
     loadDraft(id) {
         return this.apiService.get(`/draft/load?nbUserId=${id}`, {}, true);
