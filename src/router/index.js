@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-
-
-
 const routes = [
   // 首页
   {
@@ -27,7 +24,7 @@ const routes = [
   {
     path: '/opencard',
     name: 'orderlist',
-    component: () => import('../views/OpenCard/OrderListView.vue')
+    component: () => import('../views/OpenCard/OrderManagement/OrderListView.vue')
   },
   // 订单详情
   {
@@ -37,21 +34,33 @@ const routes = [
   },
   // 工厂审核
   {
-    path: '/factoryaudit',
+    path: '/factory/factoryaudit',
     name: 'factoryaudit',
-    component: () => import('../views/OpenCard/FactoryAudit/FactoryAuditView.vue')
+    component: () => import('../views/Factory/FactoryAudit/FactoryAuditView.vue')
   },
   // 工厂审核详情
   {
-    path: '/factoryaudit/detail/:id',
+    path: '/factory/factoryaudit/detail/:id',
     name: 'auditdetails',
-    component: () => import('../views/OpenCard/FactoryAudit/AuditDetails/DetailView.vue')
+    component: () => import('../views/Factory/FactoryAudit/AuditDetails/DetailView.vue')
   },
   // 人员管理
   {
     path: '/PersonnelManagement',
     name: 'PersonnelManagement',
     component: () => import('../views/OpenCard/PersonnelManagement/PersonnelManagementView.vue')
+  },
+  // 算法 -- 数据生成列表
+  {
+    path: '/dataGeneration/dataGenerationList',
+    name: 'dataGenerationList',
+    component: () => import('@/views/Algorithm/DataGenerationList/DataGenerationListView.vue')
+  },
+  // 算法 -- 数据生成详情
+  {
+    path: '/dataGeneration/dataGenerationDetail',
+    name: 'dataGenerationDetail',
+    component: () => import('@/views/Algorithm/DataGenerationDetail/DataGenerationDetailView.vue')
   }
 ]
 

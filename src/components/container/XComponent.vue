@@ -63,6 +63,10 @@ const validateStatus = inject('validateStatus');
                     content="小卡盒号的位置有且仅有下左、下中、下右三种摆放方式，请检查是否符合" placement="bottom-start">
                     <i style="font-style: normal;">?</i>
                 </el-tooltip>
+                <el-tooltip v-if="label === '上传数据'" class="box-item" effect="light" :show-arrow="false"
+                    content="若系统不支持此算法，人工生成上传数据" placement="bottom-start">
+                    <i style="font-style: normal;">?</i>
+                </el-tooltip>
                 <slot name="header"></slot>
                 <div class="error-msg" v-if="showErrorMsg && validateStatus">
                     <span class="iconfont icon-warning"></span>
