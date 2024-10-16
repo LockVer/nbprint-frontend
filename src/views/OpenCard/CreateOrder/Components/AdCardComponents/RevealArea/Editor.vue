@@ -62,19 +62,72 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="font-settings" v-if="communicator.data.showFontPanel">
+                    <div class="game-award">
+                        <div class="award-title">
+                            <span>揭开区字体格式</span>
+                            <el-button type="primary" link @click="openAddFont">
+                                配置字体
+                            </el-button>
+                        </div>
+                        <div class="game-award-action">
+                            <x-component label="字体" padding="0 0 18px 0">
+                                <el-select v-model="selectFontFamily" placeholder="Select" @change="changeFontFamily">
+                                    <el-option v-for="item in fontFamilyList" :key="item.value" :label="item.label"
+                                        :value="item.value" />
+                                </el-select>
+                            </x-component>
+                            <x-component label="字号" padding="0 0 18px 0">
+                                <el-input-number v-model="selectFontSize" :min="12" :max="100"
+                                    @change="changeFontSize" />
+                            </x-component>
+                            <x-component label="自动计算" padding="0 0 18px 0">
+                                <el-button type="primary" plain @click="reCalcFontSize">重置字号，并自动计算</el-button>
+                            </x-component>
+                        </div>
+                    </div>
+                </div>
             </XCanvas>
+        </div>
+        <div class="addfont-dialog">
+            <el-dialog v-model="addFontDialogVisible" width="750px">
+                <div class="dialog-header">
+                    <span>配置字体</span>
+                    <span class="iconfont icon-close" @click="addFontDialogVisible = false"></span>
+                </div>
+                <div class="line"></div>
+                <el-table :data="allFontList" style="width: 100%" max-height="300">
+                    <el-table-column prop="fontName" label="字体名称" />
+                    <el-table-column prop="fileName" label="文件名称" />
+                    <el-table-column fixed="right" label="操作" width="100">
+                        <template #default="scope">
+                            <el-button link type="danger" size="small" @click.stop="deleteFont(scope.row)">
+                                删除
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div class="add-font-box">
+                    <div class="tip">添加字体</div>
+                    <div class="add-font-upload">
+                        <el-input placeholder="请输入字体名称" v-model="addFontName" width="200px" />
+                        <x-input-upload v-model:file="addFontFile" :autoUpload="false" link uploadType="file" />
+                        <el-button type="primary" @click="uploadFont">添加</el-button>
+                    </div>
+                </div>
+            </el-dialog>
         </div>
     </div>
 </template>
 <script setup>
-import { ref, reactive, provide, inject, defineProps, defineEmits, toRaw, onMounted, computed } from 'vue';
+import { ref, reactive, provide, inject, defineProps, defineEmits, toRaw, onMounted, computed, watch } from 'vue';
 import OperationArea from './Components/OperationArea.vue';
 import XCanvas from '@/components/functional/xcanvas/XCanvas.vue';
 import XComponent from '@/components/container/XComponent.vue';
 import Communicator from '@/utils/Communicator';
-import RectHandler from '@/components/functional/xcanvas/utils/ToolbarUtils/RectHandler';
-
+import XInputUpload from '@/components/functional/XInputUpload.vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+const commonClass = inject('commonClass');
 const emits = defineEmits(['addDone', 'closePanel']);
 
 const props = defineProps({
@@ -83,6 +136,74 @@ const props = defineProps({
         default: null
     }
 });
+
+const selectFontFamily = ref('Arial');
+const fontFamilyList = computed(() => {
+    return allFontList.value.map(font => ({
+        label: font.fontName,
+        value: font.ossPath
+    }));
+});
+const selectFontUrl = ref('');
+const selectFontSize = ref(12);
+const addFontDialogVisible = ref(false);
+const addFontName = ref('');
+const addFontFile = ref(null);
+const allFontList = ref([]);
+const getFontList = () => {
+    commonClass.getFontList().then((res) => {
+        console.log('getFontList:', res);
+        allFontList.value = res.data;
+    }).catch((err) => {
+        ElMessage.error(err);
+        console.log(err);
+    });
+}
+const openAddFont = () => {
+    getFontList();
+    addFontDialogVisible.value = true;
+    addFontName.value = '';
+    addFontFile.value = null;
+}
+const uploadFont = () => {
+    console.log('uploadFont');
+    console.log('addFontName:', addFontName.value);
+    console.log('addFontFile:', addFontFile.value);
+    if (!addFontName.value) {
+        ElMessage.error('请输入字体名称');
+        return;
+    }
+    if (!addFontFile.value) {
+        ElMessage.error('请上传字体文件');
+        return;
+    }
+
+    commonClass.uploadFont(addFontFile.value, addFontName.value).then((res) => {
+        addFontName.value = '';
+        addFontFile.value = null;
+        getFontList();
+    }).catch((err) => {
+        console.log(err);
+        ElMessage.error(err);
+    });
+}
+const deleteFont = (row) => {
+    console.log('deleteFont:', row);
+    ElMessageBox.confirm('确定删除该字体？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        commonClass.deleteFont(row.id).then((res) => {
+            getFontList();
+        }).catch((err) => {
+            console.log(err);
+            ElMessage.error(err);
+        });
+    }).catch(() => {
+        ElMessage.info('已取消删除');
+    });
+}
 
 const communicatorName = 'revealAreaCommunicator';  // 通信器名称
 // 实例化 Communicator 并创建响应式对象
@@ -96,8 +217,7 @@ const currentGameShapeList = computed(() => {
     return communicator.data.shapeList.filter(item => item.id === communicator.data.currentGameArea.id);
 });
 const initData = () => {
-    const { actualScale } = communicator.data;
-
+    getFontList();
     if (!props.currentAdCard.adCardStatus) {
         return;
     }
@@ -107,8 +227,6 @@ const initData = () => {
         game.active = false;
     });
     communicator.data.regions = props.currentAdCard.openRegions;
-    console.log(actualScale)
-    
     console.log('communicator.data:', communicator.data);
 }
 
@@ -189,7 +307,7 @@ const removeAward = (index) => {
 }
 
 const addDone = () => {
-    const { shapeList, actualScale } = communicator.data;
+    const { shapeList, pxToMm } = communicator.data;
     let isPass = true;
     shapeList.forEach((shape) => {
         shape.checkProximity();
@@ -206,19 +324,21 @@ const addDone = () => {
     props.currentAdCard.openRegions = shapeList.map((shape) => {
         console.log('shape:', shape);
         return {
-            x: shape.x / actualScale,
-            y: shape.y / actualScale,
-            width: shape.width / actualScale,
-            height: shape.height / actualScale,
+            x: shape.x,
+            y: shape.y,
+            width: shape.width,
+            height: shape.height,
             awardList: shape.awardList,
             mark: shape.mark.map((item) => {
                 return {
-                    x: item.x / actualScale,
-                    y: item.y / actualScale,
-                    width: item.width / actualScale,
-                    height: item.height / actualScale,
-                    fontSize: item.fontSize,
-                    text: item.text
+                    x: item.x,
+                    y: item.y,
+                    width: item.width,
+                    height: item.height,
+                    fontSize: pxToMm(item.fontSize),
+                    text: item.text,
+                    fontFamily: item.fontFamily,
+                    fontName: item.fontName
                 }
             }),
             id: shape.id,
@@ -240,6 +360,58 @@ const addDone = () => {
 const closePanel = () => {
     emits('closePanel');
 }
+
+const changeFontFamily = (value) => {
+    console.log('changeFontFamily:', value);
+    const { shapeList } = communicator.data;
+    shapeList.forEach((shape) => {
+        if (shape.active || shape.selected) {
+            shape.fontFamily = value;
+            shape.fontName = fontFamilyList.value.find(item => item.value === value).label;
+        }
+    });
+    console.log(shapeList)
+}
+
+const changeFontSize = (value) => {
+    const { shapeList } = communicator.data;
+    shapeList.forEach((shape) => {
+        if (shape.active || shape.selected) {
+            shape.fontSize = value;
+        }
+    });
+}
+
+const reCalcFontSize = () => {
+    const { shapeList } = communicator.data;
+    shapeList.forEach((shape) => {
+        if (shape.active || shape.selected) {
+            shape.fontSize = null;
+        }
+    });
+    communicator.data.rendererUtil.render();
+}
+
+watch(communicator.data, (val) => {
+    if (!val.shapeList) return;
+    const selectedList = val.shapeList.filter(item => {
+        return item.active || item.selected;
+    })
+    if (selectedList.length > 0) {
+        communicator.data.showFontPanel = true;
+        communicator.data.currentFontFamily = selectedList[0].fontFamily;
+        communicator.data.currentFontSize = selectedList[0].fontSize;
+        selectFontFamily.value = selectedList[0].fontFamily;
+        selectFontSize.value = selectedList[0].fontSize;
+        selectFontUrl.value = selectedList[0].fontUrl;
+    } else {
+        communicator.data.showFontPanel = false;
+    }
+}, {
+    deep: true,
+    immediate: true
+});
+
 </script>
 <style scoped lang="scss">
 .panel {
@@ -293,6 +465,9 @@ const closePanel = () => {
                 color: #333333;
                 border-bottom: 1px solid #ebeef5;
                 padding-bottom: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
             }
 
             .game-award-action {
@@ -356,6 +531,76 @@ const closePanel = () => {
                 margin-top: 20px;
                 text-align: center;
                 width: 100%;
+            }
+        }
+    }
+}
+
+.font-settings {
+    width: 270px;
+    overflow-y: auto;
+    background-color: white;
+    box-shadow: 0px 0px 10px 0px #00000014;
+    z-index: 1;
+    right: 10px;
+    top: 10px;
+    position: absolute;
+    border-radius: 5px;
+}
+
+.addfont-dialog {
+    .dialog-header {
+        font-size: 24px;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .iconfont {
+            font-size: 24px;
+            cursor: pointer;
+
+            &:hover {
+                color: #FF3130;
+            }
+        }
+    }
+
+    .line {
+        margin: 10px 0;
+    }
+
+    .tip {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .process-tip {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .footer {
+        margin-top: 20px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .add-font-box {
+        padding: 10px;
+        background-color: #FAFBFD;
+        margin-top: 10px;
+
+        .add-font-upload {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+
+            .el-button {
+                width: 100px;
+                margin-left: auto;
             }
         }
     }

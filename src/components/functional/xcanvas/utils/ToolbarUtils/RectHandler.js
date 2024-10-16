@@ -221,7 +221,7 @@ class RectHandler extends ShapeBase {
         this.y = newY;
         this.width = newWidth;
         this.height = newHeight;
-
+        this.calculateDistanceLines();
         this.communicator.data.rendererUtil.render();
     }
     setInitialPosition() {

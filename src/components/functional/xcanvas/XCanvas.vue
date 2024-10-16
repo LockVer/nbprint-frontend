@@ -6,6 +6,7 @@
             <slot></slot>
             <div class="canvas-box">
                 <canvas ref="gridCanvasRef"></canvas>
+                <canvas ref="backgroundCanvasRef"></canvas>
                 <canvas ref="operateCanvasRef" tabindex="0" @mousedown="onMouseDown" @mousemove="onMouseMove"
                     @mouseup="onMouseUp" @wheel="onWheel"></canvas>
             </div>
@@ -108,19 +109,19 @@ const initCanvasPage = () => {
 }
 
 const initShapeList = () => {
+    const { mmToPx } = communicator.data;
+
     if (!communicator.data.regions) {
         return;
     }
-    const { actualScale } = communicator.data;
-
     console.log('communicator.data.regions:', communicator.data.regions);
 
     communicator.data.shapeList = communicator.data.regions.map((region) => {
         const rect = {
-            x: region.x * actualScale,
-            y: region.y * actualScale,
-            width: region.width * actualScale,
-            height: region.height * actualScale,
+            x: region.x,
+            y: region.y,
+            width: region.width,
+            height: region.height,
             awardList: region.awardList || [],
             id: region.id || '',
             text: region.text || '',
@@ -130,11 +131,13 @@ const initShapeList = () => {
         if (region.mark) {
             rect.mark = region.mark.map((item) => {
                 return {
-                    x: item.x * actualScale,
-                    y: item.y * actualScale,
-                    width: item.width * actualScale,
-                    height: item.height * actualScale,
-                    fontSize: item.fontSize,
+                    x: item.x,
+                    y: item.y,
+                    width: item.width,
+                    height: item.height,
+                    fontSize: mmToPx(item.fontSize),
+                    fontName: item.fontName,
+                    fontFamily: item.fontFamily,
                     text: item.text
                 }
             })
@@ -169,13 +172,15 @@ const mouseDownHandler = (event) => {
 }
 
 const clickAction = (item) => {
+    const { actualScale } = communicator.data;
+
     switch (item.mode) {
         case 'rect':
             const shape = {
                 x: 0,
                 y: 0,
-                width: 100,
-                height: 100,
+                width: 100 / actualScale,
+                height: 100 / actualScale,
                 type: 'rect',
             }
             if (communicator.data.shapeList.length >= communicator.data.maxShapeCount) {

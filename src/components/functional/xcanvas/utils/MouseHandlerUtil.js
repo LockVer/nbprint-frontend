@@ -147,7 +147,7 @@ class MouseHandlerUtil {
 
     // 鼠标滚轮
     mouseWheel = (e) => {
-        const { hotkey, operateCanvasRef, virtualScale, virtualMaxScale, backgroundImagePosition } = this.communicator.data;
+        const { hotkey, operateCanvasRef, virtualScale, actualScale, virtualMaxScale, backgroundImagePosition } = this.communicator.data;
         const imageCanvas = operateCanvasRef;
         const rect = imageCanvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -155,10 +155,10 @@ class MouseHandlerUtil {
         const wheel = e.deltaY < 0 ? 1.1 : 0.9;
         let newScale = virtualScale * wheel;
 
-        if (newScale < 0.5) {
-            newScale = 0.5;
-        } else if (newScale > virtualMaxScale) {
-            newScale = virtualMaxScale;
+        if (newScale < actualScale * 0.5) {
+            newScale = actualScale * 0.5;
+        } else if (newScale > actualScale * virtualMaxScale) {
+            newScale = actualScale * virtualMaxScale;
         }
 
         backgroundImagePosition.x = mouseX - (mouseX - backgroundImagePosition.x) * (newScale / virtualScale);

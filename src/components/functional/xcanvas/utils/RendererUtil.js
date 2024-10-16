@@ -1,4 +1,4 @@
-import RectHandler from "./ToolbarUtils/RectHandler";
+import FontLoader from "./FontLoader";
 
 /*
 * 渲染器工具类
@@ -10,6 +10,7 @@ class RendererUtil {
         this.selectColor = '#00a1ff';
         this.normalColor = 'rgba(0,0,0,0.65)';
         this.warningColor = 'rgba(255, 165,0,0.5)';
+        this.fontLoader = new FontLoader();
     }
     // 渲染
     render() {
@@ -23,7 +24,7 @@ class RendererUtil {
         this.drawShapeSizeText();
     }
     drawImage() {
-        const { operateCanvasRef, backgroundImageObject, backgroundImagePosition, virtualScale, showImageSize } = this.communicator.data;
+        const { operateCanvasRef, backgroundImageObject, backgroundImagePosition, backgroundImageSize, virtualScale, showImageSize } = this.communicator.data;
         const imageCanvas = operateCanvasRef;
         if (imageCanvas == null) { return; }
         const ctx = imageCanvas.getContext('2d');
@@ -31,7 +32,7 @@ class RendererUtil {
         ctx.save();
         ctx.translate(backgroundImagePosition.x, backgroundImagePosition.y);
         ctx.scale(virtualScale, virtualScale);
-        ctx.drawImage(backgroundImageObject, 0, 0, showImageSize.width, showImageSize.height);
+        ctx.drawImage(backgroundImageObject, 0, 0, backgroundImageSize.width, backgroundImageSize.height);
         ctx.restore();
     }
     drawGrid() {
@@ -71,12 +72,12 @@ class RendererUtil {
         ctx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
     }
     drawRects() {
-        const { operateCanvasRef, shapeList, virtualScale, backgroundImagePosition, hotkey, gameList } = this.communicator.data;
+        const { operateCanvasRef, shapeList, virtualScale, actualScale, backgroundImagePosition, hotkey, gameList } = this.communicator.data;
         if (operateCanvasRef == null) { return; }
         if (shapeList == null) { return; }
         const ctx = operateCanvasRef.getContext('2d');
 
-        const handleSize = 10; // 把手的大小
+        const handleSize = 10 / actualScale; // 把手的大小
         const borderColor = this.selectColor; // 边框和把手的边框颜色
         const fillColor = 'rgba(0, 161, 255, 0.5)'; // 50% 透明度的填充颜色
         const handleFillColor = '#ffffff'; // 把手内部填充颜色
@@ -379,7 +380,7 @@ class RendererUtil {
         ctx.restore();
     }
     drawAwardText() {
-        const { operateCanvasRef, shapeList, virtualScale,actualScale, backgroundImagePosition } = this.communicator.data;
+        const { operateCanvasRef, shapeList, virtualScale, backgroundImagePosition } = this.communicator.data;
         if (operateCanvasRef == null) { return; }
         if (shapeList == null) { return; }
         const ctx = operateCanvasRef.getContext('2d');
@@ -390,42 +391,55 @@ class RendererUtil {
         shapeList.forEach(shape => {
             const padding = 5;
             const cellPadding = 1; // Padding between cells
-            let fontSize = 20; // Initial font size
+            let fontSize = 200; // 初始化字体大小
             const texts = shape.awardList;
             if (texts == null) { return; }
-            // Determine the number of rows and columns
+
+            if (shape.fontFamily) {
+                this.fontLoader.loadFont(shape.fontName, shape.fontFamily);
+            }
+            if (shape.fontSize) {
+                if (shape.fontSize > shape.maxFontSize) {
+                    shape.fontSize = shape.maxFontSize;
+                }
+                fontSize = shape.fontSize;
+            }
+            // 确定行数和列数
             const cols = Math.ceil(Math.sqrt(texts.length));
             const rows = Math.ceil(texts.length / cols);
 
-            // Calculate the maximum font size that fits all texts within the shape
+            // 计算适合形状内所有文本的最大字体大小
             const cellWidth = (shape.width - 2 * padding - (cols - 1) * cellPadding) / cols;
             const cellHeight = (shape.height - 2 * padding - (rows - 1) * cellPadding) / rows;
 
-            // Adjust font size to fit within cell dimensions
-            ctx.font = `${fontSize}px Arial`;
-            while (true) {
-                let fits = true;
-                for (const text of texts) {
-                    const lines = text.split('\n');
-                    const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
-                    const totalHeight = lines.length * fontSize;
-                    if (maxWidth > cellWidth || totalHeight > cellHeight) {
-                        fits = false;
+            // 调整字体大小以适应单元格尺寸
+            if (!shape.fontSize) {
+                ctx.font = `${fontSize}px ${shape.fontName ? shape.fontName : 'Arial'}`;
+                while (true) {
+                    let fits = true;
+                    for (const text of texts) {
+                        const lines = text.split('\n');
+                        const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+                        const totalHeight = lines.length * fontSize;
+                        if (maxWidth > cellWidth || totalHeight > cellHeight) {
+                            fits = false;
+                            break;
+                        }
+                    }
+                    if (fits) {
+                        shape.maxFontSize = fontSize;
                         break;
                     }
+                    fontSize -= 1;
+                    ctx.font = `${fontSize}px ${shape.fontName ? shape.fontName : 'Arial'}`;
                 }
-                if (fits) {
-                    break;
-                }
-                fontSize -= 1;
-                ctx.font = `${fontSize}px Arial`;
             }
 
-            // Set the final font size
-            ctx.font = `${fontSize}px Arial`;
+            // 设置字体样式
+            ctx.font = `${fontSize}px ${shape.fontName ? shape.fontName : 'Arial'}`;
             ctx.textBaseline = 'top';
 
-            // Calculate the positions to render the texts
+            // 计算位置
             const positions = [];
             for (let i = 0; i < texts.length; i++) {
                 const col = i % cols;
@@ -435,7 +449,7 @@ class RendererUtil {
                 positions.push({ x, y });
             }
             shape.mark = [];
-            // Render the texts
+            // 渲染文字
             for (let i = 0; i < texts.length; i++) {
                 const { x, y } = positions[i];
                 const lines = texts[i].split('\n');
@@ -446,7 +460,16 @@ class RendererUtil {
                 for (let j = 0; j < lines.length; j++) {
                     const lineWidth = ctx.measureText(lines[j]).width;
                     ctx.fillText(lines[j], x + (cellWidth - lineWidth) / 2, y + offsetY + j * fontSize);
-                    shape.mark.push({ x: x + (cellWidth - lineWidth) / 2, y: y + offsetY + j * fontSize, width: lineWidth, height: fontSize, text: lines[j], fontSize: fontSize });
+                    shape.mark.push({
+                        x: x + (cellWidth - lineWidth) / 2,
+                        y: y + offsetY + j * fontSize,
+                        width: lineWidth,
+                        height: fontSize,
+                        text: lines[j],
+                        fontSize: fontSize,
+                        fontName: shape.fontName ? shape.fontName : 'Arial',
+                        fontFamily: shape.fontFamily ? shape.fontFamily : ''
+                    });
                 }
             }
         })

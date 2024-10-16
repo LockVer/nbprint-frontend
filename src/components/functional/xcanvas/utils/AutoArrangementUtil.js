@@ -5,7 +5,7 @@ class AutoArrangementUtil {
 
     // 水平排列
     arrangeShapes() {
-        const { shapeList, showImageSize, actualScale, mmToPx, minGridSize } = this.communicator.data;
+        const { shapeList, showImageSize, mmToPx, minGridSize } = this.communicator.data;
         const selectedShapes = shapeList.filter(shape => shape.selected);
 
         if (selectedShapes.length === 0) {
@@ -62,7 +62,7 @@ class AutoArrangementUtil {
 
     // 垂直排列
     arrangeShapesVertically() {
-        const { shapeList, showImageSize, actualScale, mmToPx, minGridSize } = this.communicator.data;
+        const { shapeList, showImageSize, mmToPx, minGridSize } = this.communicator.data;
         const selectedShapes = shapeList.filter(shape => shape.selected);
 
         if (selectedShapes.length === 0) {

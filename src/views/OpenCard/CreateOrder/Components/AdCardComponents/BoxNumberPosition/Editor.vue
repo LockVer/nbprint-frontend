@@ -51,13 +51,13 @@ onMounted(() => {
 });
 
 const addDone = () => {
-    const { shapeList, actualScale } = communicator.data;
+    const { shapeList } = communicator.data;
     props.currentAdCard.boxNumberRegions = shapeList.map((shape) => {
         return {
-            x: shape.x / actualScale,
-            y: shape.y / actualScale,
-            width: shape.width / actualScale,
-            height: shape.height / actualScale,
+            x: shape.x,
+            y: shape.y,
+            width: shape.width,
+            height: shape.height,
             id: shape.id,
             text: shape.text
         }

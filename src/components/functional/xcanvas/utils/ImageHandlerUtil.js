@@ -25,7 +25,6 @@ class ImageHandlerUtil {
                 operateCanvasRef.width = operateCanvasRef.clientWidth;
                 operateCanvasRef.height = operateCanvasRef.clientHeight;
 
-
                 resolve(img);
             };
             img.onerror = (err) => {
@@ -57,9 +56,13 @@ class ImageHandlerUtil {
 
         backgroundImagePosition.x = (canvasWidth - imgWidth) / 2;
         backgroundImagePosition.y = (canvasHeight - imgHeight) / 2;
+        // this.communicator.data.showImageSize = {
+        //     width: imgWidth,
+        //     height: imgHeight
+        // }
         this.communicator.data.showImageSize = {
-            width: imgWidth,
-            height: imgHeight
+            width: imageWidth,
+            height: imageHeight
         }
         const unitConvertUtil = new UnitConvertUtil(this.communicator);
         this.communicator.data.mmToPx = unitConvertUtil.mmToPx;    //毫米转像素

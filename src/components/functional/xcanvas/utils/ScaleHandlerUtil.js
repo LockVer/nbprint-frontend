@@ -14,7 +14,7 @@ class ScaleHandlerUtil {
         const canvasHeight = operateCanvasRef.height;
         const imageWidth = backgroundImageSize.width;
         const imageHeight = backgroundImageSize.height;
-
+        this.communicator.data.virtualScale = Math.min(canvasWidth / imageWidth, canvasHeight / imageHeight);
         this.communicator.data.actualScale = Math.min(canvasWidth / imageWidth, canvasHeight / imageHeight);
     }
 }
