@@ -1,35 +1,6 @@
 <template>
     <x-card title="工厂审核">
-        <div class="general-content">
-            <x-component label="产品名称">
-                <el-input v-model="searchForm.productName" placeholder="请输入产品名称" />
-            </x-component>
-            <x-component label="客户">
-                <el-input v-model="searchForm.customerName" placeholder="请输入客户名称" />
-            </x-component>
-            <x-component label="尺寸">
-                <el-select v-model="searchForm.smallCardSize" placeholder="请选择尺寸" clearable>
-                    <el-option v-for="(item, index) in options.cardSizes" :key="index" :label="item" :value="item" />
-                </el-select>
-            </x-component>
-            <x-component label="数量">
-                <div class="number-range-container">
-                    <div class="number-range">
-                        <el-input-number placeholder="最小值" v-model="searchForm.minTotal" :controls="false" />
-                        <div class="to">
-                            <span>-</span>
-                        </div>
-                        <el-input-number placeholder="最大值" v-model="searchForm.maxTotal" :controls="false" />
-                    </div>
-                    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-                </div>
-            </x-component>
-            <x-component label="创建时间">
-                <el-date-picker v-model="createTime" type="daterange" style="width: 100%;" start-placeholder="开始日期"
-                    end-placeholder="结束日期" :append-to-body="true" :default-value="[new Date(), new Date()]"
-                    @change="changeHandler" />
-            </x-component>
-        </div>
+        <factory-audit-search @update:searchData="searchDataUpdatehandle" />
         <el-table :data="tableData" style="width: 100%">
             <el-table-column prop="productName" label="产品名称" :show-overflow-tooltip="true">
                 <template #default="scope">
@@ -37,14 +8,23 @@
                 </template>
             </el-table-column>
             <el-table-column prop="customerName" label="客户名字" />
-            <el-table-column prop="status" label="状态">
+            <!-- <el-table-column prop="progress" label="进度">
                 <template #default="scope">
-                    <el-tag :type="['warning', 'warning', 'success', 'danger'][scope.row.checkStatus]">{{ ["待审核",
-                        "待审核", "已通过", "未通过"][scope.row.checkStatus] }}</el-tag>
+                    <div>{{ ["-----", "订单创建", "工厂审核", "业务自审",
+                        "客户确认", "算法规则", "数据生成", "工厂生产", "物流运输", "尾款支付", "订单确认"][scope.row.progress ? scope.row.progress : "0"] }}</div>
+                    <div>工厂审核</div>
+                </template>
+            </el-table-column> -->
+            <el-table-column prop="checkStatus" label="状态">
+                <template #default="scope">
+                    <el-tag :style="{
+                        'color': getTagTextColor(scope.row.checkStatus),
+                        'border-color': scope.row.checkStatus == '1' ? getTagTextColor(scope.row.checkStatus) : getTagColor(scope.row.checkStatus)
+                    }" :color="getTagColor(scope.row.checkStatus)" :type="getTagType(scope.row.checkStatus)">
+                        {{ getStatusLabel(scope.row.checkStatus) }}
+                    </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="total" label="数量" />
-            <el-table-column prop="smallCardSize" label="尺寸" />
             <el-table-column prop="userName" label="业务员" />
             <el-table-column prop="createTime" label="创建时间">
                 <template #default="scope">
@@ -54,17 +34,17 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column fixed="right" label="印前文件" width="80">
+            <el-table-column fixed="right" label="印前文件" width="100">
                 <template #default="scope">
                     <el-link type="primary" :href="scope.row.pdfOss" @click.stop>下载</el-link>
                 </template>
             </el-table-column>
             <el-table-column fixed="right" label="操作" width="100">
                 <template #default="scope">
-                    <button class="btn" :disabled="scope.row.checkStatus == 2 || scope.row.checkStatus == 3"
-                        :class="{ 'btn-disabled': scope.row.checkStatus == 2 || scope.row.checkStatus == 3 }"
-                        @click="checkOrder(scope.row)">{{ ["审核",
-                            "审核", "已审核", "已审核"][scope.row.checkStatus] }}</button>
+                    <button class="btn" :disabled="canAudit(scope.row.checkStatus)"
+                        :class="{ 'btn-disabled': canAudit(scope.row.checkStatus) }" @click="checkOrder(scope.row)">{{
+                            ["审核",
+                                "审核", "已审核", "未通过"][scope.row.checkStatus] }}</button>
                 </template>
             </el-table-column>
         </el-table>
@@ -82,7 +62,7 @@ import { useRouter } from 'vue-router';
 import XCard from '@/components/container/XCard.vue';
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
-import XComponent from '@/components/container/XComponent.vue';
+import FactoryAuditSearch from './components/FactoryAuditSearch.vue';
 import searchService from '@/services/SearchService';
 import factoryService from '@/services/FactoryService';
 
@@ -90,74 +70,16 @@ import factoryService from '@/services/FactoryService';
 const router = useRouter();
 const tableData = ref([]);
 const totalPage = ref(0);
-const errorMessage = ref('');
 const options = ref('');
 const searchServiceClass = new searchService();
 const factoryServiceClass = new factoryService();
-const searchForm = reactive({
-    chineseName: '',
-    customerName: '',
-    smallCardSize: '',
-    minTotal: null,
-    maxTotal: null,
-});
-
-const createTime = ref(null);
-const startTime = ref('');
-const endTime = ref('');
 // 分页参数
 const currentPage = ref(1);
 const pageSize = ref(12);
 // 权限
 const isWatch = ref(true);
-// 监听 searchForm 的变化
-watch(searchForm, (newVal) => {
-    if (searchForm.minTotal !== null && searchForm.maxTotal !== null && searchForm.maxTotal < searchForm.minTotal) {
-        errorMessage.value = '最大值不能小于最小值';
-        return
-    }
-    // 清空错误信息
-    errorMessage.value = '';
-    // 去除空值或 null 的键
-    for (const key in newVal) {
-        if (newVal[key] === '' || newVal[key] === null) {
-            delete newVal[key];
-        }
-    }
-    // 调用搜索处理函数
-    searchHandler({
-        ...newVal,
-        startTime: startTime.value,
-        endTime: endTime.value
-    });
-});
-// 日期变化处理函数
-const changeHandler = (value) => {
-    if (value) {
-        const formattedDates = value.map(date => {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        });
-        startTime.value = formattedDates[0];
-        endTime.value = formattedDates[1];
-    } else {
-        startTime.value = '';
-        endTime.value = '';
-    }
-    searchHandler({
-        ...searchForm,
-        startTime: startTime.value,
-        endTime: endTime.value
-    })
-}
-
-const searchHandler = (value) => {
+// 监听搜索表单数据的变化
+const searchDataUpdatehandle = (value) => {
     for (const key in value) {
         if (value[key] === '' || value[key] === null) {
             delete value[key];
@@ -211,6 +133,37 @@ onMounted(() => {
     })
     loadData();
 });
+
+
+
+// 获取标签类型
+const getTagType = (status) => {
+    if (["3"].includes(status)) return 'danger';
+    if (["0"].includes(status)) return 'info';
+    return '';
+};
+// 获取标签颜色
+const getTagColor = (status) => {
+    if (["1"].includes(status)) return '#FFF7F0';
+    if (["2"].includes(status)) return '#E6FAF0';
+    return '';
+};
+// 获取标签文本颜色
+const getTagTextColor = (status) => {
+    if (["1"].includes(status)) return '#FF6D40';
+    if (["2"].includes(status)) return '#04CB6A';
+    return '';
+}
+
+// 状态标签文本
+const getStatusLabel = (status) => {
+    const labels = ["未获取", "待审核", "已审核", "未通过"];
+    return labels[status] || '';
+};
+// 是否可以审核
+const canAudit = (status) => {
+    return ["0", "2", "3"].includes(status);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -241,7 +194,7 @@ onMounted(() => {
 
 a {
     color: #4D64B8;
-    font-family:"Source Han Sans CN";
+    font-family: "Source Han Sans CN";
     font-size: 12px;
 }
 

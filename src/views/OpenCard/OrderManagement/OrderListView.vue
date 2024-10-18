@@ -2,12 +2,16 @@
     <x-card title="订单管理" @createOrder="createOrderHandler" @updateOrderStatus="updateOrderStatusHandler"
         v-model:modelValue="isSpinning" :isListTitle="true">
         <!-- 筛选条件 -->
-        <order-search />
+        <order-search @update:searchData="searchDataUpdatehandle" />
         <!-- 列表数据 -->
         <el-table :data="tableData" style="width: 100%" @row-dblclick="rowClick">
             <el-table-column prop="progress" width="10" label="" :show-overflow-tooltip="true">
                 <template #default="scope">
-                    <div class="dot"><span></span></div>
+                    <div class="dot">
+                        <span
+                            v-if="scope.row.progress == 4 || scope.row.progress == 5 || scope.row.progress == 7 || scope.row.progress == 13"></span>
+                        <i v-else></i>
+                    </div>
                 </template>
             </el-table-column>
             <el-table-column prop="productName" label="产品名称" :show-overflow-tooltip="true">
@@ -18,34 +22,17 @@
             <el-table-column prop="customerName" label="客户名字" />
             <el-table-column prop="progress" label="进度">
                 <template #default="scope">
-                    <div>{{ ["渲染中1", "待审核2", "已通过", "未通过", "渲染失败",][scope.row.status] }}</div>
+                    <div>{{ ["-----", "订单创建", "工厂审核", "业务自审",
+                        "客户确认", "算法规则", "数据生成", "工厂生产", "物流运输", "尾款支付", "订单确认"][scope.row.progress] }}</div>
                 </template>
             </el-table-column>
             <el-table-column prop="progressStatus" label="状态">
                 <template #default="scope">
-                    <el-tag
-                        :type="['info', 'primary', 'warning', 'danger', 'warning', 'warning', 'danger', 'warning', 'primary', 'primary', 'primary', 'primary', 'danger', 'warning', 'success'][scope.row.status]">
-                        {{
-                            [
-                                "已取消",
-                                "渲染中",
-                                "审核中",
-                                "未通过",
-                                "待审核",
-                                "待确认",
-                                "已取消",
-                                "待编辑",
-                                "生成中",
-                                "印刷中",
-                                "待发货",
-                                "运输中",
-                                "异常",
-                                "待支付",
-                        "已完成",
-                        ][scope.row.status]
-                        
-                        }}
-                        <!-- scope.row.status -->
+                    <el-tag :style="{
+                        'color': getTagTextColor(scope.row.progressStatus),
+                        'border-color': scope.row.progressStatus == '5' ? getTagTextColor(scope.row.progressStatus) : getTagColor(scope.row.progressStatus)
+                    }" :type="getTagType(scope.row.progressStatus)" :color="getTagColor(scope.row.progressStatus)">
+                        {{ getStatusLabel(scope.row.progressStatus) }}
                     </el-tag>
                 </template>
             </el-table-column>
@@ -63,8 +50,8 @@
             <el-table-column fixed="right" label="印前文件">
                 <template #default="scope">
                     <el-link type="primary" :href="scope.row.pdfOss" @click.stop style="padding: 2px;"
-                        :class="{ 'btn-disable': scope.row.status == 0 || scope.row.status == 4 }"
-                        :disabled="scope.row.status == 0 || scope.row.status == 4">
+                        :class="{ 'btn-disable': !canDownload(scope.row.progressStatus) }"
+                        :disabled="!canDownload(scope.row.progressStatus)">
                         下载
                     </el-link>
                 </template>
@@ -72,10 +59,13 @@
             <el-table-column fixed="right" label="操作">
                 <template #default="scope">
                     <el-button link type="primary" size="small" @click.stop="editOrder(scope.row)"
-                        :class="{ 'btn-disable': scope.row.status == 0 }" :disabled="scope.row.status == 0">
+                        :class="{ 'btn-disable': !canEditOrDelete(scope.row.progressStatus) }"
+                        :disabled="!canEditOrDelete(scope.row.progressStatus)">
                         编辑
                     </el-button>
-                    <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)">
+                    <el-button link type="danger" size="small" @click.stop="deleteOrder(scope.row)"
+                        :class="{ 'btn-disable': !canEditOrDelete(scope.row.progressStatus) }"
+                        :disabled="!canEditOrDelete(scope.row.progressStatus)">
                         删除
                     </el-button>
                 </template>
@@ -99,7 +89,6 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import moment from 'moment';
 import OpenCardService from '@/services/OpenCardService';
 import searchService from '@/services/SearchService';
-import XComponent from '@/components/container/XComponent.vue';
 import OrderSearch from './components/orderSearch.vue';
 import { useStore } from 'vuex';
 
@@ -114,59 +103,11 @@ const openCardServiceClass = new OpenCardService();
 const searchServiceClass = new searchService();
 const isSpinning = ref(false); // 控制刷新图标旋转
 const isUpdateClickable = ref(true); // 控制刷新按钮是否可点击
-// 搜索表单数据
-const searchForm = reactive({
-    chineseName: '',
-    customerName: '',
-    smallCardSize: '',
-    progressValue: '',
-});
-const createTime = ref(null); // 创建时间范围
-const startTime = ref(''); // 搜索开始时间
-const endTime = ref(''); // 搜索结束时间
 const currentPage = ref(1);
 const pageSize = ref(12);
 const queryParams = ref({}) // 查询参数
 // 监听搜索表单数据的变化
-watch(searchForm, (newVal) => {
-    errorMessage.value = '';
-    for (const key in newVal) {
-        if (newVal[key] === '' || newVal[key] === null) {
-            delete newVal[key];
-        }
-    }
-    searchHandler({
-        ...newVal,
-        startTime: startTime.value,
-        endTime: endTime.value
-    });
-});
-// 日期范围变化处理
-const changeHandler = (value) => {
-    if (value) {
-        const formattedDates = value.map(date => {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        });
-        startTime.value = formattedDates[0];
-        endTime.value = formattedDates[1];
-    } else {
-        startTime.value = '';
-        endTime.value = '';
-    }
-    searchHandler({
-        ...searchForm,
-        startTime: startTime.value,
-        endTime: endTime.value
-    })
-}
-const searchHandler = (value) => {
+const searchDataUpdatehandle = (value) => {
     for (const key in value) {
         if (value[key] === '' || value[key] === null) {
             delete value[key];
@@ -288,6 +229,46 @@ const deleteOrder = (row) => {
             console.log('取消删除');
         })
 
+};
+
+// 获取标签类型
+const getTagType = (status) => {
+    if (["0","6"].includes(status)) return 'info';
+    if (["3","12"].includes(status)) return 'danger';
+    return '';
+};
+
+// 获取标签颜色
+const getTagColor = (status) => {
+    if (["1", "2", "8", "9", "10", "11"].includes(status)) return '#FFF9EC';
+    if (["4", "5", "7", "13"].includes(status)) return '#FFF7F0';
+    if (status == "14") return '#E6FAF0';
+    return '';
+};
+// 获取标签文本颜色
+const getTagTextColor = (status) => {
+    if (["1", "2", "8", "9", "10", "11"].includes(status)) return '#FFC740';
+    if (["4", "5", "7", "13"].includes(status)) return '#FF6D40';
+    if (status == "14") return '#04CB6A';
+    return '';
+}
+
+// 状态标签文本
+const getStatusLabel = (status) => {
+    const labels = [
+        "已取消", "渲染中", "审核中", "未通过", "待审核", "待确认",
+        "已取消", "待编辑", "生成中", "印刷中", "待发货", "运输中",
+        "异常", "待支付", "已完成"
+    ];
+    return labels[status] || '';
+};
+// 是否可以下载
+const canDownload = (status) => {
+    return ["2", "3", "8", "9", "10", "11", "12", "13", "14"].includes(status);
+};
+// 是否可以编辑或删除
+const canEditOrDelete = (status) => {
+    return ["2","3","4","5","8","9","10","11","12","13","14"].includes(status);
 };
 
 </script>
@@ -441,5 +422,10 @@ a {
         height: 6px;
         border-radius: 50%;
     }
+}
+
+.dot:hover span {
+    background-color: #FF3130;
+    /* 确保悬停时颜色不变 */
 }
 </style>

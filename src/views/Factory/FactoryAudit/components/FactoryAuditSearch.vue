@@ -6,12 +6,15 @@
         <x-component label="客户">
             <el-input v-model="searchForm.customerName" placeholder="请输入客户名称" />
         </x-component>
-        <x-component label="进度">
+        <x-component label="业务员">
+            <el-input v-model="searchForm.businessPeople" placeholder="请输入业务员名称" />
+        </x-component>
+        <!-- <x-component label="进度">
             <el-select v-model="searchForm.progress" clearable filterable placeholder="请选择进度" >
                 <el-option v-for="item in progressValueOptions" :key="item.value" :label="item.label"
                     :value="item.value" />
             </el-select>
-        </x-component>
+        </x-component> -->
         <x-component label="状态">
             <el-select v-model="searchForm.progressStatus" clearable filterable placeholder="请选择状态" >
                 <el-option v-for="item in progressStatusValueOptions" :key="item.value" :label="item.label"
@@ -31,112 +34,69 @@ import XComponent from '@/components/container/XComponent.vue';
 
 const emit = defineEmits(['update:searchData']);
 // 搜索进度数据
-const progressValueOptions = [
-    {
-        "label": "订单创建",
-        "value": "1"
-    },
-    {
-        "label": "工厂审核",
-        "value": "2"
-    },
-    {
-        "label": "业务自审",
-        "value": "3"
-    },
-    {
-        "label": "客户确认",
-        "value": "4"
-    },
-    {
-        "label": "算法规则",
-        "value": "5"
-    },
-    {
-        "label": "数据生成",
-        "value": "6"
-    },
-    {
-        "label": "工厂生产",
-        "value": "7"
-    },
-    {
-        "label": "物流运输",
-        "value": "8"
-    },
-    {
-        "label": "尾款支付",
-        "value": "9"
-    },
-    {
-        "label": "订单确认",
-        "value": "10"
-    }
-]
+// const progressValueOptions = [
+//     {
+//         "label": "订单创建",
+//         "value": "1"
+//     },
+//     {
+//         "label": "工厂审核",
+//         "value": "2"
+//     },
+//     {
+//         "label": "业务自审",
+//         "value": "3"
+//     },
+//     {
+//         "label": "客户确认",
+//         "value": "4"
+//     },
+//     {
+//         "label": "算法规则",
+//         "value": "5"
+//     },
+//     {
+//         "label": "数据生成",
+//         "value": "6"
+//     },
+//     {
+//         "label": "工厂生产",
+//         "value": "7"
+//     },
+//     {
+//         "label": "物流运输",
+//         "value": "8"
+//     },
+//     {
+//         "label": "尾款支付",
+//         "value": "9"
+//     },
+//     {
+//         "label": "订单确认",
+//         "value": "10"
+//     }
+// ]
 // 搜索订单状态数据
 const progressStatusValueOptions = [
     {
-        "label": "渲染中",
+        "label": "待审核",
         "value": "1"
     },
     {
-        "label": "审核中",
+        "label": "已审核",
         "value": "2"
     },
     {
         "label": "未通过",
         "value": "3"
-    },
-    {
-        "label": "待审核",
-        "value": "4"
-    },
-    {
-        "label": "待确认",
-        "value": "5"
-    },
-    {
-        "label": "已取消",
-        "value": "6"
-    },
-    {
-        "label": "待编辑",
-        "value": "7"
-    },
-    {
-        "label": "生成中",
-        "value": "8"
-    },
-    {
-        "label": "印刷中",
-        "value": "9"
-    },
-    {
-        "label": "待发货",
-        "value": "10"
-    },
-    {
-        "label": "运输中",
-        "value": "11"
-    },
-    {
-        "label": "异常",
-        "value": "12"
-    },
-    {
-        "label": "待支付",
-        "value": "13"
-    },
-    {
-        "label": "已完成",
-        "value": "14"
     }
 ]
 // 搜索表单数据
 const searchForm = reactive({
     productName: '',
     customerName: '',
-    progress: '',
+    businessPeople: '',
+    // progress: '',
     progressStatus: '',
 });
 const createTime = ref(null); // 创建时间范围

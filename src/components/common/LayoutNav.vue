@@ -56,12 +56,14 @@ const menuActive = ref('');
 
 // 初始化menuActive
 const updateMenuActive = (path) => {
-    let activePath = path.split('/')[1];
-    menuActive.value = `/${activePath}`;
-    if (menuActive.value == '/') {
-        menuActive.value = '/opencard'
+    const matchedItem = navList.actions.find(item => path.startsWith(item.url));
+    if (matchedItem) {
+        menuActive.value = matchedItem.url;
+    } else {
+        menuActive.value = '/opencard'; // Default if no match
     }
 };
+
 
 watch(route, (newRoute) => {
     updateMenuActive(newRoute.path);

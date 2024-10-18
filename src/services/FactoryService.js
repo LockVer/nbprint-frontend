@@ -9,7 +9,7 @@ class FactoryService {
     }
 
     getFactoryList(data) {
-        return this.apiService.post('/check/getList', data, true);
+        return this.apiService.post('/check/getList', { ...data, ...this.nbUserId }, true);
     }
     // 审核锁单
     auditLock(data) {

@@ -9,6 +9,7 @@
 import { onMounted, ref, watch } from 'vue';
 import XCard from '@/components/container/XCard.vue';
 import dataSearch from '../components/dataSearch.vue';
+import AlgorithmService from '@/services/AlgorithmService';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 const searchFormData = ref({}); // 搜索表单数据
@@ -16,6 +17,8 @@ const currentPage = ref(1); // 当前页码
 const pageSize = ref(12); // 每页大小
 const isSpinning = ref(false); // 控制刷新图标旋转
 const isUpdateClickable = ref(true); // 控制刷新按钮是否可点击
+const dataGenerationList = ref([]); // 数据生成列表
+const algorithmService =  new AlgorithmService()
 
 onMounted(() => {
     // 初始化请求
@@ -67,7 +70,14 @@ const loadData =  async () => {
     if (searchFormData.value) {
         params = Object.assign(params, searchFormData.value);
     }
-    console.log('初始化列表请求---',params)
+
+    algorithmService.getAlgorithmList(params).then((res) => {
+        dataGenerationList.value = res.data;
+        console.log(res)
+    }).catch((err) => {
+        console.log(err);
+        ElMessage.error(err);
+    });
 }
 </script>
 
