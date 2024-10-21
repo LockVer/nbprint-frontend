@@ -13,6 +13,9 @@ class ShapeBase {
         this.borderColor = shape.borderColor || '';
         this.communicator = communicator;
         this.distanceThreshold = communicator.data.minGridSize;
+        this.fontSize = shape.fontSize || null;
+        this.fontFamily = shape.fontFamily || null;
+        this.fontName = shape.fontName || null;
     }
 
     contains(e) {

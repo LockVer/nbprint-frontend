@@ -117,6 +117,7 @@ const initShapeList = () => {
     console.log('communicator.data.regions:', communicator.data.regions);
 
     communicator.data.shapeList = communicator.data.regions.map((region) => {
+        console.log('region:', region);
         const rect = {
             x: region.x,
             y: region.y,
@@ -126,6 +127,9 @@ const initShapeList = () => {
             id: region.id || '',
             text: region.text || '',
             borderColor: region.borderColor || 'black',
+            fontSize:region.fontSize,
+            fontFamily:region.fontFamily,
+            fontName:region.fontName,
             type: 'rect'
         }
         if (region.mark) {

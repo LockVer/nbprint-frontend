@@ -101,7 +101,7 @@
                     <el-table-column prop="fileName" label="文件名称" />
                     <el-table-column fixed="right" label="操作" width="100">
                         <template #default="scope">
-                            <el-button link type="danger" size="small" @click.stop="deleteFont(scope.row)">
+                            <el-button link type="danger" v-if="!scope.row.isDefault" size="small" @click.stop="deleteFont(scope.row)">
                                 删除
                             </el-button>
                         </template>
@@ -127,6 +127,7 @@ import XComponent from '@/components/container/XComponent.vue';
 import Communicator from '@/utils/Communicator';
 import XInputUpload from '@/components/functional/XInputUpload.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { all } from 'axios';
 const commonClass = inject('commonClass');
 const emits = defineEmits(['addDone', 'closePanel']);
 
@@ -151,9 +152,16 @@ const addFontName = ref('');
 const addFontFile = ref(null);
 const allFontList = ref([]);
 const getFontList = () => {
+    allFontList.value = [];
+    allFontList.value.push({
+        fontName: 'Arial',
+        fileName: '',
+        ossPath: '0',
+        isDefault: true
+    });
     commonClass.getFontList().then((res) => {
         console.log('getFontList:', res);
-        allFontList.value = res.data;
+        allFontList.value.push(...res.data);
     }).catch((err) => {
         ElMessage.error(err);
         console.log(err);
@@ -343,7 +351,10 @@ const addDone = () => {
             }),
             id: shape.id,
             borderColor: shape.borderColor,
-            text: shape.text
+            text: shape.text,
+            fontSize: shape.fontSize,
+            fontFamily: shape.fontFamily,
+            fontName: shape.fontName    
         }
     });
     props.currentAdCard.adCardStatus = toRaw({

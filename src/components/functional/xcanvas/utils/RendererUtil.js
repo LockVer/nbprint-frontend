@@ -1,4 +1,5 @@
 import FontLoader from "./FontLoader";
+import { ElMessageBox } from "element-plus";
 
 /*
 * 渲染器工具类
@@ -46,11 +47,10 @@ class RendererUtil {
         const rows = gridData.rows;
         ctx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
 
-        // Colors for the checkerboard pattern
-        const color1 = 'rgba(255, 255, 255, 0.5)'; // White with 50% opacity
-        const color2 = 'rgba(192, 192, 192, 0.5)'; // Gray with 50% opacity
+        const color1 = 'rgba(255, 255, 255, 0.5)'; // 白色 50% 透明度
+        const color2 = 'rgba(192, 192, 192, 0.5)'; // 灰色 50% 透明度
 
-        // Draw the checkerboard pattern
+        // 绘制网格
         for (let i = 0; i < cols.length - 1; i++) {
             for (let j = 0; j < rows.length - 1; j++) {
                 const x = cols[i];
@@ -58,7 +58,7 @@ class RendererUtil {
                 const width = cols[i + 1] - x;
                 const height = rows[j + 1] - y;
 
-                // Alternate colors
+                // 交替填充颜色
                 ctx.fillStyle = (i + j) % 2 === 0 ? color1 : color2;
                 ctx.fillRect(x, y, width, height);
             }
@@ -379,8 +379,8 @@ class RendererUtil {
 
         ctx.restore();
     }
-    drawAwardText() {
-        const { operateCanvasRef, shapeList, virtualScale, backgroundImagePosition } = this.communicator.data;
+    async drawAwardText() {
+        const { operateCanvasRef, shapeList, virtualScale, backgroundImagePosition, mmToPx } = this.communicator.data;
         if (operateCanvasRef == null) { return; }
         if (shapeList == null) { return; }
         const ctx = operateCanvasRef.getContext('2d');
@@ -388,16 +388,29 @@ class RendererUtil {
         ctx.translate(backgroundImagePosition.x, backgroundImagePosition.y);
         ctx.scale(virtualScale, virtualScale);
         ctx.fillStyle = 'white';
-        shapeList.forEach(shape => {
-            const padding = 5;
-            const cellPadding = 1; // Padding between cells
+        const loadPromises = shapeList.map((shape) => {
+            if (shape.fontFamily) {
+                return this.fontLoader.loadFont(shape.fontName, shape.fontFamily);
+            }
+            return true; // 如果没有 fontFamily，视为成功
+        });
+        // 使用 Promise.all 等待所有字体加载完成
+        const results = await Promise.all(loadPromises);
+        // 检查是否所有字体都加载成功
+        const allLoaded = results.every(result => result === true);
+        if (!allLoaded) {
+            ElMessageBox.alert('字体加载失败，请检查字体文件是否正确。', '错误', {
+                type: 'error'
+            });
+            return;
+        }
+
+        shapeList.forEach((shape) => {
+            const padding = mmToPx(3);
+            const cellPadding = mmToPx(1); // Padding between cells
             let fontSize = 200; // 初始化字体大小
             const texts = shape.awardList;
             if (texts == null) { return; }
-
-            if (shape.fontFamily) {
-                this.fontLoader.loadFont(shape.fontName, shape.fontFamily);
-            }
             if (shape.fontSize) {
                 if (shape.fontSize > shape.maxFontSize) {
                     shape.fontSize = shape.maxFontSize;
@@ -434,7 +447,6 @@ class RendererUtil {
                     ctx.font = `${fontSize}px ${shape.fontName ? shape.fontName : 'Arial'}`;
                 }
             }
-
             // 设置字体样式
             ctx.font = `${fontSize}px ${shape.fontName ? shape.fontName : 'Arial'}`;
             ctx.textBaseline = 'top';
