@@ -19,7 +19,7 @@
                     <el-dropdown-item @click="changePassword">修改密码</el-dropdown-item>
                     <el-dropdown-item>
                         <a class="infoLink"
-                            href="https://huivodata.feishu.cn/docx/EOyOdYW8zoGC2Tx1K76c60XbnYe?from=from_copylink"
+                            href="https://huivodata.feishu.cn/docx/Ql4pdweGCo3Rx5xrmiGcvuHAnLc?from=from_copylink"
                             target="_blank" rel="noopener noreferrer">帮助文档</a>
                     </el-dropdown-item>
                     <el-dropdown-item >
@@ -59,7 +59,7 @@
         </div>
         <div class="info">
             <div class="title">更新时间</div>
-            <div class="value">2024-10-10</div>
+            <div class="value">2024-10-11</div>
         </div>
         <div class="content">
             <div class="title">更新内容</div>

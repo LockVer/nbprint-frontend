@@ -36,12 +36,17 @@ const navList = reactive({
         {
             text: "工厂审核",
             id: '2',
-            url: "/factoryaudit"
+            url: "/factory/factoryaudit"
         },
         {
             text: "人力资源管理",
             id: '3',
             url: "/PersonnelManagement"
+        },
+        {
+            text: "数据管理",
+            id: '4',
+            url: "/dataGeneration/dataGenerationList"
         }
     ]
 });
@@ -51,12 +56,14 @@ const menuActive = ref('');
 
 // 初始化menuActive
 const updateMenuActive = (path) => {
-    let activePath = path.split('/')[1];
-    menuActive.value = `/${activePath}`;
-    if (menuActive.value == '/') {
-        menuActive.value = '/opencard'
+    const matchedItem = navList.actions.find(item => path.startsWith(item.url));
+    if (matchedItem) {
+        menuActive.value = matchedItem.url;
+    } else {
+        menuActive.value = '/opencard'; // Default if no match
     }
 };
+
 
 watch(route, (newRoute) => {
     updateMenuActive(newRoute.path);

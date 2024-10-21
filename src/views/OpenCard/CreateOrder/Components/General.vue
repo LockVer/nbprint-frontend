@@ -38,7 +38,7 @@
             </x-component>
             <x-component label="背景颜色" width="220px">
                 <div class="color-picker">
-                    <el-color-picker ref="colorPicker" v-model="initData.backgroundColor"
+                    <el-color-picker ref="colorPicker" show-alpha v-model="initData.backgroundColor"
                         :predefine="predefineColors" />
                     <div class="colorText">{{ initData.backgroundColor }}</div>
                     <div class="btn" @click="openColorPicker">选择</div>
@@ -55,13 +55,9 @@ import XComponent from '@/components/container/XComponent.vue';
 import { useStore } from 'vuex';
 
 const predefineColors = ref([
-    '#ff4500',
-    '#ff8c00',
-    '#ffd700',
-    '#90ee90',
-    '#00ced1',
-    '#1e90ff',
-    '#c71585',
+    'rgb(223, 242, 252,1)',
+    'rgb(218, 236, 219,1)',
+    'rgb(255, 220, 220,1)',
 ]);
 
 const companyList = ref([
@@ -135,8 +131,8 @@ watch(
         }
 
         .btn {
-            font-family:"Source Han Sans CN";
-            margin-left: 90px;
+            font-family: "Source Han Sans CN";
+            margin-left: 10px;
             color: #029;
         }
     }
@@ -161,7 +157,7 @@ watch(
 
     .no-icon {
         color: rgba(0, 0, 0, 0.8);
-        font-family:"Source Han Sans CN";
+        font-family: "Source Han Sans CN";
         font-size: 12px;
         line-height: 30px;
     }

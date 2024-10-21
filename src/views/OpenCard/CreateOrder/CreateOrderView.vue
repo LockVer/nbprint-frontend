@@ -53,7 +53,7 @@ const general = ref({
         employeeName: ''
     },
     currency: 'USD',
-    backgroundColor: '#409EFF',
+    backgroundColor: 'rgba(255, 220, 220, 1)',
     company: ""
 });
 const smallCard = ref({
